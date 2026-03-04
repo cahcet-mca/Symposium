@@ -59,7 +59,7 @@ const LOCAL_IP = getLocalIP();
 // Configure CORS for production
 const allowedOrigins = [
   'http://localhost:3000',
-  'https://tecnorendezvous-symposium.netlify.app',
+  'https://tecnorendezous.netlify.app',
   'https://symposium-veyj.onrender.com',
   ...(process.env.NODE_ENV === 'production' ? [] : [`http://${LOCAL_IP}:3000`])
 ];
