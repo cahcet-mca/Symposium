@@ -5,27 +5,31 @@ const dotenv = require('dotenv');
 const colors = require('colors');
 const connectDB = require('./config/db');
 
-// Load env vars - IMPORTANT: This must be first
+// Load env vars
 dotenv.config();
 
 // Validate critical environment variables
 if (!process.env.MONGODB_URI) {
   console.error('❌ MONGODB_URI is not defined in environment variables!'.red.bold);
-  console.error('Please set MONGODB_URI in your Render environment variables.'.yellow);
+  console.error('Please check your .env file or environment variables.'.yellow);
   process.exit(1);
 }
 
-if (!process.env.JWT_SECRET) {
-  console.error('❌ JWT_SECRET is not defined in environment variables!'.red.bold);
-  console.error('Please set JWT_SECRET in your Render environment variables.'.yellow);
-  process.exit(1);
-}
+console.log('🔍 MongoDB URI found:', process.env.MONGODB_URI.replace(/:[^:@]*@/, ':****@'));
 
-// Connect to database
-connectDB().catch(err => {
-  console.error('❌ Failed to connect to MongoDB:'.red.bold, err.message);
-  process.exit(1);
-});
+// Connect to database with better error handling
+const connectWithRetry = async () => {
+  try {
+    await connectDB();
+    console.log('✅ MongoDB Connected Successfully!'.green.bold);
+  } catch (err) {
+    console.error('❌ MongoDB connection failed:'.red.bold, err.message);
+    console.log('🔄 Retrying in 5 seconds...'.yellow);
+    setTimeout(connectWithRetry, 5000);
+  }
+};
+
+connectWithRetry();
 
 // Initialize app
 const app = express();
@@ -34,7 +38,7 @@ const app = express();
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
-// Get local IP address (for local development only)
+// Get local IP address
 const getLocalIP = () => {
   try {
     const { networkInterfaces } = require('os');
@@ -42,7 +46,6 @@ const getLocalIP = () => {
     
     for (const name of Object.keys(nets)) {
       for (const net of nets[name]) {
-        // Skip internal and non-IPv4 addresses
         if (net.family === 'IPv4' && !net.internal) {
           return net.address;
         }
@@ -56,12 +59,13 @@ const getLocalIP = () => {
 
 const LOCAL_IP = getLocalIP();
 
-// Configure CORS for production
+// Configure CORS
 const allowedOrigins = [
   'http://localhost:3000',
-  'https://tecnorendezous.netlify.app/',
-  'https://symposium-veyj.onrender.com',
-  ...(process.env.NODE_ENV === 'production' ? [] : [`http://${LOCAL_IP}:3000`])
+  'http://127.0.0.1:3000',
+  `http://${LOCAL_IP}:3000`,
+  'https://tecnorendezvous-symposium.netlify.app',
+  'https://symposium-veyj.onrender.com'
 ];
 
 app.use(cors({
@@ -83,6 +87,16 @@ app.use(cors({
 // Handle preflight requests
 app.options('*', cors());
 
+// Health check endpoint
+app.get('/health', (req, res) => {
+  res.json({
+    status: 'ok',
+    timestamp: new Date().toISOString(),
+    mongodb: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected',
+    environment: process.env.NODE_ENV
+  });
+});
+
 // Mount routes
 app.use('/api/auth', require('./routes/authRoutes'));
 app.use('/api/events', require('./routes/eventRoutes'));
@@ -90,15 +104,6 @@ app.use('/api/registrations', require('./routes/registrationRoutes'));
 app.use('/api/payments', require('./routes/paymentRoutes'));
 app.use('/api/event-registers', require('./routes/eventRegisterRoutes'));
 app.use('/api/admin', require('./routes/adminRoutes'));
-
-// Health check endpoint
-app.get('/health', (req, res) => {
-  res.json({
-    status: 'ok',
-    timestamp: new Date().toISOString(),
-    mongodb: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected'
-  });
-});
 
 // Error handler
 app.use((err, req, res, next) => {
@@ -116,11 +121,40 @@ const server = app.listen(PORT, '0.0.0.0', () => {
   console.log(`\n🚀 Server is running!`.green.bold);
   console.log(`📡 Port: ${PORT}`.cyan);
   console.log(`🌍 Environment: ${process.env.NODE_ENV || 'development'}`.cyan);
-  console.log(`💾 MongoDB: ${mongoose.connection.readyState === 1 ? 'Connected ✅' : 'Disconnected ❌'}`.cyan);
+  console.log(`📱 Local: http://localhost:${PORT}`.cyan);
+  if (LOCAL_IP !== 'localhost') {
+    console.log(`📱 Network: http://${LOCAL_IP}:${PORT}`.cyan);
+  }
+  
+  // Check MongoDB connection status after server starts
+  setTimeout(() => {
+    const state = mongoose.connection.readyState;
+    const states = ['disconnected', 'connected', 'connecting', 'disconnecting'];
+    console.log(`💾 MongoDB Status: ${states[state] || 'unknown'}`.cyan);
+  }, 1000);
 });
 
 // Handle unhandled promise rejections
 process.on('unhandledRejection', (err, promise) => {
-  console.log(`❌ Error: ${err.message}`.red);
-  server.close(() => process.exit(1));
+  console.log(`❌ Unhandled Rejection: ${err.message}`.red);
+  // Don't exit the process, just log the error
+});
+
+// Handle MongoDB connection errors after initial connection
+mongoose.connection.on('error', (err) => {
+  console.error('❌ MongoDB connection error:'.red, err.message);
+});
+
+mongoose.connection.on('disconnected', () => {
+  console.log('⚠️ MongoDB disconnected'.yellow);
+});
+
+mongoose.connection.on('reconnected', () => {
+  console.log('✅ MongoDB reconnected'.green);
+});
+
+process.on('SIGINT', async () => {
+  await mongoose.connection.close();
+  console.log('MongoDB connection closed through app termination'.cyan);
+  process.exit(0);
 });
