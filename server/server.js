@@ -64,7 +64,7 @@ const allowedOrigins = [
   'http://localhost:3000',
   'http://127.0.0.1:3000',
   `http://${LOCAL_IP}:3000`,
-  'https://tecnorendezvous-symposium.netlify.app',
+  'https://tecnorendezous.netlify.app',
   'https://symposium-veyj.onrender.com'
 ];
 
