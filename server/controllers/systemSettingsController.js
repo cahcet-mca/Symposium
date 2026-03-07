@@ -33,8 +33,17 @@ const toggleRegistrations = async (req, res) => {
     // Get admin ID from token (if available)
     const updatedBy = req.admin?.id || req.user?._id || null;
     
-    // Toggle registrations
-    const settings = await SystemSettings.toggleRegistrations(updatedBy);
+    // Get current settings
+    let settings = await SystemSettings.getSettings();
+    
+    // Toggle the value
+    settings.registrationsOpen = !settings.registrationsOpen;
+    settings.updatedBy = updatedBy;
+    settings.updatedAt = new Date();
+    
+    await settings.save();
+    
+    console.log(`🔄 Registrations toggled to: ${settings.registrationsOpen ? 'OPEN' : 'CLOSED'}`);
     
     res.json({
       success: true,
