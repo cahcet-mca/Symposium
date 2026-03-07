@@ -157,6 +157,12 @@ const AdminDashboard = () => {
       setToggling(true);
       const adminToken = localStorage.getItem('adminToken');
       
+      if (!adminToken) {
+        alert('Session expired. Please login again.');
+        navigate('/admin/login');
+        return;
+      }
+      
       console.log('🔄 Toggling registrations. Current state:', registrationsOpen ? 'OPEN' : 'CLOSED');
       
       const response = await axios.put(
@@ -177,12 +183,15 @@ const AdminDashboard = () => {
         const newState = response.data.data.registrationsOpen;
         setRegistrationsOpen(newState);
         alert(`✅ Registrations are now ${newState ? 'OPEN' : 'CLOSED'}`);
+      } else {
+        alert(`❌ Failed: ${response.data.message || 'Unknown error'}`);
       }
     } catch (error) {
       console.error('❌ Error toggling registrations:', error);
       
       let errorMessage = 'Failed to toggle registration status';
       if (error.response) {
+        console.log('Error response:', error.response.data);
         errorMessage = error.response.data?.message || `Server error: ${error.response.status}`;
       } else if (error.request) {
         errorMessage = 'No response from server. Please check your connection.';
