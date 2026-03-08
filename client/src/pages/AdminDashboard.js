@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import * as XLSX from 'xlsx'; // Re-added for Excel download
+import * as XLSX from 'xlsx';
 import './AdminDashboard.css';
 
 const API_URL = process.env.REACT_APP_API_URL || 'https://symposium-veyj.onrender.com/api';
@@ -63,14 +63,21 @@ const AdminDashboard = () => {
       }
       
       let url = `${API_URL}/admin/registrations`;
-      if (activeTab !== 'all' && activeTab !== 'participants') {
-        let statusParam = activeTab;
-        if (activeTab === 'verified') statusParam = 'verified';
-        if (activeTab === 'rejected') statusParam = 'rejected';
-        if (activeTab === 'pending') statusParam = 'pending';
-        
-        url = `${API_URL}/admin/registrations?status=${statusParam}`;
+      
+      // Fix: Properly map status parameters
+      if (activeTab === 'pending') {
+        url = `${API_URL}/admin/registrations?status=pending`;
+      } else if (activeTab === 'verified' || activeTab === 'accepted') {
+        url = `${API_URL}/admin/registrations?status=verified`;
+      } else if (activeTab === 'rejected') {
+        url = `${API_URL}/admin/registrations?status=rejected`;
+      } else if (activeTab === 'all') {
+        url = `${API_URL}/admin/registrations?status=all`;
+      } else if (activeTab === 'participants') {
+        url = `${API_URL}/admin/registrations?status=verified`; // Participants come from verified registrations
       }
+
+      console.log(`Fetching registrations for ${activeTab} from:`, url);
 
       const response = await axios.get(url, {
         headers: { 
@@ -80,66 +87,78 @@ const AdminDashboard = () => {
       });
 
       if (response.data.success) {
-        setRegistrations(response.data.data);
+        const allRegs = response.data.data || [];
+        console.log(`Received ${allRegs.length} registrations for ${activeTab}`);
         
-        const pendingCount = response.data.data.filter(r => r.paymentStatus === 'pending').length;
-        const acceptedCount = response.data.data.filter(r => r.paymentStatus === 'verified').length;
-        const rejectedCount = response.data.data.filter(r => r.paymentStatus === 'rejected').length;
-        const totalRevenue = response.data.data
+        // Log status breakdown for debugging
+        const pendingCount = allRegs.filter(r => r.paymentStatus === 'pending').length;
+        const verifiedCount = allRegs.filter(r => r.paymentStatus === 'verified').length;
+        const rejectedCount = allRegs.filter(r => r.paymentStatus === 'rejected').length;
+        
+        console.log(`Status breakdown - Pending: ${pendingCount}, Verified: ${verifiedCount}, Rejected: ${rejectedCount}`);
+        
+        setRegistrations(allRegs);
+        
+        // Calculate stats based on ALL registrations (not filtered)
+        const totalPending = allRegs.filter(r => r.paymentStatus === 'pending').length;
+        const totalAccepted = allRegs.filter(r => r.paymentStatus === 'verified').length;
+        const totalRejected = allRegs.filter(r => r.paymentStatus === 'rejected').length;
+        const totalRevenue = allRegs
           .filter(r => r.paymentStatus === 'verified')
           .reduce((sum, r) => sum + (r.totalAmount || 0), 0);
         
         setStats({
-          pending: pendingCount,
-          accepted: acceptedCount,
-          rejected: rejectedCount,
-          totalUsers: response.data.data.length,
+          pending: totalPending,
+          accepted: totalAccepted,
+          rejected: totalRejected,
+          totalUsers: allRegs.length,
           totalRevenue: totalRevenue
         });
         
-        // Extract participants for participants tab
+        // Extract participants for participants tab (only verified registrations)
         if (activeTab === 'participants') {
           const allParticipants = [];
-          response.data.data.forEach(reg => {
-            if (reg.paymentStatus === 'verified') {
-              if (reg.participants && reg.participants.length > 0) {
-                reg.participants.forEach((p, index) => {
-                  allParticipants.push({
-                    name: p.name,
-                    mobile: p.phone,
-                    email: p.email,
-                    eventName: reg.event?.name || reg.eventName,
-                    eventCategory: reg.event?.category || 'N/A',
-                    college: reg.user?.college,
-                    year: reg.user?.year,
-                    teamName: reg.teamName,
-                    teamSize: reg.teamSize,
-                    isTeamLead: index === 0,
-                    registrationDate: new Date(reg.createdAt).toLocaleDateString(),
-                    transactionId: reg.transactionId,
-                    amount: reg.totalAmount
-                  });
-                });
-              } else {
+          const verifiedRegs = allRegs.filter(r => r.paymentStatus === 'verified');
+          
+          verifiedRegs.forEach(reg => {
+            if (reg.participants && reg.participants.length > 0) {
+              reg.participants.forEach((p, index) => {
                 allParticipants.push({
-                  name: reg.user?.name,
-                  mobile: reg.user?.phone,
-                  email: reg.user?.email,
+                  name: p.name,
+                  mobile: p.phone,
+                  email: p.email,
                   eventName: reg.event?.name || reg.eventName,
                   eventCategory: reg.event?.category || 'N/A',
                   college: reg.user?.college,
                   year: reg.user?.year,
-                  teamName: 'Individual',
-                  teamSize: 1,
-                  isTeamLead: true,
+                  teamName: reg.teamName,
+                  teamSize: reg.teamSize,
+                  isTeamLead: index === 0,
                   registrationDate: new Date(reg.createdAt).toLocaleDateString(),
                   transactionId: reg.transactionId,
                   amount: reg.totalAmount
                 });
-              }
+              });
+            } else {
+              allParticipants.push({
+                name: reg.user?.name,
+                mobile: reg.user?.phone,
+                email: reg.user?.email,
+                eventName: reg.event?.name || reg.eventName,
+                eventCategory: reg.event?.category || 'N/A',
+                college: reg.user?.college,
+                year: reg.user?.year,
+                teamName: 'Individual',
+                teamSize: 1,
+                isTeamLead: true,
+                registrationDate: new Date(reg.createdAt).toLocaleDateString(),
+                transactionId: reg.transactionId,
+                amount: reg.totalAmount
+              });
             }
           });
           setParticipants(allParticipants);
+          console.log(`Extracted ${allParticipants.length} participants from ${verifiedRegs.length} verified registrations`);
         }
       }
     } catch (error) {
@@ -241,6 +260,7 @@ const AdminDashboard = () => {
       );
 
       if (response.data.success) {
+        // Update the registration in the list
         setRegistrations(prev => 
           prev.map(reg => 
             reg._id === registrationId 
@@ -252,6 +272,7 @@ const AdminDashboard = () => {
           )
         );
         
+        // Refresh data
         fetchRegistrations();
         fetchStats();
         
@@ -285,7 +306,6 @@ const AdminDashboard = () => {
     }
 
     try {
-      // Prepare data for Excel with detailed columns
       const excelData = participants.map((p, index) => ({
         'S.No': index + 1,
         'Participant Name': p.name || 'N/A',
@@ -303,10 +323,8 @@ const AdminDashboard = () => {
         'Amount Paid': p.amount ? `₹${p.amount}` : 'N/A'
       }));
 
-      // Create worksheet
       const ws = XLSX.utils.json_to_sheet(excelData);
       
-      // Set column widths for better readability
       const colWidths = [
         { wch: 5 },   // S.No
         { wch: 25 },  // Participant Name
@@ -320,21 +338,18 @@ const AdminDashboard = () => {
         { wch: 10 },  // Team Size
         { wch: 10 },  // Role
         { wch: 15 },  // Registration Date
-        { wch: 20 },  // Transaction ID - Full 12 digits
+        { wch: 20 },  // Transaction ID
         { wch: 12 }   // Amount Paid
       ];
       ws['!cols'] = colWidths;
 
-      // Create workbook
       const wb = XLSX.utils.book_new();
       XLSX.utils.book_append_sheet(wb, ws, 'Participants');
 
-      // Generate filename with current date
       const today = new Date();
       const dateStr = today.toISOString().split('T')[0];
       const fileName = `participants_list_${dateStr}.xlsx`;
 
-      // Download file
       XLSX.writeFile(wb, fileName);
 
       alert(`✅ Participants list downloaded successfully!\nTotal: ${participants.length} participants`);
@@ -434,7 +449,6 @@ const AdminDashboard = () => {
         </nav>
 
         <div className="sidebar-footer">
-          {/* Toggle Button */}
           <div className="toggle-container">
             <button 
               onClick={toggleRegistrations}
@@ -510,7 +524,6 @@ const AdminDashboard = () => {
                 <span className="live-dot"></span> Live Updates
               </div>
               
-              {/* Download Excel Button - Only show in Participants tab */}
               {activeTab === 'participants' && participants.length > 0 && (
                 <button 
                   onClick={downloadParticipantsSheet}
@@ -537,7 +550,6 @@ const AdminDashboard = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {/* Participants Tab View */}
                   {activeTab === 'participants' ? (
                     participants.length > 0 ? (
                       participants.map((p, i) => (
@@ -562,7 +574,6 @@ const AdminDashboard = () => {
                       </tr>
                     )
                   ) : (
-                    /* Registrations Table View */
                     registrations.length > 0 ? (
                       registrations.map(reg => (
                         <tr key={reg._id}>
@@ -590,6 +601,7 @@ const AdminDashboard = () => {
                             {reg.teamName !== 'Individual' ? (
                               <>
                                 <strong>{reg.teamName}</strong>
+                                <br />
                                 <small>{reg.teamSize} members</small>
                               </>
                             ) : 'Individual'}
