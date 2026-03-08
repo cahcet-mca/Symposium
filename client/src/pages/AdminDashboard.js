@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-// Removed unused XLSX import
+import * as XLSX from 'xlsx';
 import './AdminDashboard.css';
 
 const API_URL = process.env.REACT_APP_API_URL || 'https://symposium-veyj.onrender.com/api';
@@ -107,22 +107,34 @@ const AdminDashboard = () => {
                   allParticipants.push({
                     name: p.name,
                     mobile: p.phone,
+                    email: p.email,
                     eventName: reg.event?.name || reg.eventName,
+                    eventCategory: reg.event?.category || 'N/A',
                     college: reg.user?.college,
                     year: reg.user?.year,
                     teamName: reg.teamName,
-                    isTeamLead: index === 0
+                    teamSize: reg.teamSize,
+                    isTeamLead: index === 0,
+                    registrationDate: new Date(reg.createdAt).toLocaleDateString(),
+                    transactionId: reg.transactionId,
+                    amount: reg.totalAmount
                   });
                 });
               } else {
                 allParticipants.push({
                   name: reg.user?.name,
                   mobile: reg.user?.phone,
+                  email: reg.user?.email,
                   eventName: reg.event?.name || reg.eventName,
+                  eventCategory: reg.event?.category || 'N/A',
                   college: reg.user?.college,
                   year: reg.user?.year,
                   teamName: 'Individual',
-                  isTeamLead: true
+                  teamSize: 1,
+                  isTeamLead: true,
+                  registrationDate: new Date(reg.createdAt).toLocaleDateString(),
+                  transactionId: reg.transactionId,
+                  amount: reg.totalAmount
                 });
               }
             }
@@ -163,7 +175,7 @@ const AdminDashboard = () => {
     }
   }, []);
 
-  // Toggle registrations - SIMPLIFIED AND FIXED
+  // Toggle registrations
   const toggleRegistrations = async () => {
     try {
       setToggling(true);
@@ -265,6 +277,73 @@ const AdminDashboard = () => {
     setSelectedRegistration(null);
   };
 
+  // Download Participants as Excel
+  const downloadParticipantsSheet = () => {
+    if (participants.length === 0) {
+      alert('No participants data to download');
+      return;
+    }
+
+    try {
+      // Prepare data for Excel with detailed columns
+      const excelData = participants.map((p, index) => ({
+        'S.No': index + 1,
+        'Participant Name': p.name || 'N/A',
+        'Mobile Number': p.mobile || 'N/A',
+        'Email': p.email || 'N/A',
+        'Event Name': p.eventName || 'N/A',
+        'Event Category': p.eventCategory || 'N/A',
+        'College Name': p.college || 'N/A',
+        'Year': formatYear(p.year),
+        'Team Name': p.teamName || 'Individual',
+        'Team Size': p.teamSize || 1,
+        'Role': p.isTeamLead ? 'Team Lead' : 'Member',
+        'Registration Date': p.registrationDate || 'N/A',
+        'Transaction ID': p.transactionId || 'N/A',
+        'Amount Paid': p.amount ? `₹${p.amount}` : 'N/A'
+      }));
+
+      // Create worksheet
+      const ws = XLSX.utils.json_to_sheet(excelData);
+      
+      // Set column widths for better readability
+      const colWidths = [
+        { wch: 5 },   // S.No
+        { wch: 25 },  // Participant Name
+        { wch: 15 },  // Mobile Number
+        { wch: 30 },  // Email
+        { wch: 25 },  // Event Name
+        { wch: 15 },  // Event Category
+        { wch: 25 },  // College Name
+        { wch: 10 },  // Year
+        { wch: 20 },  // Team Name
+        { wch: 10 },  // Team Size
+        { wch: 10 },  // Role
+        { wch: 15 },  // Registration Date
+        { wch: 20 },  // Transaction ID - Full 12 digits
+        { wch: 12 }   // Amount Paid
+      ];
+      ws['!cols'] = colWidths;
+
+      // Create workbook
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, 'Participants');
+
+      // Generate filename with current date
+      const today = new Date();
+      const dateStr = today.toISOString().split('T')[0];
+      const fileName = `participants_list_${dateStr}.xlsx`;
+
+      // Download file
+      XLSX.writeFile(wb, fileName);
+
+      alert(`✅ Participants list downloaded successfully!\nTotal: ${participants.length} participants`);
+    } catch (error) {
+      console.error('Error downloading Excel:', error);
+      alert('❌ Failed to download participants list');
+    }
+  };
+
   const getStatusBadgeClass = (status) => {
     switch(status) {
       case 'pending': return 'status-pending';
@@ -355,7 +434,7 @@ const AdminDashboard = () => {
         </nav>
 
         <div className="sidebar-footer">
-          {/* Simple Toggle Button */}
+          {/* Toggle Button */}
           <div className="toggle-container">
             <button 
               onClick={toggleRegistrations}
@@ -426,8 +505,22 @@ const AdminDashboard = () => {
               {activeTab === 'participants' && 'All Participants'}
               {activeTab === 'all' && 'All Registrations'}
             </h2>
-            <div className="live-status-indicator">
-              <span className="live-dot"></span> Live Updates
+            <div className="header-actions">
+              <div className="live-status-indicator">
+                <span className="live-dot"></span> Live Updates
+              </div>
+              
+              {/* Download Excel Button - Only show in Participants tab */}
+              {activeTab === 'participants' && participants.length > 0 && (
+                <button 
+                  onClick={downloadParticipantsSheet}
+                  className="btn-download-excel"
+                  title="Download Participants List as Excel"
+                >
+                  <span className="btn-icon">📥</span>
+                  Download Excel
+                </button>
+              )}
             </div>
           </div>
 
@@ -475,8 +568,8 @@ const AdminDashboard = () => {
                         <tr key={reg._id}>
                           <td>{new Date(reg.createdAt).toLocaleDateString()}</td>
                           <td>
-                            <span className="transaction-id" title={reg.transactionId}>
-                              {reg.transactionId?.substring(0,10)}...
+                            <span className="transaction-id-full" title={reg.transactionId}>
+                              {reg.transactionId || 'N/A'}
                             </span>
                           </td>
                           <td>
