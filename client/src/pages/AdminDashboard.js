@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import * as XLSX from 'xlsx';
+// Removed unused XLSX import
 import './AdminDashboard.css';
 
 const API_URL = process.env.REACT_APP_API_URL || 'https://symposium-veyj.onrender.com/api';
