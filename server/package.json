@@ -1,0 +1,41 @@
+{
+  "name": "tecno-rendezvous-backend",
+  "version": "1.0.0",
+  "description": "TECNO RENDEZVOUS 2025 Symposium Backend",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js",
+    "dev:clean": "npx kill-port 5000 && nodemon server.js",
+    "seed": "node seeder.js",
+    "seed:destroy": "node seeder.js -d"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "colors": "^1.4.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.0.3",
+    "express": "^4.18.2",
+    "express-validator": "^7.0.1",
+    "jsonwebtoken": "^9.0.0",
+    "mongoose": "^7.0.3",
+    "nodemailer": "^6.9.1"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.22"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
+  },
+  "keywords": [
+    "symposium",
+    "tecno-rendezvous",
+    "event-management",
+    "nodejs",
+    "express",
+    "mongodb"
+  ],
+  "author": "C. Abdul Hakeem College of Engineering and Technology",
+  "license": "MIT"
+}
