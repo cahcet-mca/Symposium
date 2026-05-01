@@ -1,7 +1,7 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import axios from 'axios';
 
-const API_URL = import.meta.env.VITE_API_URL || 'https://symposium-veyj.onrender.com/api';
+const API_URL = import.meta.env.VITE_API_URL;
 
 const DateContext = createContext();
 

@@ -7,7 +7,7 @@ import api from '../services/api';
 import axios from 'axios';
 import './UPIPayment.css';
 
-const API_URL = import.meta.env.VITE_API_URL || 'https://symposium-veyj.onrender.com/api';
+const API_URL = import.meta.env.VITE_API_URL;
 
 const UPIPayment = () => {
   const { id } = useParams();

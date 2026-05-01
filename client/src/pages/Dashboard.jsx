@@ -8,7 +8,7 @@ import Loader from '../components/common/Loader';
 import EventDetailsPopup from '../components/events/EventDetailsPopup';
 import './Dashboard.css';
 
-const API_URL = import.meta.env.VITE_API_URL || 'https://symposium-veyj.onrender.com/api';
+const API_URL = import.meta.env.VITE_API_URL;
 
 const Dashboard = () => {
   const { user } = useAuth();

@@ -8,7 +8,7 @@ import EventDetailsPopup from '../components/events/EventDetailsPopup';
 import axios from 'axios';
 import './Events.css';
 
-const API_URL = import.meta.env.VITE_API_URL || 'https://symposium-veyj.onrender.com/api';
+const API_URL = import.meta.env.VITE_API_URL;
 
 const Events = () => {
   const [category, setCategory] = useState('All');
