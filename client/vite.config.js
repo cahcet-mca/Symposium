@@ -36,7 +36,7 @@ export default defineConfig(({ mode }) => {
     
     // Important: Define env variables for build
     define: {
-      'import.meta.env.VITE_API_URL': JSON.stringify(env.VITE_API_URL || 'https://symposium-veyj.onrender.com/api'),
+      'import.meta.env.VITE_API_URL': JSON.stringify(env.VITE_API_URL),
     },
   };
 });

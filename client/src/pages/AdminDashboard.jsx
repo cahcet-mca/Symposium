@@ -5,7 +5,7 @@ import * as XLSX from 'xlsx';
 import { useSymposiumDate } from '../context/DateContext';
 import './AdminDashboard.css';
 
-const API_URL = import.meta.env.VITE_API_URL || 'https://symposium-veyj.onrender.com/api';
+const API_URL = import.meta.env.VITE_API_URL;
 
 const AdminDashboard = () => {
   const [activeTab, setActiveTab] = useState('pending');

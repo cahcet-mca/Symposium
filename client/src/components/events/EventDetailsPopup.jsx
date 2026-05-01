@@ -4,7 +4,7 @@ import { useAuth } from '../../context/AuthContext';
 import { useSymposiumDate } from '../../context/DateContext';
 import './EventDetailsPopup.css';
 
-const API_URL = import.meta.env.VITE_API_URL || 'https://symposium-veyj.onrender.com/api';
+const API_URL = import.meta.env.VITE_API_URL;
 
 const EventDetailsPopup = ({ event, onClose, registrationsOpen = true }) => {
   const [eventDetails, setEventDetails] = useState(event);

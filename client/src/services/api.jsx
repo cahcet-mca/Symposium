@@ -2,7 +2,7 @@
 import axios from 'axios';
 
 // API Base URL - Updated to Render backend
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://symposium-veyj.onrender.com/api';
+const API_BASE_URL = import.meta.env.VITE_API_URL;
 
 // List of problematic event IDs that consistently return 500 (temporary fix)
 // Remove these once backend is fixed

@@ -1,5 +1,5 @@
 // API Endpoints
-export const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://symposium-veyj.onrender.com/api';
+export const API_BASE_URL = import.meta.env.VITE_API_URL;
 
 // Event Categories
 export const EVENT_CATEGORIES = {

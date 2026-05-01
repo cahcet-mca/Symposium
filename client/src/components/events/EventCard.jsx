@@ -4,7 +4,7 @@ import { useSymposiumDate } from '../../context/DateContext';
 import axios from 'axios';
 import './EventCard.css';
 
-const API_URL = import.meta.env.VITE_API_URL || 'https://symposium-veyj.onrender.com/api';
+const API_URL = import.meta.env.VITE_API_URL;
 
 const EventCard = ({ event, onViewDetails, registrationsOpen = true }) => {
   const [realCounts, setRealCounts] = useState(null);

@@ -5,7 +5,7 @@ import axios from 'axios';
 import HomeEventCard from '../components/events/HomeEventCard';
 import './Home.css';
 
-const API_URL = import.meta.env.VITE_API_URL || 'https://symposium-veyj.onrender.com/api';
+const API_URL = import.meta.env.VITE_API_URL;
 
 const Home = () => {
   const [registrationsOpen, setRegistrationsOpen] = useState(true);
