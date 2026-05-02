@@ -35,13 +35,19 @@ const getEvents = async (req, res) => {
           paymentStatus: 'pending'
         });
         
+        const capacity = event.maxParticipants || 0;
+        const totalOccupancy = confirmedCount + pendingCount;
+        const isCompletelyFull = totalOccupancy >= capacity;
+        
         return {
           ...event.toObject(),
           confirmedCount: confirmedCount,
           pendingCount: pendingCount,
-          totalRegistrations: confirmedCount + pendingCount,
-          isFull: confirmedCount >= (event.maxParticipants || 0),
-          waitlistCount: pendingCount
+          totalRegistrations: totalOccupancy,
+          isFull: confirmedCount >= capacity,
+          isCompletelyFull: isCompletelyFull,
+          waitlistCount: pendingCount,
+          availableSpots: capacity - totalOccupancy
         };
       } catch (err) {
         console.error(`Error enriching event ${event.name}:`, err.message);
@@ -51,7 +57,9 @@ const getEvents = async (req, res) => {
           pendingCount: 0,
           totalRegistrations: event.registeredCount || 0,
           isFull: false,
-          waitlistCount: 0
+          isCompletelyFull: false,
+          waitlistCount: 0,
+          availableSpots: (event.maxParticipants || 0) - (event.registeredCount || 0)
         };
       }
     }));
@@ -198,7 +206,7 @@ const deleteEvent = async (req, res) => {
   }
 };
 
-// @desc    Get event with real registration count (with waitlist)
+// @desc    Get event with real registration count (with waitlist = capacity)
 // @route   GET /api/events/:id/with-count
 // @access  Public
 const getEventWithRealCount = async (req, res) => {
@@ -247,32 +255,41 @@ const getEventWithRealCount = async (req, res) => {
       });
     } catch (countError) {
       console.error('Error counting registrations:', countError.message);
-      // Use fallback values from event document
       confirmedCount = event.confirmedCount || 0;
       pendingCount = event.pendingCount || 0;
       rejectedCount = event.rejectedCount || 0;
     }
 
+    const capacity = event.maxParticipants || 0;
+    const totalOccupancy = confirmedCount + pendingCount;
+    
+    // ✅ Waitlist max = capacity (same as max participants)
+    const maxWaitlist = capacity;
+    const isCompletelyFull = totalOccupancy >= capacity;
+    const isFull = confirmedCount >= capacity;
+    const isWaitlistFull = pendingCount >= maxWaitlist;
+    const availableSpots = capacity - totalOccupancy;
+    const waitlistAvailable = maxWaitlist - pendingCount;
+
     console.log(`📊 Event: ${event.name}`);
+    console.log(`   Capacity: ${capacity}`);
     console.log(`   Confirmed: ${confirmedCount}`);
-    console.log(`   Pending (Waitlist): ${pendingCount}`);
-    console.log(`   Rejected: ${rejectedCount}`);
+    console.log(`   Waitlist: ${pendingCount}`);
+    console.log(`   Total Occupancy: ${totalOccupancy}/${capacity}`);
+    console.log(`   Max Waitlist: ${maxWaitlist}`);
+    console.log(`   Completely Full: ${isCompletelyFull}`);
 
     // Safely update event counts if needed
     let needsSave = false;
-    const currentConfirmed = event.confirmedCount || 0;
-    const currentPending = event.pendingCount || 0;
-    const currentRejected = event.rejectedCount || 0;
-    
-    if (currentConfirmed !== confirmedCount) {
+    if ((event.confirmedCount || 0) !== confirmedCount) {
       event.confirmedCount = confirmedCount;
       needsSave = true;
     }
-    if (currentPending !== pendingCount) {
+    if ((event.pendingCount || 0) !== pendingCount) {
       event.pendingCount = pendingCount;
       needsSave = true;
     }
-    if (currentRejected !== rejectedCount) {
+    if ((event.rejectedCount || 0) !== rejectedCount) {
       event.rejectedCount = rejectedCount;
       needsSave = true;
     }
@@ -283,40 +300,32 @@ const getEventWithRealCount = async (req, res) => {
         console.log(`✅ Event counts updated for ${event.name}`);
       } catch (saveError) {
         console.error(`Error saving event ${event.name}:`, saveError.message);
-        // Continue even if save fails
       }
     }
-
-    // Safely get configuration values with fallbacks
-    const maxParticipants = event.maxParticipants || 0;
-    const maxWaitlist = event.maxParticipants || 0;
-    const isFull = (confirmedCount || 0) >= maxParticipants;
-    const isWaitlistFull = (pendingCount || 0) >= maxWaitlist;
-    const availableSpots = maxParticipants - (confirmedCount || 0);
-    const waitlistAvailable = maxWaitlist - (pendingCount || 0);
     
-    const statusInfo = {
-      confirmed: confirmedCount,
-      pending: pendingCount,
-      total: confirmedCount + pendingCount,
-      available: availableSpots,
-      waitlistAvailable: waitlistAvailable,
-      isFull: isFull,
-      isWaitlistFull: isWaitlistFull
-    };
-    
-    // Create response object with safe defaults
     const responseData = {
       ...event.toObject(),
       confirmedCount: confirmedCount,
       pendingCount: pendingCount,
       rejectedCount: rejectedCount,
-      totalRegistrations: confirmedCount + pendingCount,
-      availableSpots: availableSpots,
-      waitlistAvailable: waitlistAvailable,
+      totalRegistrations: totalOccupancy,
+      availableSpots: availableSpots < 0 ? 0 : availableSpots,
+      waitlistAvailable: waitlistAvailable < 0 ? 0 : waitlistAvailable,
       isFull: isFull,
       isWaitlistFull: isWaitlistFull,
-      statusInfo: statusInfo
+      isCompletelyFull: isCompletelyFull,
+      maxWaitlist: maxWaitlist,
+      statusInfo: {
+        confirmed: confirmedCount,
+        pending: pendingCount,
+        total: totalOccupancy,
+        capacity: capacity,
+        available: availableSpots < 0 ? 0 : availableSpots,
+        waitlistAvailable: waitlistAvailable < 0 ? 0 : waitlistAvailable,
+        isFull: isFull,
+        isWaitlistFull: isWaitlistFull,
+        isCompletelyFull: isCompletelyFull
+      }
     };
     
     res.json({
@@ -326,30 +335,6 @@ const getEventWithRealCount = async (req, res) => {
 
   } catch (error) {
     console.error('❌ Error in getEventWithRealCount:', error);
-    
-    // Try to return basic event data as fallback
-    try {
-      const event = await Event.findById(req.params.id);
-      if (event) {
-        console.log('🔄 Returning fallback event data without counts');
-        return res.json({
-          success: true,
-          data: {
-            ...event.toObject(),
-            confirmedCount: event.confirmedCount || 0,
-            pendingCount: event.pendingCount || 0,
-            rejectedCount: event.rejectedCount || 0,
-            totalRegistrations: (event.confirmedCount || 0) + (event.pendingCount || 0),
-            availableSpots: (event.maxParticipants || 0) - (event.confirmedCount || 0),
-            waitlistAvailable: (event.maxWaitlist || 50) - (event.pendingCount || 0),
-            isFull: (event.confirmedCount || 0) >= (event.maxParticipants || 0),
-            isWaitlistFull: (event.pendingCount || 0) >= (event.maxWaitlist || 50)
-          }
-        });
-      }
-    } catch (fallbackError) {
-      console.error('Fallback also failed:', fallbackError.message);
-    }
     
     res.status(500).json({
       success: false,
@@ -390,19 +375,24 @@ const getEventWaitlistStatus = async (req, res) => {
       pendingCount = event.pendingCount || 0;
     }
     
+    const capacity = event.maxParticipants || 0;
+    const maxWaitlist = capacity;
+    const totalOccupancy = confirmedCount + pendingCount;
+    
     const statusInfo = {
       eventId: event._id,
       eventName: event.name,
-      maxParticipants: event.maxParticipants || 0,
-      maxWaitlist: event.maxWaitlist || 50,
+      capacity: capacity,
+      maxWaitlist: maxWaitlist,
       confirmedCount: confirmedCount,
       pendingCount: pendingCount,
-      totalRegistrations: confirmedCount + pendingCount,
-      availableSpots: (event.maxParticipants || 0) - confirmedCount,
-      waitlistAvailable: (event.maxWaitlist || 50) - pendingCount,
-      isFull: confirmedCount >= (event.maxParticipants || 0),
-      isWaitlistFull: pendingCount >= (event.maxWaitlist || 50),
-      registrationStatus: confirmedCount >= (event.maxParticipants || 0) ? 'waitlist' : 'open'
+      totalRegistrations: totalOccupancy,
+      availableSpots: capacity - totalOccupancy,
+      waitlistAvailable: maxWaitlist - pendingCount,
+      isFull: confirmedCount >= capacity,
+      isWaitlistFull: pendingCount >= maxWaitlist,
+      isCompletelyFull: totalOccupancy >= capacity,
+      registrationStatus: totalOccupancy >= capacity ? 'full' : (confirmedCount >= capacity ? 'waitlist' : 'open')
     };
     
     res.json({
@@ -518,6 +508,9 @@ const debugEventCounts = async (req, res) => {
           paymentStatus: 'pending'
         });
         
+        const capacity = event.maxParticipants || 0;
+        const totalOccupancy = confirmedCount + pendingCount;
+        
         result.push({
           eventId: event._id,
           eventName: event.name,
@@ -527,9 +520,11 @@ const debugEventCounts = async (req, res) => {
           storedPending: event.pendingCount || 0,
           actualConfirmed: confirmedCount,
           actualPending: pendingCount,
-          maxParticipants: event.maxParticipants || 0,
+          capacity: capacity,
+          totalOccupancy: totalOccupancy,
+          isCompletelyFull: totalOccupancy >= capacity,
           match: (event.confirmedCount || 0) === confirmedCount,
-          confirmedPercentage: event.maxParticipants > 0 ? Math.round((confirmedCount / event.maxParticipants) * 100) + '%' : 'N/A'
+          confirmedPercentage: capacity > 0 ? Math.round((totalOccupancy / capacity) * 100) + '%' : 'N/A'
         });
       } catch (err) {
         result.push({
@@ -590,6 +585,8 @@ const syncEventCounts = async (req, res) => {
             eventName: event.name,
             confirmedCount: confirmedCount,
             pendingCount: pendingCount,
+            totalOccupancy: confirmedCount + pendingCount,
+            capacity: event.maxParticipants,
             updated: true
           });
         } else {
@@ -597,6 +594,8 @@ const syncEventCounts = async (req, res) => {
             eventName: event.name,
             confirmedCount: confirmedCount,
             pendingCount: pendingCount,
+            totalOccupancy: confirmedCount + pendingCount,
+            capacity: event.maxParticipants,
             updated: false
           });
         }
