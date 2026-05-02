@@ -26,6 +26,7 @@ const UPIPayment = () => {
   const [transactionIdError, setTransactionIdError] = useState('');
   const [event, setEvent] = useState(null);
   const [isWaitlistRegistration, setIsWaitlistRegistration] = useState(false);
+  const [eventFullMessage, setEventFullMessage] = useState('');
 
   const [formData, setFormData] = useState({
     teamSize: 1,
@@ -136,6 +137,7 @@ const UPIPayment = () => {
     try {
       setLoading(true);
       setFetchError('');
+      setEventFullMessage('');
 
       console.log('📡 Fetching event with ID:', id);
       const eventData = await getEvent(id);
@@ -144,6 +146,25 @@ const UPIPayment = () => {
 
       if (!eventData) {
         setFetchError('Event not found');
+        setLoading(false);
+        return;
+      }
+
+      // ✅ CHECK IF EVENT IS FULL (Confirmed count >= maxParticipants)
+      const confirmedCount = eventData.confirmedCount || eventData.registeredCount || 0;
+      const maxParticipants = eventData.maxParticipants || 0;
+      const isEventFull = confirmedCount >= maxParticipants;
+
+      if (isEventFull) {
+        const waitlistCount = eventData.pendingCount || 0;
+        const maxWaitlist = eventData.maxWaitlist || maxParticipants;
+        const isWaitlistFull = waitlistCount >= maxWaitlist;
+        
+        if (isWaitlistFull) {
+          setEventFullMessage(`${eventData.name} is completely full. No waitlist spots available.`);
+        } else {
+          setEventFullMessage(`${eventData.name} has reached full capacity. You can join the waitlist.`);
+        }
         setLoading(false);
         return;
       }
@@ -407,6 +428,61 @@ const UPIPayment = () => {
   };
 
   const totalAmount = event && event.fee ? event.fee * formData.teamSize : 0;
+
+  // ✅ NEW: Event Full Message State
+  if (eventFullMessage) {
+    return (
+      <div className="payment-page">
+        <div className="event-full-container" style={{
+          textAlign: 'center',
+          padding: '60px 20px',
+          background: 'linear-gradient(145deg, #1a1a1a, #0d0d0d)',
+          borderRadius: '20px',
+          maxWidth: '500px',
+          margin: '100px auto',
+          border: '2px solid #ffa502'
+        }}>
+          <span style={{ fontSize: '4rem', display: 'block', marginBottom: '20px' }}>🚫</span>
+          <h2 style={{ color: '#ffa502', marginBottom: '15px' }}>Event Full</h2>
+          <p style={{ color: '#b0b0b0', marginBottom: '30px', lineHeight: '1.6', fontSize: '1.1rem' }}>
+            {eventFullMessage}
+          </p>
+          <div style={{ display: 'flex', gap: '15px', justifyContent: 'center', flexWrap: 'wrap' }}>
+            <button
+              onClick={() => navigate('/events')}
+              className="btn-browse"
+              style={{
+                padding: '12px 30px',
+                background: 'linear-gradient(135deg, #b8860b, #ffd700)',
+                color: '#000',
+                border: 'none',
+                borderRadius: '5px',
+                cursor: 'pointer',
+                fontSize: '16px'
+              }}
+            >
+              Browse Other Events
+            </button>
+            <button
+              onClick={() => window.history.back()}
+              className="btn-back"
+              style={{
+                padding: '12px 30px',
+                background: 'transparent',
+                border: '2px solid #ffd700',
+                color: '#ffd700',
+                borderRadius: '5px',
+                cursor: 'pointer',
+                fontSize: '16px'
+              }}
+            >
+              Go Back
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   // Loading state
   if (loading || checkingStatus) {
