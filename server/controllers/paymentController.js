@@ -5,7 +5,7 @@ const User = require('../models/User');
 const EventRegister = require('../models/EventRegister');
 
 // ============================================
-// MAIN PAYMENT VERIFICATION FUNCTION (with Waitlist)
+// MAIN PAYMENT VERIFICATION FUNCTION (with Waitlist = Capacity)
 // ============================================
 
 const verifyPayment = async (req, res) => {
@@ -78,25 +78,54 @@ const verifyPayment = async (req, res) => {
 
     console.log('✅ Event found:', event.name);
 
-    // STEP 3: Get current counts and determine registration status
+    // STEP 3: Get current counts
     const confirmedCount = await Registration.countDocuments({
       event: event._id,
       paymentStatus: 'verified'
     });
-
+    
     const pendingCount = await Registration.countDocuments({
       event: event._id,
       paymentStatus: 'pending'
     });
+    
+    const totalOccupancy = confirmedCount + pendingCount;
+    const capacity = event.maxParticipants || 0;
+    
+    // ✅ Max waitlist = capacity (same as max participants)
+    const maxWaitlist = capacity;
+    
+    // ✅ Check if event is completely full (confirmed + pending >= capacity)
+    const isCompletelyFull = totalOccupancy >= capacity;
+    
+    console.log(`📊 Event Status:`);
+    console.log(`   Capacity: ${capacity}`);
+    console.log(`   Confirmed: ${confirmedCount}`);
+    console.log(`   Waitlist: ${pendingCount}`);
+    console.log(`   Total Occupancy: ${totalOccupancy}/${capacity}`);
+    console.log(`   Max Waitlist: ${maxWaitlist}`);
+    console.log(`   Completely Full: ${isCompletelyFull}`);
 
-    const isFull = confirmedCount >= event.maxParticipants;
-    const maxWaitlist = event.maxParticipants;
+    // ✅ Block registration if completely full
+    if (isCompletelyFull) {
+      return res.status(400).json({
+        success: false,
+        message: `❌ "${event.name}" is completely full (${confirmedCount} registered + ${pendingCount} waitlist = ${totalOccupancy}/${capacity}). No more registrations accepted. Please try later.`,
+        isFull: true,
+        confirmedCount: confirmedCount,
+        waitlistCount: pendingCount,
+        capacity: capacity
+      });
+    }
+
+    // STEP 4: Determine registration status
+    const isFull = confirmedCount >= capacity;
     const isWaitlistFull = pendingCount >= maxWaitlist;
-
+    
     let paymentStatus = 'pending';
     let registrationStatus = 'pending';
     let statusMessage = '';
-
+    
     if (!isFull) {
       // Direct registration (confirmed spot once approved)
       paymentStatus = 'pending';
@@ -108,14 +137,14 @@ const verifyPayment = async (req, res) => {
       registrationStatus = 'waitlist';
       statusMessage = 'Event is full. You have been added to the waitlist. You will be notified if a spot opens up.';
     } else {
-      // Both full - reject
+      // Both full - should not reach here because of the check above, but keep for safety
       return res.status(400).json({
         success: false,
-        message: 'Event is completely full. No waitlist spots available.'
+        message: `Event is completely full. No waitlist spots available.`
       });
     }
 
-    // STEP 4: Check if user has an existing registration
+    // STEP 5: Check if user has an existing registration
     const existingRegistration = await Registration.findOne({
       user: req.user._id,
       event: event._id
@@ -128,7 +157,7 @@ const verifyPayment = async (req, res) => {
       });
     }
 
-    // STEP 5: Check if transaction ID already exists
+    // STEP 6: Check if transaction ID already exists
     const existsInMongo = await Transaction.findOne({ transactionId: transactionId.toUpperCase() });
     if (existsInMongo) {
       return res.status(400).json({
@@ -137,7 +166,7 @@ const verifyPayment = async (req, res) => {
       });
     }
 
-    // STEP 6: Save transaction to MongoDB
+    // STEP 7: Save transaction to MongoDB
     console.log('💾 Saving transaction to MongoDB...');
     const transaction = await Transaction.create({
       transactionId: transactionId.toUpperCase(),
@@ -150,7 +179,7 @@ const verifyPayment = async (req, res) => {
     });
     console.log('✅ Transaction saved:', transaction._id);
 
-    // STEP 7: Create registration with appropriate status
+    // STEP 8: Create registration with appropriate status
     console.log('💾 Saving registration to MongoDB...');
     const registration = await Registration.create({
       event: event._id,
@@ -171,12 +200,12 @@ const verifyPayment = async (req, res) => {
     });
     console.log('✅ Registration saved with status:', registrationStatus);
 
-    // STEP 8: Update pending count in event
+    // STEP 9: Update pending count in event
     await Event.findByIdAndUpdate(event._id, {
       $inc: { pendingCount: 1 }
     });
 
-    // STEP 9: Create Event Register entry
+    // STEP 10: Create Event Register entry
     const eventRegister = await EventRegister.create({
       timestamp: new Date(),
       userName: req.user.name,

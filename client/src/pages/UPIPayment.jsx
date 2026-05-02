@@ -150,21 +150,17 @@ const UPIPayment = () => {
         return;
       }
 
-      // ✅ CHECK IF EVENT IS FULL (Confirmed count >= maxParticipants)
+      // ✅ Check if event is COMPLETELY FULL (confirmed + waitlist >= capacity)
       const confirmedCount = eventData.confirmedCount || eventData.registeredCount || 0;
-      const maxParticipants = eventData.maxParticipants || 0;
-      const isEventFull = confirmedCount >= maxParticipants;
+      const waitlistCount = eventData.pendingCount || 0;
+      const capacity = eventData.maxParticipants || 0;
+      const totalOccupancy = confirmedCount + waitlistCount;
+      const isCompletelyFull = totalOccupancy >= capacity;
 
-      if (isEventFull) {
-        const waitlistCount = eventData.pendingCount || 0;
-        const maxWaitlist = eventData.maxWaitlist || maxParticipants;
-        const isWaitlistFull = waitlistCount >= maxWaitlist;
-        
-        if (isWaitlistFull) {
-          setEventFullMessage(`${eventData.name} is completely full. No waitlist spots available.`);
-        } else {
-          setEventFullMessage(`${eventData.name} has reached full capacity. You can join the waitlist.`);
-        }
+      if (isCompletelyFull) {
+        setEventFullMessage(
+          `❌ "${eventData.name}" is completely full (${confirmedCount} registered + ${waitlistCount} waitlist = ${totalOccupancy}/${capacity}). No more registrations accepted. Please try later.`
+        );
         setLoading(false);
         return;
       }
@@ -414,8 +410,10 @@ const UPIPayment = () => {
         if (error.response.status === 403 && error.response.data.registrationsClosed) {
           setError(error.response.data.message || 'Online registration is finished.');
           setRegistrationsOpen(false);
+        } else if (error.response.data.message) {
+          setError(error.response.data.message);
         } else {
-          setError(error.response.data?.message || 'Transaction verification failed. Please try again.');
+          setError('Transaction verification failed. Please try again.');
         }
       } else if (error.request) {
         setError('No response from server. Please check your connection.');
@@ -429,7 +427,7 @@ const UPIPayment = () => {
 
   const totalAmount = event && event.fee ? event.fee * formData.teamSize : 0;
 
-  // ✅ NEW: Event Full Message State
+  // ✅ Event Full Message State
   if (eventFullMessage) {
     return (
       <div className="payment-page">
@@ -443,7 +441,7 @@ const UPIPayment = () => {
           border: '2px solid #ffa502'
         }}>
           <span style={{ fontSize: '4rem', display: 'block', marginBottom: '20px' }}>🚫</span>
-          <h2 style={{ color: '#ffa502', marginBottom: '15px' }}>Event Full</h2>
+          <h2 style={{ color: '#ffa502', marginBottom: '15px' }}>Event Completely Full</h2>
           <p style={{ color: '#b0b0b0', marginBottom: '30px', lineHeight: '1.6', fontSize: '1.1rem' }}>
             {eventFullMessage}
           </p>
@@ -589,7 +587,7 @@ const UPIPayment = () => {
     );
   }
 
-  // Main render - USE DYNAMIC UPI ID
+  // Main render
   return (
     <div className="payment-page">
       <div className="payment-container">
