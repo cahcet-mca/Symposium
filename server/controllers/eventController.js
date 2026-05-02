@@ -111,7 +111,6 @@ const createEvent = async (req, res) => {
     req.body.confirmedCount = 0;
     req.body.pendingCount = 0;
     req.body.rejectedCount = 0;
-    req.body.maxWaitlist = req.body.maxWaitlist || 50;
     req.body.registeredCount = 0;
     
     const event = await Event.create(req.body);
@@ -290,7 +289,7 @@ const getEventWithRealCount = async (req, res) => {
 
     // Safely get configuration values with fallbacks
     const maxParticipants = event.maxParticipants || 0;
-    const maxWaitlist = event.maxWaitlist || 50;
+    const maxWaitlist = event.maxParticipants || 0;
     const isFull = (confirmedCount || 0) >= maxParticipants;
     const isWaitlistFull = (pendingCount || 0) >= maxWaitlist;
     const availableSpots = maxParticipants - (confirmedCount || 0);

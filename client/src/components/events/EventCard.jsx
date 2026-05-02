@@ -56,7 +56,7 @@ const EventCard = ({ event, onViewDetails, registrationsOpen = true }) => {
           confirmed: realEventData.confirmedCount || 0,
           pending: realEventData.pendingCount || 0,
           maxParticipants: realEventData.maxParticipants || 0,
-          isFull: realEventData.isFull || false
+          isFull: realEventData.isFull || (realEventData.confirmedCount >= realEventData.maxParticipants)
         });
         setImageError(false);
       }
@@ -98,6 +98,19 @@ const EventCard = ({ event, onViewDetails, registrationsOpen = true }) => {
       return;
     }
     
+    // CHECK IF EVENT IS FULL - Show confirmation for waitlist
+    const confirmedCount = realCounts?.confirmed || 0;
+    const maxParticipants = realCounts?.maxParticipants || eventDetails.maxParticipants || 0;
+    const isEventFull = confirmedCount >= maxParticipants;
+    
+    if (isEventFull) {
+      const confirmMessage = `⚠️ "${event.name}" is full!\n\nYou will be added to the waitlist. Payment will be required. Do you want to continue?`;
+      if (window.confirm(confirmMessage)) {
+        navigate(`/payment/${event._id}`);
+      }
+      return;
+    }
+    
     navigate(`/payment/${event._id}`);
   };
 
@@ -114,6 +127,8 @@ const EventCard = ({ event, onViewDetails, registrationsOpen = true }) => {
   
   // AVAILABLE SPOTS = TOTAL CAPACITY - (REGISTERED + WAITLIST)
   const availableSpots = maxParticipants - (confirmedCount + pendingCount);
+  // FILL PERCENTAGE = (REGISTERED + WAITLIST) / CAPACITY * 100
+  const fillPercentage = maxParticipants > 0 ? Math.min(Math.round(((confirmedCount + pendingCount) / maxParticipants) * 100), 100) : 0;
 
   const imageSrc = getImageSource();
 
@@ -205,7 +220,7 @@ const EventCard = ({ event, onViewDetails, registrationsOpen = true }) => {
             </div>
           )}
           
-          {/* REGISTRATION COUNT SECTION */}
+          {/* REGISTRATION COUNT SECTION with FILL PERCENTAGE */}
           <div className="detail-item registration-count">
             <span className="icon">📊</span>
             <div className="registration-stats">
@@ -223,14 +238,18 @@ const EventCard = ({ event, onViewDetails, registrationsOpen = true }) => {
                         · <strong>{pendingCount}</strong> on waitlist
                       </span>
                     )}
+                    {/* Total occupancy percentage */}
+                    <span className="fill-percentage" style={{ marginLeft: 'auto', fontSize: '0.8rem', color: '#ffd700' }}>
+                      {fillPercentage}% Full
+                    </span>
                   </div>
                   
-                  {/* Progress bar */}
+                  {/* Progress bar - shows Confirmed + Waitlist as fill percentage */}
                   <div className="stats-bar">
                     <div 
                       className="stats-fill" 
                       style={{ 
-                        width: `${((confirmedCount + pendingCount) / maxParticipants) * 100}%`,
+                        width: `${fillPercentage}%`,
                         backgroundColor: isFull ? '#ff4757' : '#2ecc71'
                       }}
                     ></div>

@@ -295,7 +295,7 @@
   }
   
   .loader-text {
-    font-size: 0.85rem;
+    font-size: 0.80rem;
     max-width: 120px;
     letter-spacing: 1px;
   }
@@ -322,7 +322,7 @@
   }
   
   .loader-text {
-    font-size: 0.80rem;
+    font-size: 0.70rem;
     max-width: 100px;
   }
 }

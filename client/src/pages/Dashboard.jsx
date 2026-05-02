@@ -164,13 +164,16 @@ const Dashboard = () => {
             const max = eventData.maxParticipants || 0;
             const availableSpots = max - (confirmed + pending);
             
+            // ✅ FIX: Percentage = (Confirmed + Waitlist) / Capacity
+            const percentage = max > 0 ? Math.round(((confirmed + pending) / max) * 100) : 0;
+            
             return {
               eventId: event._id,
               confirmedCount: confirmed,
               pendingCount: pending,
               maxParticipants: max,
               availableSpots: availableSpots < 0 ? 0 : availableSpots,
-              percentage: max > 0 ? Math.round((confirmed / max) * 100) : 0,
+              percentage: percentage,
               isFull: confirmed >= max
             };
           }
@@ -178,13 +181,15 @@ const Dashboard = () => {
           console.error(`Error fetching real stats for ${event.name}:`, error);
           const confirmed = event.registeredCount || 0;
           const max = event.maxParticipants || 0;
+          const pending = 0;
+          const percentage = max > 0 ? Math.round(((confirmed + pending) / max) * 100) : 0;
           return {
             eventId: event._id,
             confirmedCount: confirmed,
             pendingCount: 0,
             maxParticipants: max,
             availableSpots: max - confirmed,
-            percentage: max > 0 ? Math.round((confirmed / max) * 100) : 0,
+            percentage: percentage,
             isFull: false
           };
         }
@@ -520,10 +525,6 @@ const Dashboard = () => {
                 <span className="stat-label">Pending</span>
               </div>
               <div className="stat-item">
-                <span className="stat-value">{registeredEvents.filter(e => e.registrationStatus === 'waitlist').length}</span>
-                <span className="stat-label">Waitlist</span>
-              </div>
-              <div className="stat-item">
                 <span className="stat-value">{registeredEvents.filter(e => e.paymentStatus === 'verified').length}</span>
                 <span className="stat-label">Confirmed</span>
               </div>
@@ -670,11 +671,28 @@ const Dashboard = () => {
                       pendingCount: 0,
                       maxParticipants: event.maxParticipants || 0,
                       availableSpots: event.maxParticipants - (event.registeredCount || 0),
-                      percentage: event.maxParticipants > 0 ? Math.round(((event.registeredCount || 0) / event.maxParticipants) * 100) : 0,
+                      // ✅ FIX: Percentage based on confirmed + pending (total occupancy)
+                      percentage: event.maxParticipants > 0 
+                        ? Math.round(((event.registeredCount || 0) / event.maxParticipants) * 100) 
+                        : 0,
                       isFull: false
                     };
+
+                    // ✅ If using real stats, ensure percentage uses confirmed + pending
+                    if (eventStats[event._id]) {
+                      const realStats = eventStats[event._id];
+                      stats.percentage = realStats.maxParticipants > 0 
+                        ? Math.round(((realStats.confirmedCount + realStats.pendingCount) / realStats.maxParticipants) * 100) 
+                        : 0;
+                      stats.confirmedCount = realStats.confirmedCount;
+                      stats.pendingCount = realStats.pendingCount;
+                      stats.availableSpots = realStats.availableSpots;
+                      stats.isFull = realStats.isFull;
+                    }
+
                     const isFull = stats.isFull || stats.confirmedCount >= stats.maxParticipants;
-                    const availableSpots = stats.maxParticipants - (stats.confirmedCount + stats.pendingCount);
+                    const totalOccupancy = stats.confirmedCount + stats.pendingCount;
+                    const fillPercentage = stats.percentage;
 
                     return (
                       <div key={event._id} className="event-card-dashboard">
@@ -721,7 +739,7 @@ const Dashboard = () => {
                             <span>₹{event.fee} per head</span>
                           </div>
                           
-                          {/* Registration Stats */}
+                          {/* Registration Stats with FILL PERCENTAGE = Confirmed + Waitlist */}
                           <div className="detail-item-dashboard registration-progress-dashboard">
                             <span className="icon-dashboard">📊</span>
                             <div className="progress-info-dashboard">
@@ -734,21 +752,24 @@ const Dashboard = () => {
                                     · <strong>{stats.pendingCount}</strong> on waitlist
                                   </span>
                                 )}
+                                <span className="fill-percentage-dashboard" style={{ marginLeft: 'auto', fontSize: '0.8rem', color: '#ffd700' }}>
+                                  {fillPercentage}% Full
+                                </span>
                               </div>
                               <div className="progress-bar-dashboard">
                                 <div
                                   className="progress-fill-dashboard"
                                   style={{
-                                    width: `${stats.percentage}%`,
+                                    width: `${fillPercentage}%`,
                                     backgroundColor: isFull ? '#ff4757' : '#2ecc71'
                                   }}
                                 ></div>
                               </div>
                               <div className="spots-message-dashboard">
-                                {availableSpots <= 0 ? (
+                                {stats.availableSpots <= 0 ? (
                                   <span style={{ color: '#ffa502' }}>⏳ Event Full - Join Waitlist</span>
                                 ) : (
-                                  <span style={{ color: '#2ecc71' }}>{availableSpots} spots available</span>
+                                  <span style={{ color: '#2ecc71' }}>{stats.availableSpots} spots available</span>
                                 )}
                               </div>
                             </div>

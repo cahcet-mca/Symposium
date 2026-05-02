@@ -100,10 +100,6 @@ const eventSchema = new mongoose.Schema({
     type: Boolean,
     default: true
   },
-  maxWaitlist: {
-    type: Number,
-    default: 50
-  },
   registeredCount: {
     type: Number,
     default: 0

@@ -73,7 +73,8 @@ const EventDetailsPopup = ({ event, onClose, registrationsOpen = true }) => {
           
           // AVAILABLE = TOTAL CAPACITY - (REGISTER + WAITLIST)
           const available = max - (registered + waitlist);
-          const percent = max > 0 ? Math.round((registered / max) * 100) : 0;
+          // FILL PERCENTAGE = (REGISTER + WAITLIST) / CAPACITY * 100
+          const percent = max > 0 ? Math.round(((registered + waitlist) / max) * 100) : 0;
           const isFull = registered >= max;
 
           setRegistrationStats({
@@ -85,7 +86,7 @@ const EventDetailsPopup = ({ event, onClose, registrationsOpen = true }) => {
             isFull: isFull
           });
 
-          console.log(`📊 Event Stats: REGISTER=${registered}, WAITLIST=${waitlist}, AVAILABLE=${available}, TOTAL=${max}`);
+          console.log(`📊 Event Stats: REGISTER=${registered}, WAITLIST=${waitlist}, AVAILABLE=${available}, TOTAL=${max}, FILL=${percent}%`);
         }
 
         if (isAuthenticated && token) {
@@ -111,13 +112,14 @@ const EventDetailsPopup = ({ event, onClose, registrationsOpen = true }) => {
 
         const registered = event.registeredCount || 0;
         const max = event.maxParticipants || 0;
-        const available = max - registered;
-        const percent = max > 0 ? Math.round((registered / max) * 100) : 0;
+        const waitlist = event.pendingCount || 0;
+        const available = max - (registered + waitlist);
+        const percent = max > 0 ? Math.round(((registered + waitlist) / max) * 100) : 0;
         const isFull = registered >= max;
 
         setRegistrationStats({
           registeredCount: registered,
-          waitlistCount: 0,
+          waitlistCount: waitlist,
           maxParticipants: max,
           availableSpots: available,
           percentage: percent,
@@ -149,6 +151,17 @@ const EventDetailsPopup = ({ event, onClose, registrationsOpen = true }) => {
     if (registrationStats.availableSpots <= 5) return 'Only Few Spots Left!';
     if (registrationStats.availableSpots <= 10) return 'Limited Spots';
     return 'Spots Available';
+  };
+
+  const handleRegisterClick = () => {
+    if (isEventFull()) {
+      const confirmMessage = `⚠️ "${eventDetails.name}" is full!\n\nYou will be added to the waitlist. Payment will be required. Do you want to continue?`;
+      if (window.confirm(confirmMessage)) {
+        window.location.href = `/payment/${eventDetails._id}`;
+      }
+    } else {
+      window.location.href = `/payment/${eventDetails._id}`;
+    }
   };
 
   if (!eventDetails) return null;
@@ -233,10 +246,13 @@ const EventDetailsPopup = ({ event, onClose, registrationsOpen = true }) => {
                   </div>
                 </div>
 
+                {/* Progress Bar - shows total occupancy */}
                 <div className="progress-container">
                   <div className="progress-info">
-                    <span>Fill Percentage</span>
-                    <span style={{ color: getStatusColor(), fontWeight: 'bold' }}>{registrationStats.percentage}%</span>
+                    <span>Total Occupancy</span>
+                    <span style={{ color: getStatusColor(), fontWeight: 'bold' }}>
+                      {registrationStats.percentage}% ({registrationStats.registeredCount + registrationStats.waitlistCount}/{registrationStats.maxParticipants})
+                    </span>
                   </div>
                   <div className="progress-bar-bg">
                     <div
@@ -431,14 +447,21 @@ const EventDetailsPopup = ({ event, onClose, registrationsOpen = true }) => {
 
           {canRegister && registrationsOpen ? (
             isEventFull() ? (
+              // Event is full - Waitlist option with confirmation
               <button
-                onClick={() => window.location.href = `/payment/${eventDetails._id}`}
+                onClick={() => {
+                  const confirmMessage = `⚠️ "${eventDetails.name}" is full!\n\nYou will be added to the waitlist. Payment will be required. Do you want to continue?`;
+                  if (window.confirm(confirmMessage)) {
+                    window.location.href = `/payment/${eventDetails._id}`;
+                  }
+                }}
                 className={`btn-register-popup waitlist-btn ${userRegistration?.paymentStatus === 'rejected' ? 'rejected' : ''}`}
               >
                 <span className="btn-icon">⏳</span>
                 Join Waitlist
               </button>
             ) : (
+              // Event has spots - Direct registration
               <button
                 onClick={() => window.location.href = `/payment/${eventDetails._id}`}
                 className={`btn-register-popup ${userRegistration?.paymentStatus === 'rejected' ? 'rejected' : ''}`}

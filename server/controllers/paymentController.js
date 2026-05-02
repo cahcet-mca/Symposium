@@ -83,19 +83,20 @@ const verifyPayment = async (req, res) => {
       event: event._id,
       paymentStatus: 'verified'
     });
-    
+
     const pendingCount = await Registration.countDocuments({
       event: event._id,
       paymentStatus: 'pending'
     });
-    
+
     const isFull = confirmedCount >= event.maxParticipants;
-    const isWaitlistFull = pendingCount >= (event.maxWaitlist || 50);
-    
+    const maxWaitlist = event.maxParticipants;
+    const isWaitlistFull = pendingCount >= maxWaitlist;
+
     let paymentStatus = 'pending';
     let registrationStatus = 'pending';
     let statusMessage = '';
-    
+
     if (!isFull) {
       // Direct registration (confirmed spot once approved)
       paymentStatus = 'pending';
