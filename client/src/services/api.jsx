@@ -7,8 +7,8 @@ const API_BASE_URL = import.meta.env.VITE_API_URL;
 // List of problematic event IDs that consistently return 500 (temporary fix)
 // Remove these once backend is fixed
 const PROBLEMATIC_EVENT_IDS = [
-  '69b78f57505865bbacabd2a3', // Presento
-  '69b30323ac367921d9b418e9'  // Posterno
+  '69b78f57505865bbacabd2a3',
+  '69b30323ac367921d9b418e9'
 ];
 
 // Create axios instance
