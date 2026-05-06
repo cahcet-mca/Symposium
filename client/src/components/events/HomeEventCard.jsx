@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSymposiumDate } from '../../context/DateContext';
+import { getEventImageUrl } from '../../services/api';
 import './HomeEventCard.css';
 
 const HomeEventCard = ({ event }) => {
@@ -23,14 +24,16 @@ const HomeEventCard = ({ event }) => {
 
   // Get image source
   const getImageSource = () => {
-    if (!event.image || imageError) return null;
+    if (!event.image && !event.imageUrl) return null;
+    if (imageError) return null;
     
-    try {
-      const filename = event.image.split('/').pop();
-      return new URL(`/src/assets/images/${filename}`, import.meta.url).href;
-    } catch {
-      return null;
+    // Use imageUrl from API if available
+    if (event.imageUrl) {
+      return event.imageUrl;
     }
+    
+    // Fallback to using image filename
+    return getEventImageUrl(event.image);
   };
 
   const imageSrc = getImageSource();

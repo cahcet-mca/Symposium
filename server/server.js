@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const dotenv = require('dotenv');
 const colors = require('colors');
+const path = require('path');
 const connectDB = require('./config/db');
 
 // Load env vars
@@ -62,6 +63,24 @@ const app = express();
 // Body parser with increased limit for screenshots
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
+
+// ============================================
+// SERVE STATIC EVENT IMAGES
+// ============================================
+
+// Path to event-images folder (outside client and server)
+const eventImagesPath = path.join(__dirname, '..', 'event-images');
+
+// Create directory if it doesn't exist
+const fs = require('fs');
+if (!fs.existsSync(eventImagesPath)) {
+  fs.mkdirSync(eventImagesPath, { recursive: true });
+  console.log('📁 Created event-images directory'.green);
+}
+
+// Serve static images
+app.use('/event-images', express.static(eventImagesPath));
+console.log(`📁 Serving event images from: ${eventImagesPath}`.cyan);
 
 // ============================================
 // CORS CONFIGURATION
@@ -170,7 +189,8 @@ app.get('/', (req, res) => {
       payments: '/api/payments',
       admin: '/api/admin',
       health: '/health',
-      settings: '/api/settings/registrations-status'
+      settings: '/api/settings/registrations-status',
+      images: '/event-images/:filename'
     }
   });
 });
@@ -259,6 +279,7 @@ const server = app.listen(PORT, '0.0.0.0', () => {
   if (LOCAL_IP !== 'localhost') {
     console.log(`📱 Network: http://${LOCAL_IP}:${PORT}`.cyan);
   }
+  console.log(`🖼️  Image URL: http://localhost:${PORT}/event-images/`.cyan);
   
   // Show allowed origins
   console.log(`\n🔒 Allowed Origins:`.yellow);

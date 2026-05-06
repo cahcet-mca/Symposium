@@ -1,6 +1,14 @@
 const Event = require('../models/Event');
 const Registration = require('../models/Registration');
 
+// Helper function to get full image URL
+const getImageUrl = (imageFilename, req) => {
+  if (!imageFilename) return null;
+  // Use BASE_URL from env or construct from request
+  const baseUrl = process.env.BASE_URL || `${req.protocol}://${req.get('host')}`;
+  return `${baseUrl}/event-images/${imageFilename}`;
+};
+
 // @desc    Get all events
 // @route   GET /api/events
 // @access  Public
@@ -47,7 +55,8 @@ const getEvents = async (req, res) => {
           isFull: confirmedCount >= capacity,
           isCompletelyFull: isCompletelyFull,
           waitlistCount: pendingCount,
-          availableSpots: capacity - totalOccupancy
+          availableSpots: capacity - totalOccupancy,
+          imageUrl: getImageUrl(event.image, req)
         };
       } catch (err) {
         console.error(`Error enriching event ${event.name}:`, err.message);
@@ -59,7 +68,8 @@ const getEvents = async (req, res) => {
           isFull: false,
           isCompletelyFull: false,
           waitlistCount: 0,
-          availableSpots: (event.maxParticipants || 0) - (event.registeredCount || 0)
+          availableSpots: (event.maxParticipants || 0) - (event.registeredCount || 0),
+          imageUrl: getImageUrl(event.image, req)
         };
       }
     }));
@@ -94,7 +104,10 @@ const getEventById = async (req, res) => {
 
     res.json({
       success: true,
-      data: event
+      data: {
+        ...event.toObject(),
+        imageUrl: getImageUrl(event.image, req)
+      }
     });
   } catch (error) {
     console.error('Error in getEventById:', error);
@@ -125,7 +138,10 @@ const createEvent = async (req, res) => {
     
     res.status(201).json({
       success: true,
-      data: event
+      data: {
+        ...event.toObject(),
+        imageUrl: getImageUrl(event.image, req)
+      }
     });
   } catch (error) {
     console.error('Error in createEvent:', error);
@@ -166,7 +182,10 @@ const updateEvent = async (req, res) => {
 
     res.json({
       success: true,
-      data: event
+      data: {
+        ...event.toObject(),
+        imageUrl: getImageUrl(event.image, req)
+      }
     });
   } catch (error) {
     console.error('Error in updateEvent:', error);
@@ -315,6 +334,7 @@ const getEventWithRealCount = async (req, res) => {
       isWaitlistFull: isWaitlistFull,
       isCompletelyFull: isCompletelyFull,
       maxWaitlist: maxWaitlist,
+      imageUrl: getImageUrl(event.image, req),
       statusInfo: {
         confirmed: confirmedCount,
         pending: pendingCount,
@@ -431,7 +451,10 @@ const updateEventImage = async (req, res) => {
 
     res.json({
       success: true,
-      data: event
+      data: {
+        ...event.toObject(),
+        imageUrl: getImageUrl(event.image, req)
+      }
     });
   } catch (error) {
     console.error('Error in updateEventImage:', error);
@@ -451,10 +474,15 @@ const getEventsByCategory = async (req, res) => {
       category: req.params.category 
     }).sort({ startTime: 1 });
     
+    const eventsWithUrls = events.map(event => ({
+      ...event.toObject(),
+      imageUrl: getImageUrl(event.image, req)
+    }));
+    
     res.json({
       success: true,
-      count: events.length,
-      data: events
+      count: eventsWithUrls.length,
+      data: eventsWithUrls
     });
   } catch (error) {
     console.error('Error in getEventsByCategory:', error);
@@ -474,10 +502,15 @@ const getFeaturedEvents = async (req, res) => {
       { $sample: { size: 4 } }
     ]);
     
+    const eventsWithUrls = events.map(event => ({
+      ...event,
+      imageUrl: getImageUrl(event.image, req)
+    }));
+    
     res.json({
       success: true,
-      count: events.length,
-      data: events
+      count: eventsWithUrls.length,
+      data: eventsWithUrls
     });
   } catch (error) {
     console.error('Error in getFeaturedEvents:', error);
@@ -515,6 +548,7 @@ const debugEventCounts = async (req, res) => {
           eventId: event._id,
           eventName: event.name,
           image: event.image,
+          imageUrl: getImageUrl(event.image, req),
           storedCount: event.registeredCount || 0,
           storedConfirmed: event.confirmedCount || 0,
           storedPending: event.pendingCount || 0,

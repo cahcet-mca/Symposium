@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useAuth } from '../../context/AuthContext';
 import { useSymposiumDate } from '../../context/DateContext';
+import { getEventImageUrl } from '../../services/api';
 import './EventDetailsPopup.css';
 
 const API_URL = import.meta.env.VITE_API_URL;
@@ -37,16 +38,16 @@ const EventDetailsPopup = ({ event, onClose, registrationsOpen = true }) => {
   };
 
   const getImageSource = () => {
-    if (!eventDetails.image || imageError) {
-      return null;
+    if (!eventDetails.image && !eventDetails.imageUrl) return null;
+    if (imageError) return null;
+    
+    // Use imageUrl from API if available
+    if (eventDetails.imageUrl) {
+      return eventDetails.imageUrl;
     }
-
-    try {
-      const filename = eventDetails.image.split('/').pop();
-      return new URL(`/src/assets/images/${filename}`, import.meta.url).href;
-    } catch {
-      return null;
-    }
+    
+    // Fallback: construct URL from image filename
+    return getEventImageUrl(eventDetails.image);
   };
 
   useEffect(() => {
@@ -209,7 +210,7 @@ const EventDetailsPopup = ({ event, onClose, registrationsOpen = true }) => {
         </div>
 
         <div className="popup-content">
-          {/* Registration Status Section - 4 Columns */}
+          {/* Registration Status Section */}
           <div className="popup-section registration-status-section">
             <h3>📊 Registration Status</h3>
             {loading ? (
@@ -226,7 +227,7 @@ const EventDetailsPopup = ({ event, onClose, registrationsOpen = true }) => {
                   </div>
                 </div>
 
-                {/* 4-Column Stats Grid: REGISTER | WAITLIST | AVAILABLE | TOTAL CAPACITY */}
+                {/* 4-Column Stats Grid */}
                 <div className="stats-grid-4">
                   <div className="stat-box">
                     <span className="stat-label">REGISTER</span>
@@ -246,7 +247,7 @@ const EventDetailsPopup = ({ event, onClose, registrationsOpen = true }) => {
                   </div>
                 </div>
 
-                {/* Progress Bar - shows total occupancy */}
+                {/* Progress Bar */}
                 <div className="progress-container">
                   <div className="progress-info">
                     <span>Total Occupancy</span>
@@ -447,7 +448,6 @@ const EventDetailsPopup = ({ event, onClose, registrationsOpen = true }) => {
 
           {canRegister && registrationsOpen ? (
             isEventFull() ? (
-              // Event is full - Waitlist option with confirmation
               <button
                 onClick={() => {
                   const confirmMessage = `⚠️ "${eventDetails.name}" is full!\n\nYou will be added to the waitlist. Payment will be required. Do you want to continue?`;
@@ -461,7 +461,6 @@ const EventDetailsPopup = ({ event, onClose, registrationsOpen = true }) => {
                 Join Waitlist
               </button>
             ) : (
-              // Event has spots - Direct registration
               <button
                 onClick={() => window.location.href = `/payment/${eventDetails._id}`}
                 className={`btn-register-popup ${userRegistration?.paymentStatus === 'rejected' ? 'rejected' : ''}`}
