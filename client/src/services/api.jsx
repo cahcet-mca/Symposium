@@ -63,6 +63,26 @@ api.interceptors.response.use(
 );
 
 // ============================================
+// HELPER FUNCTION FOR IMAGE URLS
+// ============================================
+
+/**
+ * Get full image URL for an event
+ * @param {string} imageFilename - The image filename stored in database
+ * @returns {string|null} Full URL to the image or null
+ */
+export const getEventImageUrl = (imageFilename) => {
+  if (!imageFilename) return null;
+  
+  // If it's already a full URL, return as is
+  if (imageFilename.startsWith('http')) return imageFilename;
+  
+  // Get base URL without /api suffix
+  const baseUrl = API_BASE_URL.replace('/api', '');
+  return `${baseUrl}/event-images/${imageFilename}`;
+};
+
+// ============================================
 // EVENTS API - REAL DATA FROM DATABASE
 // ============================================
 
@@ -88,7 +108,8 @@ export const fetchEvents = async () => {
             confirmedCount: event.registeredCount || 0,
             pendingCount: 0,
             availableSpots: (event.maxParticipants || 0) - (event.registeredCount || 0),
-            isFull: false
+            isFull: false,
+            imageUrl: event.imageUrl || getEventImageUrl(event.image)
           };
         }
         
@@ -106,7 +127,10 @@ export const fetchEvents = async () => {
           if (countResponse.data.success) {
             return countResponse.data.data;
           }
-          return event;
+          return {
+            ...event,
+            imageUrl: event.imageUrl || getEventImageUrl(event.image)
+          };
         } catch (error) {
           // Log the error but don't crash
           if (error.code === 'ECONNABORTED' || error.name === 'AbortError') {
@@ -125,7 +149,8 @@ export const fetchEvents = async () => {
             confirmedCount: event.registeredCount || 0,
             pendingCount: 0,
             availableSpots: (event.maxParticipants || 0) - (event.registeredCount || 0),
-            isFull: false
+            isFull: false,
+            imageUrl: event.imageUrl || getEventImageUrl(event.image)
           };
         }
       })
@@ -175,7 +200,8 @@ export const fetchEvent = async (id) => {
               confirmedCount: basicEvent.registeredCount || 0,
               pendingCount: 0,
               availableSpots: (basicEvent.maxParticipants || 0) - (basicEvent.registeredCount || 0),
-              isFull: false
+              isFull: false,
+              imageUrl: getEventImageUrl(basicEvent.image)
             }
           }
         };
@@ -222,7 +248,8 @@ export const fetchEvent = async (id) => {
               confirmedCount: basicEvent.registeredCount || 0,
               pendingCount: 0,
               availableSpots: (basicEvent.maxParticipants || 0) - (basicEvent.registeredCount || 0),
-              isFull: false
+              isFull: false,
+              imageUrl: getEventImageUrl(basicEvent.image)
             }
           }
         };

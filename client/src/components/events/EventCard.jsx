@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSymposiumDate } from '../../context/DateContext';
+import { getEventImageUrl } from '../../services/api';
 import axios from 'axios';
 import './EventCard.css';
 
@@ -27,16 +28,16 @@ const EventCard = ({ event, onViewDetails, registrationsOpen = true }) => {
   };
 
   const getImageSource = () => {
-    if (!eventDetails.image || imageError) {
-      return null;
+    if (!eventDetails.image && !eventDetails.imageUrl) return null;
+    if (imageError) return null;
+    
+    // Use imageUrl from API if available, otherwise construct from filename
+    if (eventDetails.imageUrl) {
+      return eventDetails.imageUrl;
     }
     
-    try {
-      const filename = eventDetails.image.split('/').pop();
-      return new URL(`/src/assets/images/${filename}`, import.meta.url).href;
-    } catch (error) {
-      return null;
-    }
+    // Fallback: construct URL from image filename
+    return getEventImageUrl(eventDetails.image);
   };
 
   const fetchRealCounts = useCallback(async () => {
@@ -146,7 +147,7 @@ const EventCard = ({ event, onViewDetails, registrationsOpen = true }) => {
           />
         ) : (
           <div className="event-image-placeholder">
-            <span>{event.subEventName?.charAt(0) || event.name.charAt(0)}</span>
+            <span>{eventDetails.subEventName?.charAt(0) || event.name.charAt(0)}</span>
           </div>
         )}
         <div className="event-badge">{event.category}</div>
