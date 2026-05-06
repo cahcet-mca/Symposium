@@ -1616,7 +1616,7 @@
 /* Small Mobile */
 @media (max-width: 480px) {
   .mobile-sidebar-toggle {
-    top: 65px;
+    top: 5px;
     width: 40px;
     height: 40px;
     font-size: 1.3rem;

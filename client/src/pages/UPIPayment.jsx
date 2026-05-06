@@ -747,6 +747,16 @@ const UPIPayment = () => {
               </div>
 
               <div className="payment-steps">
+                <h4>Rules:</h4>
+                <ol>
+                  <li>Once you have registered and paid for an event, you cannot cancel your registration. Payments are non-refundable</li>
+                  <li>Kindly enter a valid 12-digit transaction ID. This is required for payment verification</li>
+                  <li>After payment, wait for verification. If approved, registration is confirmed. If rejected, retry using the same transaction ID</li>
+                  <li>Having trouble? Reach out to your event coordinator for help.</li>
+                </ol>
+              </div>
+
+              <div className="payment-steps">
                 <h4>Steps to complete payment:</h4>
                 <ol>
                   <li>Scan QR code or copy UPI ID</li>
