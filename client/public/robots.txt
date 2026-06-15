@@ -5,13 +5,5 @@ User-agent: *
 Allow: /
 
 # Tell Google where to find your sitemap
-# ⚠️ IMPORTANT: Replace YOUR_SITE_NAME with your actual Netlify URL
-Sitemap: Sitemap: https://tecno-rendezvous-client.netlify.app/sitemap.xml
-
-# Optional: Block admin and dashboard from search results (privacy)
-# Uncomment if you don't want these pages in Google search
-
-# Disallow: /admin/
-# Disallow: /dashboard/
-# Disallow: /login/
-# Disallow: /register/
+# ⚠️ IMPORTANT: Replace with YOUR actual Netlify URL
+Sitemap: https://tecno-rendezvous.netlify.app/sitemap.xml
