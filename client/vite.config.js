@@ -9,7 +9,7 @@ export default defineConfig(({ mode }) => {
   
   // Get your Netlify URL (replace with YOUR actual Netlify URL)
   // Example: https://tecno-rendezvous.netlify.app
-  const siteUrl = env.VITE_SITE_URL || 'https://YOUR_SITE_NAME.netlify.app';
+  const siteUrl = env.VITE_SITE_URL || 'https://tecno-rendezvous-client.netlify.app';
   
   return {
     plugins: [
