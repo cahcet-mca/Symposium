@@ -1,9 +1,13 @@
+// src/pages/Home.jsx
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSymposiumDate } from '../context/DateContext';
 import axios from 'axios';
 import HomeEventCard from '../components/events/HomeEventCard';
 import './Home.css';
+
+// Import location icon image
+import locationIcon from '../assets/location-icon.png';
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -12,13 +16,27 @@ const Home = () => {
   const [technicalEvents, setTechnicalEvents] = useState([]);
   const [nonTechnicalEvents, setNonTechnicalEvents] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [isHeroVisible, setIsHeroVisible] = useState(true);
   
   // Slider refs
   const technicalSliderRef = useRef(null);
   const nonTechnicalSliderRef = useRef(null);
   
+  // Section refs for scroll animations
+  const infoSectionRef = useRef(null);
+  const technicalSectionRef = useRef(null);
+  const nonTechnicalSectionRef = useRef(null);
+  const venueSectionRef = useRef(null);
+  const ctaSectionRef = useRef(null);
+  
+  // Scroll animation state
+  const [scrollY, setScrollY] = useState(0);
+  
   const { symposiumDate, symposiumName, venue, venueDetails } = useSymposiumDate();
   const navigate = useNavigate();
+
+  // Google Maps location link
+  const MAPS_LOCATION_URL = "https://maps.app.goo.gl/LFiTvjqPmsFzePN96";
 
   useEffect(() => {
     const fetchData = async () => {
@@ -52,6 +70,48 @@ const Home = () => {
 
     fetchData();
   }, []);
+
+  // Scroll animation effect
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrollY(window.scrollY);
+      
+      // Hero fades as you scroll
+      setIsHeroVisible(window.scrollY < 300);
+    };
+    
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  // Intersection Observer for section animations
+  useEffect(() => {
+    const observerOptions = {
+      threshold: 0.1,
+      rootMargin: '0px 0px -50px 0px'
+    };
+    
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('section-visible');
+        }
+      });
+    }, observerOptions);
+    
+    // Observe all sections
+    const sections = [
+      infoSectionRef.current,
+      technicalSectionRef.current,
+      nonTechnicalSectionRef.current,
+      venueSectionRef.current,
+      ctaSectionRef.current
+    ].filter(Boolean);
+    
+    sections.forEach(section => observer.observe(section));
+    
+    return () => observer.disconnect();
+  }, [loading]);
 
   const handleRegisterClick = (e) => {
     e.preventDefault();
@@ -94,8 +154,15 @@ const Home = () => {
 
   return (
     <div className="home">
-      {/* Hero Section */}
-      <section className="hero">
+      {/* Hero Section with Parallax Effect */}
+      <section 
+        id="hero"
+        className={`hero ${isHeroVisible ? 'hero-visible' : 'hero-fade'}`}
+        style={{
+          transform: `translateY(${scrollY * 0.3}px)`,
+          opacity: Math.max(1 - scrollY / 400, 0)
+        }}
+      >
         <div className="hero-content">
           <h1 className="hero-title">{symposiumName}</h1>
           <p className="hero-subtitle">Think Big • Act Smart • Win Together</p>
@@ -116,26 +183,30 @@ const Home = () => {
       </section>
 
       {/* Info Section */}
-      <section className="info-section">
+      <section 
+        id="info"
+        ref={infoSectionRef}
+        className="info-section section-animate"
+      >
         <div className="container">
-          <h2 className="section-title">Create • Compete • Claim your crown</h2>
+          <h2 className="section-title section-title-animate">Create • Compete • Claim your crown</h2>
           <div className="info-grid">
-            <div className="info-card">
+            <div className="info-card info-card-animate">
               <div className="info-number">1</div>
               <h3>Leadership</h3>
               <p>Develop the confidence to guide and inspire others</p>
             </div>
-            <div className="info-card">
+            <div className="info-card info-card-animate info-card-delay-1">
               <div className="info-number">2</div>
               <h3>Skill Building</h3>
               <p>Strengthen practical abilities for real-world success</p>
             </div>
-            <div className="info-card">
+            <div className="info-card info-card-animate info-card-delay-2">
               <div className="info-number">3</div>
               <h3>Collaboration</h3>
               <p>Work together to achieve shared goals effectively</p>
             </div>
-            <div className="info-card">
+            <div className="info-card info-card-animate info-card-delay-3">
               <div className="info-number">4</div>
               <h3>Achievement</h3>
               <p>Reach milestones and celebrate personal progress</p>
@@ -145,11 +216,15 @@ const Home = () => {
       </section>
 
       {/* Technical Events Slider */}
-      <section className="slider-section">
+      <section 
+        id="technical"
+        ref={technicalSectionRef}
+        className="slider-section section-animate"
+      >
         <div className="container">
           <div className="slider-header">
             <div className="header-left">
-              <h2 className="section-title">⚡ Technical Events</h2>
+              <h2 className="section-title section-title-animate">⚡ Technical Events</h2>
               <span className="event-count">{technicalEvents.length} Events</span>
             </div>
             <div className="slider-controls">
@@ -175,8 +250,12 @@ const Home = () => {
           ) : technicalEvents.length > 0 ? (
             <div className="slider-container">
               <div className="slider-track" ref={technicalSliderRef}>
-                {technicalEvents.map(event => (
-                  <div key={event._id} className="slider-item">
+                {technicalEvents.map((event, index) => (
+                  <div 
+                    key={event._id} 
+                    className="slider-item"
+                    style={{ animationDelay: `${index * 0.1}s` }}
+                  >
                     <HomeEventCard event={event} />
                   </div>
                 ))}
@@ -189,11 +268,15 @@ const Home = () => {
       </section>
 
       {/* Non-Technical Events Slider */}
-      <section className="slider-section">
+      <section 
+        id="nonTechnical"
+        ref={nonTechnicalSectionRef}
+        className="slider-section section-animate"
+      >
         <div className="container">
           <div className="slider-header">
             <div className="header-left">
-              <h2 className="section-title">🎨 Non-Technical Events</h2>
+              <h2 className="section-title section-title-animate">🎨 Non-Technical Events</h2>
               <span className="event-count">{nonTechnicalEvents.length} Events</span>
             </div>
             <div className="slider-controls">
@@ -219,8 +302,12 @@ const Home = () => {
           ) : nonTechnicalEvents.length > 0 ? (
             <div className="slider-container">
               <div className="slider-track" ref={nonTechnicalSliderRef}>
-                {nonTechnicalEvents.map(event => (
-                  <div key={event._id} className="slider-item">
+                {nonTechnicalEvents.map((event, index) => (
+                  <div 
+                    key={event._id} 
+                    className="slider-item"
+                    style={{ animationDelay: `${index * 0.1}s` }}
+                  >
                     <HomeEventCard event={event} />
                   </div>
                 ))}
@@ -233,14 +320,34 @@ const Home = () => {
       </section>
 
       {/* Venue Section */}
-      <section className="venue">
+      <section 
+        id="venue"
+        ref={venueSectionRef}
+        className="venue section-animate"
+      >
         <div className="container">
-          <h2 className="section-title">Venue</h2>
+          <h2 className="section-title section-title-animate">Venue</h2>
           <div className="venue-content">
-            <h3>{venue}</h3>
-            <h3>{venueDetails}</h3>
-            <p className="venue-date">{symposiumDate} • Auditorium</p>
-            <div className="venue-features">
+            <h3 className="venue-content-animate">{venue}</h3>
+            <h3 className="venue-content-animate venue-delay-1">{venueDetails}</h3>
+            <p className="venue-date venue-content-animate venue-delay-2">{symposiumDate} • Auditorium</p>
+            
+            {/* Clickable Location Icon - Opens Google Maps */}
+            <a 
+              href={MAPS_LOCATION_URL} 
+              target="_blank" 
+              rel="noopener noreferrer" 
+              className="location-link venue-content-animate venue-delay-3"
+              title="Click to open location on Google Maps"
+            >
+              <img 
+                src={locationIcon} 
+                alt="Location" 
+                className="location-icon-img"
+              />
+            </a>
+            
+            <div className="venue-features venue-content-animate venue-delay-4">
               <span>🎯 State-of-the-art facilities</span>
               <span>🎯 AC Auditorium</span>
               <span>🎯 Easy accessibility</span>
@@ -250,11 +357,15 @@ const Home = () => {
       </section>
 
       {/* CTA Section */}
-      <section className="cta-section">
+      <section 
+        id="cta"
+        ref={ctaSectionRef}
+        className="cta-section section-animate"
+      >
         <div className="container">
-          <h2>Ready to Showcase Your Talent?</h2>
-          <p>Join {technicalEvents.length + nonTechnicalEvents.length}+ participants in this premier symposium</p>
-          <button onClick={handleExploreEventsClick} className="btn btn-primary btn-large">
+          <h2 className="cta-animate">Ready to Showcase Your Talent?</h2>
+          <p className="cta-animate cta-delay-1">Join {technicalEvents.length + nonTechnicalEvents.length}+ participants in this premier symposium</p>
+          <button onClick={handleExploreEventsClick} className="btn btn-primary btn-large cta-animate cta-delay-2">
             Browse All Events
           </button>
         </div>

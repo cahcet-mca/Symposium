@@ -1,4 +1,6 @@
-import React, { useState, useEffect } from 'react';
+// src/pages/Events.jsx - Updated with Scroll Animations
+
+import React, { useState, useEffect, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
 import { useEvents } from '../context/EventContext';
 import { useSymposiumDate } from '../context/DateContext';
@@ -19,9 +21,48 @@ const Events = () => {
   const { symposiumName } = useSymposiumDate();
   const location = useLocation();
 
+  // Refs for scroll animations
+  const headerRef = useRef(null);
+  const searchRef = useRef(null);
+  const filtersRef = useRef(null);
+  const technicalSectionRef = useRef(null);
+  const nonTechnicalSectionRef = useRef(null);
+
   // State for event details popup
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [showPopup, setShowPopup] = useState(false);
+
+  // ============================================
+  // SCROLL ANIMATIONS - Intersection Observer
+  // ============================================
+  useEffect(() => {
+    const observerOptions = {
+      threshold: 0.1,
+      rootMargin: '0px 0px -30px 0px'
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('section-visible');
+        }
+      });
+    }, observerOptions);
+
+    const sections = [
+      headerRef.current,
+      searchRef.current,
+      filtersRef.current,
+      technicalSectionRef.current,
+      nonTechnicalSectionRef.current
+    ].filter(Boolean);
+
+    sections.forEach(section => {
+      if (section) observer.observe(section);
+    });
+
+    return () => observer.disconnect();
+  }, [events]);
 
   useEffect(() => {
     const params = new URLSearchParams(location.search);
@@ -50,7 +91,6 @@ const Events = () => {
     try {
       console.log('🔍 Events page fetching fresh data for event:', event._id);
 
-      // Fetch the latest event data with real counts
       const response = await axios.get(
         `${API_URL}/events/${event._id}/with-count`
       );
@@ -66,7 +106,6 @@ const Events = () => {
         setSelectedEvent(freshEventData);
         setShowPopup(true);
       } else {
-        // Fallback to the passed event if API fails
         setSelectedEvent(event);
         setShowPopup(true);
       }
@@ -102,7 +141,7 @@ const Events = () => {
   if (error) {
     return (
       <div className="events-page">
-        <div className="error-container">
+        <div className="error-container section-animate">
           <h2>Error Loading Events</h2>
           <p>{error}</p>
           <button onClick={() => window.location.reload()} className="btn-primary">
@@ -116,7 +155,7 @@ const Events = () => {
   if (!events || events.length === 0) {
     return (
       <div className="events-page">
-        <div className="no-events-container">
+        <div className="no-events-container section-animate">
           <h2>No Events Found</h2>
           <p>There are currently no events available.</p>
           <button onClick={() => window.location.reload()} className="btn-primary">
@@ -131,7 +170,7 @@ const Events = () => {
     <div className="events-page">
       {/* Registration Closed Banner */}
       {showRegistrationBanner && (
-        <div className="registration-closed-banner">
+        <div className="registration-closed-banner section-animate">
           <span className="banner-icon">🔒</span>
           <span className="banner-text">
             Online registration is finished. Only on-time registration is available at the venue.
@@ -148,11 +187,17 @@ const Events = () => {
         />
       )}
 
-      <div className="events-header">
+      <div 
+        ref={headerRef}
+        className="events-header section-animate"
+      >
         <h1>{symposiumName} Events</h1>
         <p className="header-subtitle">Choose your arena and showcase your talent</p>
 
-        <div className="search-section">
+        <div 
+          ref={searchRef}
+          className="search-section section-animate"
+        >
           <div className="search-wrapper">
             <input
               type="text"
@@ -164,7 +209,10 @@ const Events = () => {
           </div>
         </div>
 
-        <div className="filter-tabs">
+        <div 
+          ref={filtersRef}
+          className="filter-tabs section-animate"
+        >
           <button
             className={`filter-btn ${category === 'All' ? 'active' : ''}`}
             onClick={() => setCategory('All')}
@@ -185,7 +233,7 @@ const Events = () => {
           </button>
         </div>
 
-        <div className="type-filter">
+        <div className="type-filter section-animate">
           <label>Event Type:</label>
           <select
             onChange={(e) => setEventType(e.target.value)}
@@ -203,18 +251,22 @@ const Events = () => {
         {category === 'All' ? (
           <>
             {technicalEvents.length > 0 && (
-              <section className="category-section">
+              <section 
+                ref={technicalSectionRef}
+                className="category-section section-animate"
+              >
                 <div className="category-header">
                   <h2>⚡ Technical Events</h2>
                   <p className="category-fee">₹50 per head | Individual & Team events</p>
                 </div>
-                <div className="event-grid">
-                  {technicalEvents.map(event => (
+                <div className="event-grid stagger-children">
+                  {technicalEvents.map((event, index) => (
                     <EventCard
                       key={event._id}
                       event={event}
                       onViewDetails={handleViewDetails}
                       registrationsOpen={registrationsOpen}
+                      style={{ animationDelay: `${index * 0.08}s` }}
                     />
                   ))}
                 </div>
@@ -222,18 +274,22 @@ const Events = () => {
             )}
 
             {nonTechnicalEvents.length > 0 && (
-              <section className="category-section">
+              <section 
+                ref={nonTechnicalSectionRef}
+                className="category-section section-animate"
+              >
                 <div className="category-header">
                   <h2>🎨 Non-Technical Events</h2>
                   <p className="category-fee">₹50 per head | Individual & Team events</p>
                 </div>
-                <div className="event-grid">
-                  {nonTechnicalEvents.map(event => (
+                <div className="event-grid stagger-children">
+                  {nonTechnicalEvents.map((event, index) => (
                     <EventCard
                       key={event._id}
                       event={event}
                       onViewDetails={handleViewDetails}
                       registrationsOpen={registrationsOpen}
+                      style={{ animationDelay: `${index * 0.08}s` }}
                     />
                   ))}
                 </div>
@@ -241,7 +297,7 @@ const Events = () => {
             )}
 
             {technicalEvents.length === 0 && nonTechnicalEvents.length === 0 && (
-              <div className="no-results">
+              <div className="no-results section-animate">
                 <h3>No events match your filters</h3>
                 <p>Try adjusting your search criteria</p>
                 <button
@@ -260,18 +316,19 @@ const Events = () => {
         ) : (
           <>
             {filteredEvents.length > 0 ? (
-              <div className="event-grid">
-                {filteredEvents.map(event => (
+              <div className="event-grid stagger-children">
+                {filteredEvents.map((event, index) => (
                   <EventCard
                     key={event._id}
                     event={event}
                     onViewDetails={handleViewDetails}
                     registrationsOpen={registrationsOpen}
+                    style={{ animationDelay: `${index * 0.08}s` }}
                   />
                 ))}
               </div>
             ) : (
-              <div className="no-results">
+              <div className="no-results section-animate">
                 <h3>No events found</h3>
                 <p>Try adjusting your search or filter</p>
                 <button

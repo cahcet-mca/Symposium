@@ -1,4 +1,6 @@
-import React, { useState, useEffect, useCallback } from 'react';
+// src/pages/AdminDashboard.jsx - Complete with Scroll Animations
+
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import * as XLSX from 'xlsx';
@@ -14,12 +16,19 @@ const AdminDashboard = () => {
   const [loading, setLoading] = useState(true);
   const [selectedRegistration, setSelectedRegistration] = useState(null);
   const [showParticipantsModal, setShowParticipantsModal] = useState(false);
+  const [showScreenshotModal, setShowScreenshotModal] = useState(false);
+  const [selectedScreenshot, setSelectedScreenshot] = useState('');
   const [processingId, setProcessingId] = useState(null);
   const [registrationsOpen, setRegistrationsOpen] = useState(true);
   const [actionMessage, setActionMessage] = useState({ type: '', text: '' });
   
   // Mobile sidebar state
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
+  
+  // Refs for scroll animations
+  const statsRef = useRef(null);
+  const contentRef = useRef(null);
+  const sidebarRef = useRef(null);
   
   // Symposium Name update states
   const [newSymposiumName, setNewSymposiumName] = useState('');
@@ -37,6 +46,40 @@ const AdminDashboard = () => {
   // UPI ID update states
   const [newUpiId, setNewUpiId] = useState('');
   const [updatingUpi, setUpdatingUpi] = useState(false);
+
+  // Add Event states
+  const [newEvent, setNewEvent] = useState({
+    name: '',
+    subEventName: '',
+    coordinatorName: '',
+    coordinatorPhone: '',
+    category: 'Technical',
+    type: 'Individual',
+    description: '',
+    fee: 50,
+    minTeamSize: 1,
+    maxTeamSize: 1,
+    startTime: '10:00 AM',
+    endTime: '12:30 PM',
+    venue: '',
+    requirements: [],
+    prizes: {
+      first: '',
+      second: '',
+      third: ''
+    },
+    maxParticipants: 30,
+    status: 'Upcoming',
+    image: 'default-event.jpg'
+  });
+  const [creatingEvent, setCreatingEvent] = useState(false);
+  const [tempRequirement, setTempRequirement] = useState('');
+  
+  // Event Management states
+  const [events, setEvents] = useState([]);
+  const [editingEvent, setEditingEvent] = useState(null);
+  const [showEventModal, setShowEventModal] = useState(false);
+  const [loadingEvents, setLoadingEvents] = useState(false);
   
   // Message state for settings updates
   const [settingsMessage, setSettingsMessage] = useState({ type: '', text: '' });
@@ -59,6 +102,31 @@ const AdminDashboard = () => {
     upiId, 
     refreshSettings 
   } = useSymposiumDate();
+
+  // ============================================
+  // SCROLL ANIMATIONS - Intersection Observer
+  // ============================================
+  useEffect(() => {
+    const observerOptions = {
+      threshold: 0.1,
+      rootMargin: '0px 0px -30px 0px'
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('section-visible');
+        }
+      });
+    }, observerOptions);
+
+    const sections = [statsRef.current, contentRef.current, sidebarRef.current].filter(Boolean);
+    sections.forEach(section => {
+      if (section) observer.observe(section);
+    });
+
+    return () => observer.disconnect();
+  }, [loading]);
 
   // Get today's date in YYYY-MM-DD format for min attribute
   const getTodayDate = () => {
@@ -314,7 +382,6 @@ const AdminDashboard = () => {
     try {
       const adminToken = localStorage.getItem('adminToken');
       
-      // Basic UPI validation
       const upiRegex = /^[\w.-]+@[\w.-]+$/;
       if (!upiRegex.test(newUpiId)) {
         setSettingsMessage({ 
@@ -352,6 +419,169 @@ const AdminDashboard = () => {
   };
 
   // ============================================
+  // EVENT MANAGEMENT FUNCTIONS
+  // ============================================
+  const addRequirement = (e) => {
+    e.preventDefault();
+    if (tempRequirement.trim()) {
+      setNewEvent(prev => ({
+        ...prev,
+        requirements: [...prev.requirements, tempRequirement.trim()]
+      }));
+      setTempRequirement('');
+    }
+  };
+
+  const removeRequirement = (indexToRemove) => {
+    setNewEvent(prev => ({
+      ...prev,
+      requirements: prev.requirements.filter((_, idx) => idx !== indexToRemove)
+    }));
+  };
+
+  const fetchEvents = useCallback(async () => {
+    try {
+      setLoadingEvents(true);
+      const response = await axios.get(`${API_URL}/events`);
+      if (response.data.success) {
+        setEvents(response.data.data || []);
+      }
+    } catch (error) {
+      console.error('Error fetching events:', error);
+    } finally {
+      setLoadingEvents(false);
+    }
+  }, []);
+
+  const openCreateEventModal = () => {
+    setEditingEvent(null);
+    setNewEvent({
+      name: '',
+      subEventName: '',
+      coordinatorName: '',
+      coordinatorPhone: '',
+      category: 'Technical',
+      type: 'Individual',
+      description: '',
+      fee: 50,
+      minTeamSize: 1,
+      maxTeamSize: 1,
+      startTime: '10:00 AM',
+      endTime: '12:30 PM',
+      venue: '',
+      requirements: [],
+      prizes: {
+        first: '',
+        second: '',
+        third: ''
+      },
+      maxParticipants: 30,
+      status: 'Upcoming',
+      image: 'default-event.jpg'
+    });
+    setTempRequirement('');
+    setShowEventModal(true);
+  };
+
+  const openEditEventModal = (event) => {
+    setEditingEvent(event);
+    setNewEvent({
+      name: event.name || '',
+      subEventName: event.subEventName || '',
+      coordinatorName: event.coordinatorName || '',
+      coordinatorPhone: event.coordinatorPhone || '',
+      category: event.category || 'Technical',
+      type: event.type || 'Individual',
+      description: event.description || '',
+      fee: event.fee || 0,
+      minTeamSize: event.minTeamSize || 1,
+      maxTeamSize: event.maxTeamSize || 1,
+      startTime: event.startTime || '10:00 AM',
+      endTime: event.endTime || '12:30 PM',
+      venue: event.venue || '',
+      requirements: event.requirements || [],
+      prizes: {
+        first: event.prizes?.first || '',
+        second: event.prizes?.second || '',
+        third: event.prizes?.third || ''
+      },
+      maxParticipants: event.maxParticipants || 30,
+      status: event.status || 'Upcoming',
+      image: event.image || 'default-event.jpg'
+    });
+    setTempRequirement('');
+    setShowEventModal(true);
+  };
+
+  const handleDeleteEvent = async (eventId) => {
+    if (!window.confirm('Are you sure you want to delete this event? This action cannot be undone.')) {
+      return;
+    }
+    
+    try {
+      const adminToken = localStorage.getItem('adminToken');
+      const response = await axios.delete(`${API_URL}/events/${eventId}`, {
+        headers: { Authorization: `Bearer ${adminToken}` }
+      });
+      if (response.data.success) {
+        setSettingsMessage({ type: 'success', text: '✅ Event deleted successfully!' });
+        fetchEvents();
+      }
+    } catch (error) {
+      console.error('Error deleting event:', error);
+      setSettingsMessage({ type: 'error', text: '❌ Failed to delete event' });
+    }
+  };
+
+  const handleSaveEvent = async (e) => {
+    e.preventDefault();
+    setCreatingEvent(true);
+    setSettingsMessage({ type: '', text: '' });
+
+    try {
+      const adminToken = localStorage.getItem('adminToken');
+      let response;
+      
+      if (editingEvent) {
+        response = await axios.put(
+          `${API_URL}/events/${editingEvent._id}`,
+          newEvent,
+          { headers: { Authorization: `Bearer ${adminToken}` } }
+        );
+      } else {
+        response = await axios.post(
+          `${API_URL}/events`,
+          newEvent,
+          { headers: { Authorization: `Bearer ${adminToken}` } }
+        );
+      }
+
+      if (response.data.success) {
+        setSettingsMessage({
+          type: 'success',
+          text: `✅ Event "${newEvent.name}" ${editingEvent ? 'updated' : 'created'} successfully!`
+        });
+        setShowEventModal(false);
+        setEditingEvent(null);
+        fetchEvents();
+      }
+    } catch (error) {
+      console.error('Error saving event:', error);
+      setSettingsMessage({ 
+        type: 'error', 
+        text: error.response?.data?.message || '❌ Failed to save event' 
+      });
+      
+      if (error.response?.status === 401) {
+        setSettingsMessage({ type: 'error', text: 'Session expired. Please login again.' });
+        setTimeout(() => handleLogout(), 2000);
+      }
+    } finally {
+      setCreatingEvent(false);
+    }
+  };
+
+  // ============================================
   // FETCH REGISTRATIONS
   // ============================================
   const fetchRegistrations = useCallback(async () => {
@@ -366,7 +596,6 @@ const AdminDashboard = () => {
 
       let url = `${API_URL}/admin/registrations`;
       
-      // Add status filter based on active tab
       const statusMap = {
         'pending': 'pending',
         'verified': 'verified',
@@ -388,7 +617,6 @@ const AdminDashboard = () => {
         const allRegs = response.data.data || [];
         setRegistrations(allRegs);
         
-        // Calculate stats from all registrations
         const allRegsResponse = await axios.get(`${API_URL}/admin/registrations?status=all`, {
           headers: { Authorization: `Bearer ${adminToken}` }
         });
@@ -415,7 +643,6 @@ const AdminDashboard = () => {
           });
         }
         
-        // Extract participants for participants tab
         if (activeTab === 'participants') {
           const allParticipants = [];
           const verifiedRegs = allRegs.filter(r => r.paymentStatus === 'verified');
@@ -479,8 +706,9 @@ const AdminDashboard = () => {
     if (adminToken && adminLoggedIn === 'true') {
       fetchRegistrations();
       fetchSettings();
+      fetchEvents();
     }
-  }, [fetchRegistrations, fetchSettings]);
+  }, [fetchRegistrations, fetchSettings, fetchEvents]);
 
   // ============================================
   // HANDLE STATUS UPDATE (ACCEPT/REJECT)
@@ -499,7 +727,6 @@ const AdminDashboard = () => {
         return;
       }
 
-      // Map frontend status to backend expected status
       const backendStatus = status === 'accepted' ? 'verified' : 'rejected';
       
       console.log(`🔄 Updating registration ${registrationId} to ${backendStatus}`);
@@ -565,6 +792,16 @@ const AdminDashboard = () => {
   const closeModal = () => {
     setShowParticipantsModal(false);
     setSelectedRegistration(null);
+  };
+
+  const viewScreenshot = (registration) => {
+    setSelectedScreenshot(registration.paymentScreenshot || '');
+    setShowScreenshotModal(true);
+  };
+
+  const closeScreenshotModal = () => {
+    setShowScreenshotModal(false);
+    setSelectedScreenshot('');
   };
 
   // ============================================
@@ -819,6 +1056,13 @@ const AdminDashboard = () => {
               >
                 👥 View Team
               </button>
+              <button 
+                onClick={() => viewScreenshot(reg)} 
+                className="mobile-action-btn view"
+                style={{ marginTop: '5px' }}
+              >
+                👁️ View Screenshot
+              </button>
             </div>
           )}
         </div>
@@ -897,7 +1141,10 @@ const AdminDashboard = () => {
       ></div>
 
       {/* Sidebar */}
-      <div className={`admin-sidebar ${mobileSidebarOpen ? 'mobile-open' : ''}`}>
+      <div 
+        ref={sidebarRef}
+        className={`admin-sidebar section-animate ${mobileSidebarOpen ? 'mobile-open' : ''}`}
+      >
         <div className="sidebar-header">
           <h2>Admin Dashboard</h2>
           <p>{symposiumName}</p>
@@ -945,6 +1192,13 @@ const AdminDashboard = () => {
             All Registrations
           </button>
           <button 
+            className={`nav-item ${activeTab === 'events' ? 'active' : ''}`} 
+            onClick={() => setActiveTab('events')}
+          >
+            <span className="nav-icon">🎪</span> 
+            Manage Events
+          </button>
+          <button 
             className={`nav-item ${activeTab === 'settings' ? 'active' : ''}`} 
             onClick={() => setActiveTab('settings')}
           >
@@ -973,7 +1227,10 @@ const AdminDashboard = () => {
       </div>
 
       {/* Main Content */}
-      <div className="admin-main">
+      <div 
+        ref={contentRef}
+        className="admin-main section-animate"
+      >
         <div className="admin-content">
           {/* Action Message */}
           {actionMessage.text && (
@@ -993,7 +1250,10 @@ const AdminDashboard = () => {
           )}
 
           {/* Stats Cards */}
-          <div className="stats-grid">
+          <div 
+            ref={statsRef}
+            className="stats-grid section-animate"
+          >
             <div className="stat-card">
               <div className="stat-icon">⏳</div>
               <div className="stat-info">
@@ -1064,7 +1324,84 @@ const AdminDashboard = () => {
               <div className="loading-spinner">Loading...</div>
             ) : (
               <>
-                {activeTab === 'settings' ? (
+                {activeTab === 'events' ? (
+                  <div className="events-management">
+                    <div className="section-header" style={{ marginBottom: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <h2>🎪 Manage Events</h2>
+                      <button onClick={openCreateEventModal} className="btn-download-excel" style={{ background: 'linear-gradient(135deg, #b8860b, #ffd700)', color: '#000000', padding: '10px 20px', borderRadius: '8px', border: 'none', fontWeight: 'bold', cursor: 'pointer' }}>
+                        ➕ Add New Event
+                      </button>
+                    </div>
+
+                    <div className="table-container">
+                      <table className="registrations-table">
+                        <thead>
+                          <tr>
+                            <th>Event Name</th>
+                            <th>Sub Event</th>
+                            <th>Category</th>
+                            <th>Type</th>
+                            <th>Fee</th>
+                            <th>Coordinator</th>
+                            <th>Capacity</th>
+                            <th>Actions</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {loadingEvents ? (
+                            <tr>
+                              <td colSpan="8" className="no-data">Loading events...</td>
+                            </tr>
+                          ) : events.length > 0 ? (
+                            events.map(event => (
+                              <tr key={event._id}>
+                                <td><strong>{event.name}</strong></td>
+                                <td>{event.subEventName}</td>
+                                <td>
+                                  <span className={`status-badge ${event.category === 'Technical' ? 'status-accepted' : 'status-pending'}`}>
+                                    {event.category}
+                                  </span>
+                                </td>
+                                <td>{event.type}</td>
+                                <td>₹{event.fee}</td>
+                                <td>
+                                  <div style={{ display: 'flex', flexDirection: 'column' }}>
+                                    <span>{event.coordinatorName}</span>
+                                    <span style={{ fontSize: '0.75rem', color: '#2ecc71' }}>{event.coordinatorPhone}</span>
+                                  </div>
+                                </td>
+                                <td>{(event.confirmedCount || 0) + (event.pendingCount || 0)} / {event.maxParticipants}</td>
+                                <td>
+                                  <div className="action-buttons">
+                                    <button 
+                                      onClick={() => openEditEventModal(event)} 
+                                      className="btn-view" 
+                                      title="Edit Event"
+                                      style={{ marginRight: '10px' }}
+                                    >
+                                      📝
+                                    </button>
+                                    <button 
+                                      onClick={() => handleDeleteEvent(event._id)} 
+                                      className="btn-reject" 
+                                      title="Delete Event"
+                                    >
+                                      🗑️
+                                    </button>
+                                  </div>
+                                </td>
+                              </tr>
+                            ))
+                          ) : (
+                            <tr>
+                              <td colSpan="8" className="no-data">No events found</td>
+                            </tr>
+                          )}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                ) : activeTab === 'settings' ? (
                   <div className="settings-container">
                     {/* Settings Message */}
                     {settingsMessage.text && (
@@ -1114,7 +1451,7 @@ const AdminDashboard = () => {
                       </form>
                     </div>
 
-                    {/* Update Date Section - WITH UPDATED DATE CONSTRAINTS */}
+                    {/* Update Date Section */}
                     <div className="settings-card">
                       <h3>📅 Update Symposium Date</h3>
                       <p className="current-setting">
@@ -1130,8 +1467,8 @@ const AdminDashboard = () => {
                             value={newDate}
                             onChange={(e) => setNewDate(e.target.value)}
                             required
-                            min={getTodayDate()} // Today's date as minimum
-                            max="9999-12-31" // Far future date as maximum
+                            min={getTodayDate()}
+                            max="9999-12-31"
                             className="settings-input"
                           />
                           <small style={{ color: '#b0b0b0', display: 'block', marginTop: '5px' }}>
@@ -1261,7 +1598,7 @@ const AdminDashboard = () => {
                   </div>
                 ) : (
                   <>
-                    {/* Desktop Table View - Hidden on Mobile */}
+                    {/* Desktop Table View */}
                     <div className="table-container">
                       <table className="registrations-table">
                         <thead>
@@ -1272,7 +1609,6 @@ const AdminDashboard = () => {
                           </tr>
                         </thead>
                         <tbody>
-                          {/* Participants Tab - Desktop */}
                           {activeTab === 'participants' ? (
                             participants.length > 0 ? (
                               participants.map((p, i) => (
@@ -1306,7 +1642,6 @@ const AdminDashboard = () => {
                               </tr>
                             )
                           ) : (
-                            /* Registrations Table - Desktop */
                             registrations.length > 0 ? (
                               registrations.map(reg => {
                                 const safeReg = {
@@ -1387,6 +1722,14 @@ const AdminDashboard = () => {
                                           >
                                             👥
                                           </button>
+                                          <button 
+                                            onClick={() => viewScreenshot(reg)} 
+                                            className="btn-view" 
+                                            title="View Screenshot"
+                                            style={{ marginLeft: '5px' }}
+                                          >
+                                            👁️
+                                          </button>
                                         </div>
                                       </td>
                                     )}
@@ -1429,7 +1772,7 @@ const AdminDashboard = () => {
         </div>
       </div>
 
-      {/* Modal */}
+      {/* Participants Modal */}
       {showParticipantsModal && selectedRegistration && (
         <div className="modal-overlay" onClick={closeModal}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
@@ -1488,6 +1831,342 @@ const AdminDashboard = () => {
             <div className="modal-footer">
               <button onClick={closeModal} className="btn-close">Close</button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Screenshot Modal */}
+      {showScreenshotModal && selectedScreenshot && (
+        <div className="modal-overlay" onClick={closeScreenshotModal}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '600px', width: '90%' }}>
+            <div className="modal-header">
+              <h3>Payment Screenshot</h3>
+              <button className="modal-close" onClick={closeScreenshotModal}>×</button>
+            </div>
+            <div className="modal-body" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '20px' }}>
+              <img 
+                src={selectedScreenshot} 
+                alt="Payment Screenshot" 
+                style={{ maxWidth: '100%', maxHeight: '70vh', objectFit: 'contain', borderRadius: '8px', border: '1px solid rgba(255, 215, 0, 0.2)' }} 
+              />
+            </div>
+            <div className="modal-footer">
+              <button onClick={closeScreenshotModal} className="btn-close">Close</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Event Add/Edit Modal */}
+      {showEventModal && (
+        <div className="modal-overlay" onClick={() => setShowEventModal(false)}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '800px', width: '95%', maxHeight: '90vh' }}>
+            <div className="modal-header">
+              <h3>{editingEvent ? '📝 Edit Event' : '➕ Add New Event'}</h3>
+              <button className="modal-close" onClick={() => setShowEventModal(false)}>×</button>
+            </div>
+            <form onSubmit={handleSaveEvent} className="add-event-form">
+              <div className="modal-body" style={{ maxHeight: 'calc(90vh - 150px)', overflowY: 'auto' }}>
+                <div className="form-grid">
+                  <div className="form-group">
+                    <label htmlFor="eventName">Event Name *</label>
+                    <input
+                      type="text"
+                      id="eventName"
+                      value={newEvent.name}
+                      onChange={(e) => setNewEvent({ ...newEvent, name: e.target.value })}
+                      placeholder="e.g. Presento"
+                      className="settings-input"
+                      required
+                    />
+                  </div>
+
+                  <div className="form-group">
+                    <label htmlFor="subEventName">Sub Event / Subtitle *</label>
+                    <input
+                      type="text"
+                      id="subEventName"
+                      value={newEvent.subEventName}
+                      onChange={(e) => setNewEvent({ ...newEvent, subEventName: e.target.value })}
+                      placeholder="e.g. Paper Presentation"
+                      className="settings-input"
+                      required
+                    />
+                  </div>
+
+                  <div className="form-group">
+                    <label htmlFor="coordinatorName">Coordinator Name</label>
+                    <input
+                      type="text"
+                      id="coordinatorName"
+                      value={newEvent.coordinatorName}
+                      onChange={(e) => setNewEvent({ ...newEvent, coordinatorName: e.target.value })}
+                      placeholder="e.g. Mr. Abul Kalam"
+                      className="settings-input"
+                    />
+                  </div>
+
+                  <div className="form-group">
+                    <label htmlFor="coordinatorPhone">Coordinator Phone</label>
+                    <input
+                      type="text"
+                      id="coordinatorPhone"
+                      value={newEvent.coordinatorPhone}
+                      onChange={(e) => setNewEvent({ ...newEvent, coordinatorPhone: e.target.value })}
+                      placeholder="e.g. 9876543210"
+                      className="settings-input"
+                    />
+                  </div>
+
+                  <div className="form-group">
+                    <label htmlFor="eventCategory">Category *</label>
+                    <select
+                      id="eventCategory"
+                      value={newEvent.category}
+                      onChange={(e) => setNewEvent({ ...newEvent, category: e.target.value })}
+                      className="settings-input"
+                      required
+                    >
+                      <option value="Technical">Technical</option>
+                      <option value="Non-Technical">Non-Technical</option>
+                    </select>
+                  </div>
+
+                  <div className="form-group">
+                    <label htmlFor="eventType">Type *</label>
+                    <select
+                      id="eventType"
+                      value={newEvent.type}
+                      onChange={(e) => setNewEvent({ ...newEvent, type: e.target.value })}
+                      className="settings-input"
+                      required
+                    >
+                      <option value="Individual">Individual</option>
+                      <option value="Team">Team</option>
+                      <option value="Individual & Team">Individual & Team</option>
+                    </select>
+                  </div>
+
+                  <div className="form-group">
+                    <label htmlFor="minTeamSize">Min Team Size *</label>
+                    <input
+                      type="number"
+                      id="minTeamSize"
+                      value={newEvent.minTeamSize}
+                      onChange={(e) => setNewEvent({ ...newEvent, minTeamSize: Number(e.target.value) })}
+                      min="1"
+                      className="settings-input"
+                      required
+                    />
+                  </div>
+
+                  <div className="form-group">
+                    <label htmlFor="maxTeamSize">Max Team Size *</label>
+                    <input
+                      type="number"
+                      id="maxTeamSize"
+                      value={newEvent.maxTeamSize}
+                      onChange={(e) => setNewEvent({ ...newEvent, maxTeamSize: Number(e.target.value) })}
+                      min="1"
+                      className="settings-input"
+                      required
+                    />
+                  </div>
+
+                  <div className="form-group">
+                    <label htmlFor="eventFee">Registration Fee (₹) *</label>
+                    <input
+                      type="number"
+                      id="eventFee"
+                      value={newEvent.fee}
+                      onChange={(e) => setNewEvent({ ...newEvent, fee: Number(e.target.value) })}
+                      min="0"
+                      className="settings-input"
+                      required
+                    />
+                  </div>
+
+                  <div className="form-group">
+                    <label htmlFor="maxParticipants">Max Capacity / Seats *</label>
+                    <input
+                      type="number"
+                      id="maxParticipants"
+                      value={newEvent.maxParticipants}
+                      onChange={(e) => setNewEvent({ ...newEvent, maxParticipants: Number(e.target.value) })}
+                      min="1"
+                      className="settings-input"
+                      required
+                    />
+                  </div>
+
+                  <div className="form-group">
+                    <label htmlFor="startTime">Start Time</label>
+                    <input
+                      type="text"
+                      id="startTime"
+                      value={newEvent.startTime}
+                      onChange={(e) => setNewEvent({ ...newEvent, startTime: e.target.value })}
+                      placeholder="e.g. 10:00 AM"
+                      className="settings-input"
+                    />
+                  </div>
+
+                  <div className="form-group">
+                    <label htmlFor="endTime">End Time</label>
+                    <input
+                      type="text"
+                      id="endTime"
+                      value={newEvent.endTime}
+                      onChange={(e) => setNewEvent({ ...newEvent, endTime: e.target.value })}
+                      placeholder="e.g. 12:30 PM"
+                      className="settings-input"
+                    />
+                  </div>
+
+                  <div className="form-group">
+                    <label htmlFor="eventVenue">Venue</label>
+                    <input
+                      type="text"
+                      id="eventVenue"
+                      value={newEvent.venue}
+                      onChange={(e) => setNewEvent({ ...newEvent, venue: e.target.value })}
+                      placeholder="e.g. Seminar Hall - Main Block"
+                      className="settings-input"
+                    />
+                  </div>
+
+                  <div className="form-group">
+                    <label htmlFor="eventStatus">Status *</label>
+                    <select
+                      id="eventStatus"
+                      value={newEvent.status}
+                      onChange={(e) => setNewEvent({ ...newEvent, status: e.target.value })}
+                      className="settings-input"
+                      required
+                    >
+                      <option value="Upcoming">Upcoming</option>
+                      <option value="Ongoing">Ongoing</option>
+                      <option value="Completed">Completed</option>
+                    </select>
+                  </div>
+
+                  <div className="form-group full-width">
+                    <label htmlFor="eventImage">Image Filename *</label>
+                    <input
+                      type="text"
+                      id="eventImage"
+                      value={newEvent.image}
+                      onChange={(e) => setNewEvent({ ...newEvent, image: e.target.value })}
+                      placeholder="e.g. paper-presentation.jpg"
+                      className="settings-input"
+                      required
+                    />
+                  </div>
+
+                  <div className="form-group">
+                    <label htmlFor="prizeFirst">First Prize</label>
+                    <input
+                      type="text"
+                      id="prizeFirst"
+                      value={newEvent.prizes.first}
+                      onChange={(e) => setNewEvent({ 
+                        ...newEvent, 
+                        prizes: { ...newEvent.prizes, first: e.target.value } 
+                      })}
+                      placeholder="e.g. ₹3,000 + Certificate"
+                      className="settings-input"
+                    />
+                  </div>
+
+                  <div className="form-group">
+                    <label htmlFor="prizeSecond">Second Prize</label>
+                    <input
+                      type="text"
+                      id="prizeSecond"
+                      value={newEvent.prizes.second}
+                      onChange={(e) => setNewEvent({ 
+                        ...newEvent, 
+                        prizes: { ...newEvent.prizes, second: e.target.value } 
+                      })}
+                      placeholder="e.g. ₹2,000 + Certificate"
+                      className="settings-input"
+                    />
+                  </div>
+
+                  <div className="form-group">
+                    <label htmlFor="prizeThird">Third Prize</label>
+                    <input
+                      type="text"
+                      id="prizeThird"
+                      value={newEvent.prizes.third}
+                      onChange={(e) => setNewEvent({ 
+                        ...newEvent, 
+                        prizes: { ...newEvent.prizes, third: e.target.value } 
+                      })}
+                      placeholder="e.g. ₹1,000 + Certificate"
+                      className="settings-input"
+                    />
+                  </div>
+
+                  <div className="form-group full-width">
+                    <label>Requirements</label>
+                    <div style={{ display: 'flex', gap: '10px', marginBottom: '10px' }}>
+                      <input
+                        type="text"
+                        value={tempRequirement}
+                        onChange={(e) => setTempRequirement(e.target.value)}
+                        placeholder="Add requirement (e.g. Research Paper (4-6 pages))"
+                        className="settings-input"
+                        style={{ flex: 1 }}
+                      />
+                      <button 
+                        type="button" 
+                        onClick={addRequirement}
+                        className="btn-close"
+                        style={{ padding: '0 20px', whiteSpace: 'nowrap' }}
+                      >
+                        Add
+                      </button>
+                    </div>
+                    {newEvent.requirements.length > 0 && (
+                      <div className="mobile-participants" style={{ background: 'rgba(255, 215, 0, 0.05)', padding: '10px', borderRadius: '8px' }}>
+                        {newEvent.requirements.map((req, idx) => (
+                          <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '5px 0', borderBottom: '1px solid rgba(255,215,0,0.1)' }}>
+                            <span style={{ color: '#ffffff', fontSize: '0.85rem' }}>• {req}</span>
+                            <button 
+                              type="button" 
+                              onClick={() => removeRequirement(idx)}
+                              style={{ background: 'transparent', border: 'none', color: '#ff4757', cursor: 'pointer', fontSize: '1rem', marginLeft: 'auto' }}
+                            >
+                              ✕
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="form-group full-width">
+                    <label htmlFor="eventDescription">Description *</label>
+                    <textarea
+                      id="eventDescription"
+                      value={newEvent.description}
+                      onChange={(e) => setNewEvent({ ...newEvent, description: e.target.value })}
+                      placeholder="Enter event details, rules, and guidelines"
+                      className="settings-input"
+                      rows="3"
+                      required
+                    />
+                  </div>
+                </div>
+              </div>
+              <div className="modal-footer">
+                <button type="button" onClick={() => setShowEventModal(false)} className="btn-close" style={{ marginRight: '10px', border: '1px solid #ff4757', color: '#ff4757' }}>Cancel</button>
+                <button type="submit" disabled={creatingEvent} className="btn-close">
+                  {creatingEvent ? 'Saving...' : 'Save Event'}
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}

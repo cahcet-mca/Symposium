@@ -1,3 +1,6 @@
+/* ============================================
+   USER REGISTER PAGE
+   ============================================ */
 .user-register-page {
   min-height: 100vh;
   background: #0a0a0a;
@@ -5,31 +8,65 @@
   align-items: center;
   justify-content: center;
   padding: 40px 20px;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Floating ambient orbs */
+.user-register-page::before {
+  content: '';
+  position: absolute;
+  top: 10%;
+  right: -8%;
+  width: 450px;
+  height: 450px;
+  background: radial-gradient(circle, rgba(255, 215, 0, 0.04) 0%, transparent 70%);
+  border-radius: 50%;
+  z-index: 0;
+  animation: float 10s ease-in-out infinite;
+}
+
+.user-register-page::after {
+  content: '';
+  position: absolute;
+  bottom: 5%;
+  left: -5%;
+  width: 300px;
+  height: 300px;
+  background: radial-gradient(circle, rgba(184, 134, 11, 0.04) 0%, transparent 70%);
+  border-radius: 50%;
+  z-index: 0;
+  animation: float 12s ease-in-out infinite reverse;
 }
 
 .user-register-container {
   max-width: 800px;
   width: 100%;
+  position: relative;
+  z-index: 1;
 }
 
 .user-register-card {
-  background: linear-gradient(145deg, #1a1a1a, #0d0d0d);
-  border-radius: 30px;
+  background: rgba(20, 20, 20, 0.7);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-radius: 24px;
   padding: 40px;
-  box-shadow: 0 30px 60px rgba(0,0,0,0.6);
-  border: 1px solid rgba(255, 215, 0, 0.2);
+  box-shadow: 0 30px 60px rgba(0,0,0,0.5);
+  border: 1px solid rgba(255, 215, 0, 0.1);
   position: relative;
   overflow: hidden;
+  animation: scaleIn 0.6s ease;
 }
 
 .user-register-card::before {
   content: '';
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 5px;
+  top: 0; left: 0; right: 0;
+  height: 4px;
   background: linear-gradient(90deg, #b8860b, #ffd700, #b8860b);
+  background-size: 200% auto;
+  animation: shimmer 3s linear infinite;
 }
 
 .register-header {
@@ -44,38 +81,39 @@
 }
 
 .register-subtitle {
-  color: #b0b0b0;
+  color: #999;
   font-size: 1rem;
 }
 
 .register-error,
 .register-success {
   padding: 15px 20px;
-  border-radius: 10px;
+  border-radius: 12px;
   margin-bottom: 20px;
   display: flex;
   align-items: center;
   gap: 10px;
   font-size: 0.95rem;
+  animation: slideUp 0.4s ease;
 }
 
 .register-error {
-  background: rgba(255, 71, 87, 0.1);
-  border: 1px solid #ff4757;
+  background: rgba(255, 71, 87, 0.08);
+  border: 1px solid rgba(255, 71, 87, 0.3);
   color: #ff4757;
 }
 
 .register-success {
-  background: rgba(46, 204, 113, 0.1);
-  border: 1px solid #2ecc71;
+  background: rgba(46, 204, 113, 0.08);
+  border: 1px solid rgba(46, 204, 113, 0.3);
   color: #2ecc71;
 }
 
-.error-icon,
-.success-icon {
-  font-size: 1.2rem;
-}
+.error-icon, .success-icon { font-size: 1.2rem; }
 
+/* ============================================
+   FORM
+   ============================================ */
 .register-form {
   margin-bottom: 30px;
 }
@@ -87,75 +125,78 @@
   margin-bottom: 20px;
 }
 
-.form-group {
-  margin-bottom: 0;
-}
+.form-group { margin-bottom: 0; }
 
 .form-group label {
   display: block;
   margin-bottom: 8px;
   font-weight: 600;
-  color: #ffffff;
+  color: #d0d0d0;
   font-size: 0.95rem;
+  letter-spacing: 0.2px;
 }
 
 .form-input,
 .form-select {
   width: 100%;
-  padding: 12px 15px;
-  background: rgba(0, 0, 0, 0.5);
-  border: 2px solid rgba(255, 215, 0, 0.2);
-  border-radius: 10px;
+  padding: 13px 16px;
+  background: rgba(0, 0, 0, 0.4);
+  border: 2px solid rgba(255, 215, 0, 0.12);
+  border-radius: 12px;
   font-size: 1rem;
   color: #ffffff;
-  transition: all 0.4s;
+  transition: all 0.35s ease;
 }
 
 .form-input:focus,
 .form-select:focus {
-  border-color: #ffd700;
-  box-shadow: 0 0 0 4px rgba(255, 215, 0, 0.1);
+  border-color: rgba(255, 215, 0, 0.5);
+  box-shadow: 0 0 0 4px rgba(255, 215, 0, 0.08), 0 0 20px rgba(255, 215, 0, 0.05);
   outline: none;
 }
 
-.form-input:disabled,
-.form-select:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
+.form-input:disabled, .form-select:disabled { opacity: 0.5; cursor: not-allowed; }
+.form-select { cursor: pointer; }
+.form-select option { background: #1a1a1a; color: #ffffff; }
 
-.form-select {
-  cursor: pointer;
-}
-
-.form-select option {
-  background: #1a1a1a;
-  color: #ffffff;
-}
-
+/* ============================================
+   SUBMIT BUTTON
+   ============================================ */
 .btn-register-submit {
   width: 100%;
   padding: 15px;
   background: linear-gradient(135deg, #b8860b, #ffd700);
   border: none;
-  border-radius: 10px;
+  border-radius: 12px;
   color: #000000;
   font-size: 1.1rem;
   font-weight: 700;
   cursor: pointer;
-  transition: all 0.3s;
+  transition: all 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94);
   margin-top: 20px;
+  position: relative;
+  overflow: hidden;
 }
+
+.btn-register-submit::after {
+  content: '';
+  position: absolute;
+  top: -50%; left: -60%;
+  width: 200%; height: 200%;
+  background: linear-gradient(120deg, transparent 30%, rgba(255,255,255,0.2) 50%, transparent 70%);
+  transform: rotate(25deg);
+  transition: left 0.5s ease;
+  pointer-events: none;
+}
+
+.btn-register-submit:hover:not(:disabled)::after { left: 60%; }
 
 .btn-register-submit:hover:not(:disabled) {
-  transform: translateY(-2px);
-  box-shadow: 0 10px 30px rgba(255, 215, 0, 0.4);
+  transform: translateY(-3px);
+  box-shadow: 0 12px 35px rgba(255, 215, 0, 0.4);
 }
 
-.btn-register-submit:disabled {
-  opacity: 0.7;
-  cursor: not-allowed;
-}
+.btn-register-submit:disabled { opacity: 0.6; cursor: not-allowed; }
 
 .spinner {
   display: inline-block;
@@ -168,18 +209,18 @@
   margin-right: 10px;
 }
 
+/* ============================================
+   FOOTER
+   ============================================ */
 .register-footer {
   text-align: center;
   padding: 20px;
-  background: rgba(255, 215, 0, 0.05);
-  border-radius: 15px;
-  border: 1px solid rgba(255, 215, 0, 0.1);
+  background: rgba(255, 215, 0, 0.03);
+  border-radius: 14px;
+  border: 1px solid rgba(255, 215, 0, 0.08);
 }
 
-.register-footer p {
-  color: #b0b0b0;
-  margin-bottom: 10px;
-}
+.register-footer p { color: #999; margin-bottom: 10px; }
 
 .login-link {
   display: inline-flex;
@@ -189,28 +230,178 @@
   text-decoration: none;
   font-weight: 700;
   font-size: 1.1rem;
-  transition: gap 0.3s;
+  transition: gap 0.3s ease, transform 0.3s ease;
 }
 
 .login-link:hover {
-  gap: 12px;
+  gap: 14px;
+  transform: translateX(3px);
 }
 
-@keyframes spin {
-  to { transform: rotate(360deg); }
-}
+/* ============================================
+   ANIMATIONS
+   ============================================ */
+@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes scaleIn { from { opacity: 0; transform: scale(0.92); } to { opacity: 1; transform: scale(1); } }
+@keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes shimmer { 0% { background-position: -200% center; } 100% { background-position: 200% center; } }
+@keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
 
+/* ============================================
+   RESPONSIVE
+   ============================================ */
 @media (max-width: 768px) {
-  .user-register-card {
-    padding: 30px 20px;
+  .user-register-card { padding: 30px 20px; border-radius: 18px; }
+  .form-row { grid-template-columns: 1fr; gap: 15px; }
+  .register-header h1 { font-size: 1.8rem; }
+}
+
+/* src/pages/UserRegister.css - Add these animation styles at the end */
+
+/* ============================================
+   SECTION ANIMATIONS - Register Page
+   ============================================ */
+
+.section-animate {
+  opacity: 0;
+  transform: translateY(40px);
+  transition: opacity 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+              transform 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.section-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ============================================
+   ENHANCED HOVER EFFECTS
+   ============================================ */
+
+/* Register card hover enhancement */
+.user-register-card {
+  transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+              box-shadow 0.4s ease;
+}
+
+.user-register-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 40px 80px rgba(0,0,0,0.6);
+}
+
+/* Form input focus animation */
+.form-input, .form-select {
+  transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.form-input:focus, .form-select:focus {
+  transform: scale(1.01);
+}
+
+.form-input:hover, .form-select:hover {
+  border-color: rgba(255, 215, 0, 0.4);
+}
+
+/* Form group label animation */
+.form-group label {
+  transition: all 0.3s ease;
+}
+
+.form-group:focus-within label {
+  color: #ffd700;
+  transform: translateX(3px);
+}
+
+/* Submit button hover enhancement */
+.btn-register-submit {
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-register-submit::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -60%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(120deg, transparent 30%, rgba(255,255,255,0.2) 50%, transparent 70%);
+  transform: rotate(25deg);
+  transition: left 0.6s ease;
+  pointer-events: none;
+}
+
+.btn-register-submit:hover::after {
+  left: 60%;
+}
+
+/* Register footer link hover */
+.register-footer .login-link {
+  transition: all 0.35s ease;
+  position: relative;
+}
+
+.register-footer .login-link::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background: linear-gradient(90deg, #b8860b, #ffd700);
+  transition: width 0.3s ease;
+}
+
+.register-footer .login-link:hover::after {
+  width: 100%;
+}
+
+.register-footer .login-link:hover {
+  transform: translateX(5px);
+}
+
+/* Error and success message animations */
+.register-error, .register-success {
+  animation: slideDown 0.4s ease;
+}
+
+/* ============================================
+   REDUCED MOTION SUPPORT
+   ============================================ */
+@media (prefers-reduced-motion: reduce) {
+  .section-animate,
+  .user-register-card,
+  .form-input,
+  .form-select,
+  .form-group label,
+  .btn-register-submit,
+  .register-footer .login-link {
+    animation: none !important;
+    transition: none !important;
+    transform: none !important;
+    opacity: 1 !important;
   }
   
-  .form-row {
-    grid-template-columns: 1fr;
-    gap: 15px;
+  .section-animate {
+    transform: none !important;
   }
   
-  .register-header h1 {
-    font-size: 1.8rem;
+  .register-error, .register-success {
+    animation: none !important;
+  }
+}
+
+/* ============================================
+   ADDITIONAL KEYFRAME ANIMATIONS
+   ============================================ */
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }

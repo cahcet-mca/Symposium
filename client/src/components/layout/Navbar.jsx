@@ -1,3 +1,5 @@
+// src/components/layout/Navbar.jsx - Updated with proper avatar icon
+
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
@@ -19,10 +21,26 @@ const Navbar = () => {
     return fullName.split(' ')[0];
   };
 
-  // Check if admin is logged in (for styling or conditional rendering if needed)
-  const isAdminLoggedIn = () => {
-    return localStorage.getItem('adminLoggedIn') === 'true' && 
-           localStorage.getItem('adminToken') !== null;
+  // Get user initials for avatar
+  const getUserInitials = (fullName) => {
+    if (!fullName) return 'U';
+    const nameParts = fullName.split(' ');
+    if (nameParts.length === 1) return nameParts[0].charAt(0).toUpperCase();
+    return (nameParts[0].charAt(0) + nameParts[nameParts.length - 1].charAt(0)).toUpperCase();
+  };
+
+  // Get avatar color based on name
+  const getAvatarColor = (name) => {
+    if (!name) return '#b8860b';
+    const colors = [
+      '#b8860b', '#ffd700', '#2ecc71', '#3498db', '#e74c3c', 
+      '#9b59b6', '#1abc9c', '#f39c12', '#e67e22', '#2ecc71'
+    ];
+    let hash = 0;
+    for (let i = 0; i < name.length; i++) {
+      hash = name.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    return colors[Math.abs(hash) % colors.length];
   };
 
   return (
@@ -35,15 +53,25 @@ const Navbar = () => {
       
       <div className="nav-links">
         <Link to="/">Home</Link>
-        <Link to="/events">Events</Link>
-        <Link to="/admin/login">
-          Admin
-        </Link>
-        
+        <Link to="/events">Events</Link>        
         {isAuthenticated ? (
           <>
             <Link to="/dashboard">Dashboard</Link>
             <div className="user-profile">
+              <div className="user-avatar-wrapper">
+                <div 
+                  className="user-avatar"
+                  style={{ 
+                    backgroundColor: getAvatarColor(user?.name),
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                  }}
+                  title={user?.name || 'User'}
+                >
+                  {getUserInitials(user?.name)}
+                </div>
+              </div>
               <span className="user-greeting">Hi,</span>
               <span className="user-name" title={user?.name}>
                 {getFirstName(user?.name)}
@@ -56,9 +84,7 @@ const Navbar = () => {
         ) : (
           <>
             <Link to="/login">Login</Link>
-            <Link to="/register">
-              Register
-            </Link>
+            <Link to="/register">Register</Link>
           </>
         )}
       </div>

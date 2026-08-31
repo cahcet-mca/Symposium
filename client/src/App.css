@@ -1,7 +1,15 @@
+/* ============================================
+   GLOBAL STYLES - Symposium Website
+   ============================================ */
+
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
 }
 
 body {
@@ -10,6 +18,13 @@ body {
   color: #ffffff;
   background: #0a0a0a;
   overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+::selection {
+  background: rgba(255, 215, 0, 0.3);
+  color: #ffffff;
 }
 
 .App {
@@ -18,26 +33,30 @@ body {
   flex-direction: column;
 }
 
-/* Scrollbar Styling */
+/* ============================================
+   SCROLLBAR
+   ============================================ */
 ::-webkit-scrollbar {
-  width: 12px;
+  width: 10px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #1a1a1a;
+  background: #111;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: linear-gradient(135deg, #b8860b, #ffd700);
-  border-radius: 6px;
-  border: 2px solid #0a0a0a;
+  background: linear-gradient(180deg, #b8860b, #ffd700);
+  border-radius: 10px;
+  border: 2px solid #111;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(135deg, #ffd700, #b8860b);
+  background: linear-gradient(180deg, #ffd700, #b8860b);
 }
 
-/* Loading Spinner */
+/* ============================================
+   LOADING & ERROR
+   ============================================ */
 .loading {
   display: flex;
   justify-content: center;
@@ -47,7 +66,6 @@ body {
   color: #ffd700;
 }
 
-/* Error Message */
 .error {
   text-align: center;
   padding: 50px;
@@ -55,24 +73,53 @@ body {
   font-size: 1.2rem;
 }
 
-/* Container */
+/* ============================================
+   CONTAINER
+   ============================================ */
 .container {
   max-width: 1200px;
   margin: 0 auto;
   padding: 0 20px;
 }
 
-/* Button Styles */
+/* ============================================
+   BUTTONS — Premium with glow
+   ============================================ */
 .btn {
   display: inline-block;
   padding: 12px 30px;
   border: none;
-  border-radius: 5px;
+  border-radius: 8px;
   font-size: 1rem;
   font-weight: 600;
   text-decoration: none;
   cursor: pointer;
-  transition: all 0.3s;
+  transition: all 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  position: relative;
+  overflow: hidden;
+  letter-spacing: 0.3px;
+}
+
+.btn::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -60%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(
+    120deg,
+    transparent 30%,
+    rgba(255, 255, 255, 0.15) 50%,
+    transparent 70%
+  );
+  transform: rotate(25deg);
+  transition: left 0.6s ease;
+  pointer-events: none;
+}
+
+.btn:hover::after {
+  left: 60%;
 }
 
 .btn-primary {
@@ -81,8 +128,8 @@ body {
 }
 
 .btn-primary:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 5px 15px rgba(255, 215, 0, 0.4);
+  transform: translateY(-3px);
+  box-shadow: 0 8px 25px rgba(255, 215, 0, 0.45), 0 0 60px rgba(255, 215, 0, 0.15);
 }
 
 .btn-secondary {
@@ -92,6 +139,77 @@ body {
 }
 
 .btn-secondary:hover {
-  background: #ffd700;
-  color: #000000;
+  background: rgba(255, 215, 0, 0.08);
+  color: #ffd700;
+  transform: translateY(-3px);
+  box-shadow: 0 8px 25px rgba(255, 215, 0, 0.2);
+}
+
+/* ============================================
+   SHARED KEYFRAMES
+   ============================================ */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeInDown {
+  from { opacity: 0; transform: translateY(-30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(40px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideInLeft {
+  from { opacity: 0; transform: translateX(-40px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes slideInRight {
+  from { opacity: 0; transform: translateX(40px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.9); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+@keyframes pulseGlow {
+  0%, 100% { box-shadow: 0 0 5px rgba(255, 215, 0, 0.2); }
+  50% { box-shadow: 0 0 20px rgba(255, 215, 0, 0.4), 0 0 40px rgba(255, 215, 0, 0.1); }
+}
+
+@keyframes borderGlow {
+  0%, 100% { border-color: rgba(255, 215, 0, 0.2); }
+  50% { border-color: rgba(255, 215, 0, 0.5); }
+}
+
+@keyframes gradientShift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+@keyframes rotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }

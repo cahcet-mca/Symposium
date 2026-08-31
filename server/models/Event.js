@@ -28,7 +28,7 @@ const eventSchema = new mongoose.Schema({
   type: {
     type: String,
     required: [true, 'Please select event type'],
-    enum: ['Individual', 'Team']
+    enum: ['Individual', 'Team', 'Individual & Team']
   },
   description: {
     type: String,

@@ -1,4 +1,6 @@
-import React, { useState } from 'react';
+// src/pages/UserRegister.jsx - Updated with Scroll Animations
+
+import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useSymposiumDate } from '../context/DateContext';
 import axios from 'axios';
@@ -23,6 +25,33 @@ const UserRegister = () => {
   
   const navigate = useNavigate();
   const { symposiumName } = useSymposiumDate();
+
+  // Refs for scroll animations
+  const cardRef = useRef(null);
+
+  // ============================================
+  // SCROLL ANIMATIONS - Intersection Observer
+  // ============================================
+  useEffect(() => {
+    const observerOptions = {
+      threshold: 0.1,
+      rootMargin: '0px 0px -30px 0px'
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('section-visible');
+        }
+      });
+    }, observerOptions);
+
+    if (cardRef.current) {
+      observer.observe(cardRef.current);
+    }
+
+    return () => observer.disconnect();
+  }, []);
 
   const handleChange = (e) => {
     setFormData({
@@ -115,7 +144,10 @@ const UserRegister = () => {
   return (
     <div className="user-register-page">
       <div className="user-register-container">
-        <div className="user-register-card">
+        <div 
+          ref={cardRef}
+          className="user-register-card section-animate"
+        >
           <div className="register-header">
             <h1>Create Account</h1>
             <p className="register-subtitle">Join {symposiumName}</p>

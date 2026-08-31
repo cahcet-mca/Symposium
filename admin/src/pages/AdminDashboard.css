@@ -6,13 +6,14 @@
 
 .navbar {
   align-items: center;
-  background: #0a0a0a;
-  border-bottom: 2px solid #ffd70033;
-  box-shadow: 0 2px 20px #00000080;
+  background: rgba(10,10,10,0.8);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(255,215,0,0.12);
+  box-shadow: 0 4px 30px rgba(0,0,0,0.5);
   display: flex;
   justify-content: space-between;
   padding: 0.5rem 2rem;
-  position: -webkit-sticky;
   position: sticky;
   top: 0;
   z-index: 1000;
@@ -23,7 +24,7 @@
   display: flex;
   min-height: calc(100vh - 60px);
   width: 100%;
-  background: #0a0a0a;
+  background: linear-gradient(160deg, #0d0d0d 0%, #080808 50%, #050505 100%);
   color: #ffffff;
   font-family: 'Inter', sans-serif;
   position: relative;
@@ -36,8 +37,10 @@
 .admin-sidebar {
   width: 250px;
   min-width: 250px;
-  background: linear-gradient(180deg, #1a1a1a 0%, #0d0d0d 100%);
-  border-right: 1px solid rgba(255, 215, 0, 0.2);
+  background: rgba(18, 18, 18, 0.85);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-right: 1px solid rgba(255, 215, 0, 0.1);
   display: flex;
   flex-direction: column;
   height: calc(100vh - 60px);
@@ -48,6 +51,7 @@
   flex-shrink: 0;
   z-index: 100;
   transition: left 0.3s ease;
+  box-shadow: 4px 0 20px rgba(0,0,0,0.3);
 }
 
 /* Mobile sidebar toggle - hidden by default on desktop */
@@ -449,16 +453,16 @@
 .registrations-table {
   width: 100%;
   border-collapse: collapse;
-  min-width: 1100px;
+  min-width: 100%;
 }
 
 .registrations-table th {
   text-align: left;
-  padding: 12px 15px;
+  padding: 10px 10px;
   color: #ffd700;
   font-weight: 700;
   border-bottom: 2px solid rgba(255, 215, 0, 0.2);
-  font-size: 0.85rem;
+  font-size: 0.8rem;
   text-transform: uppercase;
   letter-spacing: 0.5px;
   background: rgba(0, 0, 0, 0.3);
@@ -468,10 +472,10 @@
 }
 
 .registrations-table td {
-  padding: 12px 15px;
+  padding: 8px 10px;
   border-bottom: 1px solid rgba(255, 215, 0, 0.1);
   color: #ffffff;
-  font-size: 0.9rem;
+  font-size: 0.83rem;
   vertical-align: middle;
 }
 
@@ -496,74 +500,74 @@
 .user-info {
   display: flex;
   flex-direction: column;
-  gap: 3px;
-  min-width: 200px;
+  gap: 2px;
+  min-width: 130px;
 }
 
 .user-info strong {
   color: #ffffff;
-  font-size: 0.9rem;
+  font-size: 0.83rem;
   font-weight: 700;
 }
 
 .user-info .user-email {
   color: #ffd700;
-  font-size: 0.8rem;
+  font-size: 0.75rem;
 }
 
 .user-info .user-phone {
   color: #2ecc71;
-  font-size: 0.8rem;
+  font-size: 0.75rem;
   font-family: monospace;
 }
 
 .user-info .user-college {
   color: #ffffff;
-  font-size: 0.8rem;
+  font-size: 0.75rem;
 }
 
 /* Event Info */
 .event-info {
   display: flex;
   flex-direction: column;
-  gap: 3px;
-  min-width: 200px;
+  gap: 2px;
+  min-width: 130px;
 }
 
 .event-info strong {
   color: #ffffff;
-  font-size: 0.9rem;
+  font-size: 0.83rem;
   font-weight: 700;
 }
 
 .event-info .event-subname {
   color: #ffd700;
-  font-size: 0.8rem;
+  font-size: 0.75rem;
   font-style: italic;
 }
 
 .event-info .event-category {
   color: #ffffff;
-  font-size: 0.75rem;
+  font-size: 0.7rem;
 }
 
 /* Team Info */
 .team-info {
   display: flex;
   flex-direction: column;
-  gap: 3px;
-  min-width: 130px;
+  gap: 2px;
+  min-width: 80px;
 }
 
 .team-info strong {
   color: #ffd700;
-  font-size: 0.9rem;
+  font-size: 0.83rem;
   font-weight: 700;
 }
 
 .team-info .team-size {
   color: #ffffff;
-  font-size: 0.8rem;
+  font-size: 0.75rem;
 }
 
 .individual-tag {
@@ -615,15 +619,15 @@
 /* Action Buttons */
 .action-buttons {
   display: flex;
-  gap: 8px;
+  gap: 4px;
 }
 
 .btn-accept, .btn-reject, .btn-view {
-  width: 32px;
-  height: 32px;
+  width: 28px;
+  height: 28px;
   border-radius: 50%;
   border: none;
-  font-size: 0.9rem;
+  font-size: 0.8rem;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -981,6 +985,21 @@
   border-radius: 15px;
   padding: 25px;
   transition: transform 0.3s;
+}
+
+.full-width-card {
+  grid-column: 1 / -1;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 15px;
+  margin-bottom: 10px;
+}
+
+.form-group.full-width {
+  grid-column: 1 / -1;
 }
 
 .settings-card:hover {
@@ -1834,5 +1853,531 @@
   .registrations-table td {
     color: #000;
     background: #fff;
+  }
+}
+
+/* ============================================
+   ADMIN DASHBOARD ANIMATIONS
+   ============================================ */
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.92); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-12px); }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* Stat cards entrance animation */
+.stat-card {
+  animation: scaleIn 0.5s ease both;
+}
+
+.stat-card:nth-child(1) { animation-delay: 0.05s; }
+.stat-card:nth-child(2) { animation-delay: 0.10s; }
+.stat-card:nth-child(3) { animation-delay: 0.15s; }
+.stat-card:nth-child(4) { animation-delay: 0.20s; }
+
+/* Table row hover animation */
+.registrations-table tbody tr {
+  transition: background-color 0.25s ease, transform 0.25s ease;
+}
+
+.registrations-table tbody tr:hover {
+  transform: translateX(3px);
+}
+
+/* Modal backdrop blur */
+.modal-overlay {
+  backdrop-filter: blur(8px) !important;
+  -webkit-backdrop-filter: blur(8px) !important;
+}
+
+.modal-content {
+  animation: scaleIn 0.3s ease;
+}
+
+/* src/pages/AdminDashboard.css - Add these animation styles at the end */
+
+/* ============================================
+   SECTION ANIMATIONS - Admin Dashboard
+   ============================================ */
+
+.section-animate {
+  opacity: 0;
+  transform: translateY(40px);
+  transition: opacity 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+              transform 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.section-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ============================================
+   ENHANCED STAT CARDS ANIMATIONS
+   ============================================ */
+
+/* Stat cards entrance animation - already defined, enhanced */
+.stat-card {
+  animation: scaleIn 0.5s ease both;
+  transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+              box-shadow 0.4s ease,
+              border-color 0.4s ease;
+}
+
+.stat-card:hover {
+  transform: translateY(-8px) scale(1.02);
+  border-color: rgba(255, 215, 0, 0.5);
+  box-shadow: 0 12px 35px rgba(0,0,0,0.5);
+}
+
+.stat-card .stat-icon {
+  transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.stat-card:hover .stat-icon {
+  transform: scale(1.15) rotate(-5deg);
+}
+
+.stat-card .stat-info h3 {
+  transition: color 0.3s ease, transform 0.3s ease;
+}
+
+.stat-card:hover .stat-info h3 {
+  color: #ffd700;
+  transform: scale(1.05);
+}
+
+/* ============================================
+   ENHANCED SIDEBAR ANIMATIONS
+   ============================================ */
+
+.admin-sidebar {
+  transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+              box-shadow 0.4s ease;
+}
+
+/* Nav item hover enhancement */
+.nav-item {
+  transition: all 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  position: relative;
+  overflow: hidden;
+}
+
+.nav-item::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, rgba(255,215,0,0.1), transparent);
+  transform: translateX(-100%);
+  transition: transform 0.4s ease;
+}
+
+.nav-item:hover::before {
+  transform: translateX(0);
+}
+
+.nav-item:hover .nav-icon {
+  transform: scale(1.2) rotate(-5deg);
+}
+
+.nav-item .nav-icon {
+  transition: transform 0.3s ease;
+}
+
+/* Badge animation */
+.nav-item .badge {
+  transition: transform 0.3s ease;
+}
+
+.nav-item:hover .badge {
+  transform: scale(1.1);
+}
+
+/* Toggle button animation */
+.toggle-btn {
+  transition: all 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  position: relative;
+  overflow: hidden;
+}
+
+.toggle-btn::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -60%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(120deg, transparent 30%, rgba(255,255,255,0.15) 50%, transparent 70%);
+  transform: rotate(25deg);
+  transition: left 0.6s ease;
+  pointer-events: none;
+}
+
+.toggle-btn:hover::after {
+  left: 60%;
+}
+
+.toggle-btn .toggle-icon {
+  transition: transform 0.4s ease;
+}
+
+.toggle-btn:hover .toggle-icon {
+  transform: scale(1.2) rotate(-10deg);
+}
+
+/* Logout button animation */
+.logout-btn {
+  transition: all 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  position: relative;
+  overflow: hidden;
+}
+
+.logout-btn::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: #ff4757;
+  transform: scaleX(0);
+  transform-origin: right;
+  transition: transform 0.4s ease;
+  z-index: -1;
+}
+
+.logout-btn:hover::before {
+  transform: scaleX(1);
+  transform-origin: left;
+}
+
+.logout-btn:hover .nav-icon {
+  transform: rotate(180deg);
+}
+
+.logout-btn .nav-icon {
+  transition: transform 0.4s ease;
+}
+
+/* ============================================
+   ENHANCED TABLE ANIMATIONS
+   ============================================ */
+
+/* Table row hover animation */
+.registrations-table tbody tr {
+  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  position: relative;
+}
+
+.registrations-table tbody tr:hover {
+  transform: translateX(5px) scale(1.01);
+  background: rgba(255, 215, 0, 0.05);
+  box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+}
+
+/* Table cell hover */
+.registrations-table td {
+  transition: color 0.3s ease;
+}
+
+.registrations-table tbody tr:hover td {
+  color: #ffffff;
+}
+
+/* Transaction ID hover */
+.transaction-id-full {
+  transition: all 0.3s ease;
+}
+
+.registrations-table tbody tr:hover .transaction-id-full {
+  background: rgba(255, 215, 0, 0.2);
+  transform: scale(1.02);
+}
+
+/* Status badge hover */
+.status-badge {
+  transition: all 0.3s ease;
+}
+
+.registrations-table tbody tr:hover .status-badge {
+  transform: scale(1.05);
+}
+
+/* ============================================
+   ENHANCED ACTION BUTTONS
+   ============================================ */
+
+.btn-accept, .btn-reject, .btn-view {
+  transition: all 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.btn-accept:hover, .btn-reject:hover, .btn-view:hover {
+  transform: scale(1.15) rotate(5deg);
+}
+
+/* ============================================
+   ENHANCED MODAL ANIMATIONS
+   ============================================ */
+
+.modal-content {
+  animation: modalSlideUp 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+@keyframes modalSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(50px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.modal-overlay {
+  animation: fadeIn 0.3s ease;
+}
+
+/* Participant item hover */
+.participant-item {
+  transition: all 0.3s ease;
+}
+
+.participant-item:hover {
+  transform: translateX(5px);
+  background: rgba(255, 215, 0, 0.1);
+  border-left-color: #ffd700;
+}
+
+/* ============================================
+   ENHANCED SETTINGS CARDS
+   ============================================ */
+
+.settings-card {
+  transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.settings-card:hover {
+  transform: translateY(-5px);
+  border-color: rgba(255, 215, 0, 0.4);
+  box-shadow: 0 15px 40px rgba(0,0,0,0.4);
+}
+
+.settings-card h3 {
+  transition: color 0.3s ease;
+}
+
+.settings-card:hover h3 {
+  color: #ffd700;
+}
+
+.settings-card .settings-input {
+  transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.settings-card .settings-input:focus {
+  transform: scale(1.01);
+}
+
+.settings-card .settings-input:hover {
+  border-color: rgba(255, 215, 0, 0.4);
+}
+
+.btn-save-settings {
+  transition: all 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-save-settings::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -60%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(120deg, transparent 30%, rgba(255,255,255,0.2) 50%, transparent 70%);
+  transform: rotate(25deg);
+  transition: left 0.6s ease;
+  pointer-events: none;
+}
+
+.btn-save-settings:hover::after {
+  left: 60%;
+}
+
+/* Summary item hover */
+.summary-item {
+  transition: all 0.3s ease;
+}
+
+.summary-item:hover {
+  transform: translateX(5px);
+  background: rgba(255, 215, 0, 0.08);
+  border-color: rgba(255, 215, 0, 0.3);
+}
+
+.summary-item .summary-value {
+  transition: color 0.3s ease, transform 0.3s ease;
+}
+
+.summary-item:hover .summary-value {
+  color: #ffd700;
+  transform: scale(1.02);
+}
+
+/* ============================================
+   ENHANCED SECTION HEADER
+   ============================================ */
+
+.section-header h2 {
+  transition: color 0.3s ease, transform 0.3s ease;
+}
+
+.section-header:hover h2 {
+  color: #ffd700;
+  transform: translateX(5px);
+}
+
+.live-status-indicator {
+  transition: all 0.3s ease;
+}
+
+.live-status-indicator:hover {
+  transform: scale(1.05);
+  background: rgba(255, 215, 0, 0.15);
+}
+
+.live-dot {
+  animation: pulse 1.5s infinite;
+}
+
+/* ============================================
+   ENHANCED MOBILE CARD VIEW
+   ============================================ */
+
+.registration-mobile-card {
+  transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.registration-mobile-card:hover {
+  transform: translateY(-5px);
+  border-color: rgba(255, 215, 0, 0.4);
+  box-shadow: 0 12px 30px rgba(0,0,0,0.5);
+}
+
+.mobile-action-btn {
+  transition: all 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  position: relative;
+  overflow: hidden;
+}
+
+.mobile-action-btn::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -60%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(120deg, transparent 30%, rgba(255,255,255,0.15) 50%, transparent 70%);
+  transform: rotate(25deg);
+  transition: left 0.6s ease;
+  pointer-events: none;
+}
+
+.mobile-action-btn:hover::after {
+  left: 60%;
+}
+
+/* ============================================
+   KEYFRAME ANIMATIONS
+   ============================================ */
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.92);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.2);
+  }
+}
+
+/* ============================================
+   REDUCED MOTION SUPPORT
+   ============================================ */
+@media (prefers-reduced-motion: reduce) {
+  .section-animate,
+  .stat-card,
+  .admin-sidebar,
+  .nav-item,
+  .nav-item .badge,
+  .toggle-btn,
+  .logout-btn,
+  .registrations-table tbody tr,
+  .transaction-id-full,
+  .status-badge,
+  .btn-accept,
+  .btn-reject,
+  .btn-view,
+  .modal-content,
+  .participant-item,
+  .settings-card,
+  .summary-item,
+  .registration-mobile-card,
+  .mobile-action-btn {
+    animation: none !important;
+    transition: none !important;
+    transform: none !important;
+    opacity: 1 !important;
+  }
+  
+  .section-animate {
+    transform: none !important;
+  }
+  
+  .modal-content {
+    animation: none !important;
+  }
+  
+  .live-dot {
+    animation: none !important;
   }
 }

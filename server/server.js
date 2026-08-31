@@ -4,13 +4,11 @@ const cors = require('cors');
 const dotenv = require('dotenv');
 const colors = require('colors');
 const path = require('path');
+const fs = require('fs');
 const connectDB = require('./config/db');
 
 // Load env vars
 dotenv.config();
-
-// Import middleware
-const { checkRegistrationsOpen } = require('./middleware/registrationMiddleware');
 
 // ============================================
 // VALIDATE REQUIRED ENVIRONMENT VARIABLES
@@ -26,7 +24,6 @@ if (missingEnvVars.length > 0) {
   });
   console.error('\n⚠️  Please set these variables in your .env file\n'.red);
   
-  // In production, exit the process
   if (process.env.NODE_ENV === 'production') {
     process.exit(1);
   }
@@ -37,13 +34,15 @@ if (missingEnvVars.length > 0) {
 // Validate MongoDB URI
 if (!process.env.MONGODB_URI) {
   console.error('❌ MONGODB_URI is not defined in environment variables!'.red.bold);
-  console.error('Please check your .env file or environment variables.'.yellow);
   process.exit(1);
 }
 
 console.log('🔍 MongoDB URI found:', process.env.MONGODB_URI.replace(/:[^:@]*@/, ':****@'));
 
-// Connect to database with better error handling
+// ============================================
+// CONNECT TO DATABASE
+// ============================================
+
 const connectWithRetry = async () => {
   try {
     await connectDB();
@@ -57,7 +56,10 @@ const connectWithRetry = async () => {
 
 connectWithRetry();
 
-// Initialize app
+// ============================================
+// INITIALIZE APP
+// ============================================
+
 const app = express();
 
 // Body parser with increased limit for screenshots
@@ -68,25 +70,20 @@ app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 // SERVE STATIC EVENT IMAGES
 // ============================================
 
-// Path to event-images folder (outside client and server)
 const eventImagesPath = path.join(__dirname, '..', 'event-images');
 
-// Create directory if it doesn't exist
-const fs = require('fs');
 if (!fs.existsSync(eventImagesPath)) {
   fs.mkdirSync(eventImagesPath, { recursive: true });
   console.log('📁 Created event-images directory'.green);
 }
 
-// Serve static images
 app.use('/event-images', express.static(eventImagesPath));
 console.log(`📁 Serving event images from: ${eventImagesPath}`.cyan);
 
 // ============================================
-// CORS CONFIGURATION
+// GET LOCAL IP ADDRESS
 // ============================================
 
-// Get local IP address
 const getLocalIP = () => {
   try {
     const { networkInterfaces } = require('os');
@@ -107,21 +104,45 @@ const getLocalIP = () => {
 
 const LOCAL_IP = getLocalIP();
 
-// Configure CORS
+// ============================================
+// CORS CONFIGURATION - Supports both Client & Admin
+// ============================================
+
 const allowedOrigins = [
+  // Client (User App) - Development
   'http://localhost:3000',
   'http://127.0.0.1:3000',
   `http://${LOCAL_IP}:3000`,
+  
+  // Admin App - Development
+  'http://localhost:3001',
+  'http://127.0.0.1:3001',
+  `http://${LOCAL_IP}:3001`,
+  
+  // Client (User App) - Production
   'https://tecnorendezous.netlify.app',
+  'https://tecno-rendezvous.netlify.app',
+  
+  // Admin App - Production
+  'https://tecnorendezous-admin.netlify.app',
+  'https://tecno-rendezvous-admin.netlify.app',
+  
+  // Backend - Production
   'https://symposium-veyj.onrender.com',
+  
+  // Wildcards for Netlify
   'https://*.netlify.app',
-  'https://*.vercel.app'
+  'https://*.vercel.app',
+  'https://*.render.com'
 ];
 
-app.use(cors({
+// CORS Configuration Function
+const corsOptions = {
   origin: function(origin, callback) {
-    // Allow requests with no origin (like mobile apps, curl)
-    if (!origin) return callback(null, true);
+    // Allow requests with no origin (like mobile apps, curl, Postman)
+    if (!origin) {
+      return callback(null, true);
+    }
     
     // Check if origin matches any allowed pattern
     const allowed = allowedOrigins.some(pattern => {
@@ -135,21 +156,56 @@ app.use(cors({
     if (allowed) {
       return callback(null, true);
     } else {
-      console.warn(`Blocked request from origin: ${origin}`);
-      return callback(null, true); // Allow in production temporarily
+      // In production, reject unlisted origins
+      if (process.env.NODE_ENV === 'production') {
+        console.warn(`🚫 CORS blocked: ${origin}`);
+        return callback(new Error('Not allowed by CORS'));
+      }
+      // In development, allow all for testing
+      console.warn(`⚠️ CORS allowed (dev mode): ${origin}`);
+      return callback(null, true);
     }
   },
   credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
-}));
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
+  allowedHeaders: [
+    'Content-Type', 
+    'Authorization', 
+    'X-Requested-With',
+    'Accept',
+    'Origin',
+    'Access-Control-Allow-Origin'
+  ],
+  exposedHeaders: ['Content-Range', 'X-Content-Range'],
+  maxAge: 86400 // 24 hours
+};
 
-// Handle preflight requests
-app.options('*', cors());
+// Apply CORS middleware
+app.use(cors(corsOptions));
+
+// Handle preflight requests explicitly
+app.options('*', cors(corsOptions));
+
+// ============================================
+// LOGGING MIDDLEWARE
+// ============================================
+
+app.use((req, res, next) => {
+  const start = Date.now();
+  res.on('finish', () => {
+    const duration = Date.now() - start;
+    const method = req.method.padEnd(6);
+    const status = res.statusCode;
+    const statusColor = status >= 400 ? 'red' : status >= 300 ? 'yellow' : 'green';
+    console.log(`${method} ${req.originalUrl} ${String(status)[statusColor]} ${duration}ms`.cyan);
+  });
+  next();
+});
 
 // ============================================
 // PUBLIC SETTINGS ENDPOINT (No Auth Required)
 // ============================================
+
 app.get('/api/settings/registrations-status', async (req, res) => {
   try {
     const SystemSettings = require('./models/SystemSettings');
@@ -170,6 +226,54 @@ app.get('/api/settings/registrations-status', async (req, res) => {
 });
 
 // ============================================
+// SYMPOSIUM SETTINGS - Public Endpoint
+// ============================================
+
+app.get('/api/symposium/settings', async (req, res) => {
+  try {
+    const SymposiumSettings = require('./models/SymposiumSettings');
+    const settings = await SymposiumSettings.getSettings();
+    
+    res.json({
+      success: true,
+      data: {
+        symposiumDate: settings.symposiumDate,
+        formattedDate: settings.getFormattedDate(),
+        symposiumName: settings.symposiumName,
+        venue: settings.venue,
+        venueDetails: settings.venueDetails,
+        upiId: settings.upiId,
+        updatedAt: settings.updatedAt
+      }
+    });
+  } catch (error) {
+    console.error('❌ Error getting symposium settings:', error);
+    res.status(500).json({
+      success: false,
+      message: error.message
+    });
+  }
+});
+
+// ============================================
+// APPLY REGISTRATION CHECK MIDDLEWARE
+// ============================================
+
+// Import registration middleware
+const { checkRegistrationsOpen } = require('./middleware/registrationMiddleware');
+
+// Only block WRITE operations when registrations are closed
+// READ operations (GET) are always allowed to view existing data
+
+// Payment verification (POST) - Block when closed
+app.use('/api/payments/verify', checkRegistrationsOpen);
+
+// Check conflict (POST) - Block when closed (can't register for new events)
+app.use('/api/registrations/check-conflict', checkRegistrationsOpen);
+
+// All GET routes are automatically allowed
+
+// ============================================
 // HEALTH CHECK ENDPOINTS
 // ============================================
 
@@ -178,10 +282,11 @@ app.get('/', (req, res) => {
   res.json({
     message: '🎯 TECNO RENDEZVOUS API is running',
     status: 'online',
-    version: '1.0.0',
+    version: '2.0.0',
     timestamp: new Date().toISOString(),
     mongodb: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected',
     environment: process.env.NODE_ENV || 'development',
+    allowedOrigins: allowedOrigins,
     endpoints: {
       events: '/api/events',
       auth: '/api/auth',
@@ -190,6 +295,7 @@ app.get('/', (req, res) => {
       admin: '/api/admin',
       health: '/health',
       settings: '/api/settings/registrations-status',
+      symposium: '/api/symposium/settings',
       images: '/event-images/:filename'
     }
   });
@@ -207,46 +313,44 @@ app.get('/health', (req, res) => {
 });
 
 // ============================================
-// APPLY REGISTRATION CHECK MIDDLEWARE
-// ============================================
-// Only block WRITE operations when registrations are closed
-// READ operations (GET) are always allowed to view existing data
-
-// Payment verification (POST) - Block when closed
-app.use('/api/payments/verify', checkRegistrationsOpen);
-
-// Check conflict (POST) - Block when closed (can't register for new events)
-app.use('/api/registrations/check-conflict', checkRegistrationsOpen);
-
-// All GET routes are automatically allowed
-
-// ============================================
 // MOUNT ROUTES
 // ============================================
 
-app.use('/api/auth', require('./routes/authRoutes'));
-app.use('/api/events', require('./routes/eventRoutes'));
-app.use('/api/registrations', require('./routes/registrationRoutes'));
-app.use('/api/payments', require('./routes/paymentRoutes'));
-app.use('/api/admin', require('./routes/adminRoutes'));
-app.use('/api/symposium', require('./routes/symposiumRoutes'));
+// Import routes
+const authRoutes = require('./routes/authRoutes');
+const eventRoutes = require('./routes/eventRoutes');
+const registrationRoutes = require('./routes/registrationRoutes');
+const paymentRoutes = require('./routes/paymentRoutes');
+const adminRoutes = require('./routes/adminRoutes');
+const symposiumRoutes = require('./routes/symposiumRoutes');
+
+// Mount routes
+app.use('/api/auth', authRoutes);
+app.use('/api/events', eventRoutes);
+app.use('/api/registrations', registrationRoutes);
+app.use('/api/payments', paymentRoutes);
+app.use('/api/admin', adminRoutes);
+app.use('/api/symposium', symposiumRoutes);
 
 // ============================================
 // 404 HANDLER
 // ============================================
+
 app.use('*', (req, res) => {
   res.status(404).json({
     success: false,
     message: 'API endpoint not found',
-    path: req.originalUrl
+    path: req.originalUrl,
+    method: req.method
   });
 });
 
 // ============================================
-// ERROR HANDLER
+// GLOBAL ERROR HANDLER
 // ============================================
+
 app.use((err, req, res, next) => {
-  console.error('❌ Error:', err.stack.red);
+  console.error('❌ Error:'.red, err.stack);
   
   // Handle CORS errors specifically
   if (err.message === 'Not allowed by CORS') {
@@ -257,6 +361,40 @@ app.use((err, req, res, next) => {
     });
   }
   
+  // Handle MongoDB duplicate key errors
+  if (err.code === 11000) {
+    const field = Object.keys(err.keyPattern)[0];
+    return res.status(400).json({
+      success: false,
+      message: `Duplicate value for ${field}. Please use a different value.`
+    });
+  }
+  
+  // Handle validation errors
+  if (err.name === 'ValidationError') {
+    const messages = Object.values(err.errors).map(e => e.message);
+    return res.status(400).json({
+      success: false,
+      message: messages.join(', ')
+    });
+  }
+  
+  // Handle JWT errors
+  if (err.name === 'JsonWebTokenError') {
+    return res.status(401).json({
+      success: false,
+      message: 'Invalid token. Please login again.'
+    });
+  }
+  
+  if (err.name === 'TokenExpiredError') {
+    return res.status(401).json({
+      success: false,
+      message: 'Session expired. Please login again.'
+    });
+  }
+  
+  // Default error response
   res.status(500).json({
     success: false,
     message: 'Something went wrong!',
@@ -272,7 +410,9 @@ const PORT = process.env.PORT || 5000;
 
 // Listen on all network interfaces
 const server = app.listen(PORT, '0.0.0.0', () => {
-  console.log(`\n🚀 Server is running!`.green.bold);
+  console.log(`\n${'='.repeat(60)}`.green);
+  console.log(`🚀 TECNO RENDEZVOUS BACKEND SERVER`.green.bold);
+  console.log(`${'='.repeat(60)}`.green);
   console.log(`📡 Port: ${PORT}`.cyan);
   console.log(`🌍 Environment: ${process.env.NODE_ENV || 'development'}`.cyan);
   console.log(`📱 Local: http://localhost:${PORT}`.cyan);
@@ -280,43 +420,56 @@ const server = app.listen(PORT, '0.0.0.0', () => {
     console.log(`📱 Network: http://${LOCAL_IP}:${PORT}`.cyan);
   }
   console.log(`🖼️  Image URL: http://localhost:${PORT}/event-images/`.cyan);
+  console.log(`${'='.repeat(60)}`.green);
   
   // Show allowed origins
   console.log(`\n🔒 Allowed Origins:`.yellow);
   allowedOrigins.forEach(origin => {
     console.log(`   - ${origin}`.cyan);
   });
+  console.log(`${'='.repeat(60)}\n`.green);
   
   // Check MongoDB connection status after server starts
   setTimeout(() => {
     const state = mongoose.connection.readyState;
     const states = ['disconnected', 'connected', 'connecting', 'disconnecting'];
-    console.log(`\n💾 MongoDB Status: ${states[state] || 'unknown'}`.cyan);
+    console.log(`💾 MongoDB Status: ${states[state] || 'unknown'}`.cyan);
     
     if (state === 1) {
       console.log(`   Database: ${mongoose.connection.name}`.green);
       console.log(`   Host: ${mongoose.connection.host}`.green);
     }
+    console.log(`${'='.repeat(60)}\n`.green);
   }, 1000);
 });
 
 // ============================================
 // HANDLE UNHANDLED PROMISE REJECTIONS
 // ============================================
+
 process.on('unhandledRejection', (err, promise) => {
   console.log(`❌ Unhandled Rejection: ${err.message}`.red);
-  console.log(err);
+  console.log(err.stack);
+  // Don't exit in production, just log
+  if (process.env.NODE_ENV !== 'production') {
+    process.exit(1);
+  }
 });
 
 // Handle uncaught exceptions
 process.on('uncaughtException', (err) => {
   console.log(`❌ Uncaught Exception: ${err.message}`.red);
-  console.log(err);
+  console.log(err.stack);
+  // Don't exit in production, just log
+  if (process.env.NODE_ENV !== 'production') {
+    process.exit(1);
+  }
 });
 
 // ============================================
 // HANDLE MongoDB CONNECTION EVENTS
 // ============================================
+
 mongoose.connection.on('error', (err) => {
   console.error('❌ MongoDB connection error:'.red, err.message);
 });
@@ -329,16 +482,23 @@ mongoose.connection.on('reconnected', () => {
   console.log('✅ MongoDB reconnected'.green);
 });
 
+mongoose.connection.on('connected', () => {
+  console.log('✅ MongoDB connected'.green);
+});
+
 // ============================================
 // GRACEFUL SHUTDOWN
 // ============================================
-process.on('SIGINT', async () => {
+
+const gracefulShutdown = async () => {
   console.log('\n🛑 Shutting down gracefully...'.yellow);
   
   try {
+    // Close MongoDB connection
     await mongoose.connection.close();
     console.log('✅ MongoDB connection closed'.green);
     
+    // Close HTTP server
     server.close(() => {
       console.log('✅ Server closed'.green);
       process.exit(0);
@@ -347,23 +507,19 @@ process.on('SIGINT', async () => {
     console.error('❌ Error during shutdown:'.red, err);
     process.exit(1);
   }
-});
+};
 
-process.on('SIGTERM', async () => {
-  console.log('\n🛑 Received SIGTERM, shutting down...'.yellow);
-  
-  try {
-    await mongoose.connection.close();
-    console.log('✅ MongoDB connection closed'.green);
-    
-    server.close(() => {
-      console.log('✅ Server closed'.green);
-      process.exit(0);
-    });
-  } catch (err) {
-    console.error('❌ Error during shutdown:'.red, err);
-    process.exit(1);
-  }
-});
+// Handle SIGINT (Ctrl+C)
+process.on('SIGINT', gracefulShutdown);
+
+// Handle SIGTERM (kill command)
+process.on('SIGTERM', gracefulShutdown);
+
+// Handle SIGQUIT
+process.on('SIGQUIT', gracefulShutdown);
+
+// ============================================
+// EXPORT APP (for testing)
+// ============================================
 
 module.exports = app;
