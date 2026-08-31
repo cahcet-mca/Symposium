@@ -1,6 +1,4 @@
-// src/pages/AdminLogin.jsx - Updated
-
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useSymposiumDate } from '../context/DateContext';
 import axios from 'axios';
@@ -18,35 +16,6 @@ const AdminLogin = () => {
   const navigate = useNavigate();
   const { symposiumName } = useSymposiumDate();
 
-  // Refs for scroll animations
-  const cardRef = useRef(null);
-  const infoRef = useRef(null);
-
-  // ============================================
-  // SCROLL ANIMATIONS - Intersection Observer
-  // ============================================
-  useEffect(() => {
-    const observerOptions = {
-      threshold: 0.1,
-      rootMargin: '0px 0px -30px 0px'
-    };
-
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add('section-visible');
-        }
-      });
-    }, observerOptions);
-
-    const sections = [cardRef.current, infoRef.current].filter(Boolean);
-    sections.forEach(section => {
-      if (section) observer.observe(section);
-    });
-
-    return () => observer.disconnect();
-  }, []);
-
   // Check if admin is already logged in
   useEffect(() => {
     const checkExistingSession = () => {
@@ -55,6 +24,9 @@ const AdminLogin = () => {
       const adminData = localStorage.getItem('adminData');
       
       console.log('🔍 Checking existing admin session...');
+      console.log('adminToken:', adminToken ? 'Present' : 'Not present');
+      console.log('adminLoggedIn:', adminLoggedIn);
+      console.log('adminData:', adminData ? 'Present' : 'Not present');
       
       if (adminToken && adminLoggedIn === 'true' && adminData) {
         console.log('✅ Existing admin session found, auto-logging in...');
@@ -131,10 +103,7 @@ const AdminLogin = () => {
   return (
     <div className="admin-login-page">
       <div className="admin-login-container">
-        <div 
-          ref={cardRef}
-          className="admin-login-card section-animate"
-        >
+        <div className="admin-login-card">
           <div className="admin-login-header">
             <h1>Admin Login</h1>
             <p className="admin-subtitle">{symposiumName} Symposium</p>
@@ -199,10 +168,7 @@ const AdminLogin = () => {
           </div>
         </div>
 
-        <div 
-          ref={infoRef}
-          className="admin-info-card section-animate"
-        >
+        <div className="admin-info-card">
           <div className="admin-info-badge">
             <span className="badge-icon">⚡</span>
             <span>Admin Access Only</span>
@@ -210,7 +176,7 @@ const AdminLogin = () => {
           <h2>Manage Registrations</h2>
           <p>Review pending registrations and accept/reject participant requests.</p>
           
-          <div className="admin-info-features stagger-children">
+          <div className="admin-info-features">
             <div className="feature-item">
               <span className="feature-icon">📋</span>
               <span>Pending Approvals</span>
@@ -226,6 +192,13 @@ const AdminLogin = () => {
           </div>
         </div>
       </div>
+
+      {/* Add keyframe animation for spinner - without jsx attribute */}
+      <style>{`
+        @keyframes spin {
+          to { transform: rotate(360deg); }
+        }
+      `}</style>
     </div>
   );
 };
