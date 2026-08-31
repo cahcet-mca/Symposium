@@ -583,6 +583,52 @@ const getRegistrationCount = async (req, res) => {
 // EXPORT ALL CONTROLLERS
 // ============================================
 
+/**
+ * @desc    Get registration details for public verification (QR Code)
+ * @route   GET /api/registrations/ticket/:id
+ * @access  Public
+ */
+const getTicketDetails = async (req, res) => {
+  try {
+    const registration = await Registration.findById(req.params.id)
+      .populate('event', 'name category type startTime endTime venue')
+      .populate('user', 'name college department year');
+
+    if (!registration) {
+      return res.status(404).json({
+        success: false,
+        message: 'Ticket not found or invalid'
+      });
+    }
+
+    // Return only non-sensitive data for verification
+    const ticketData = {
+      _id: registration._id,
+      paymentStatus: registration.paymentStatus,
+      registrationStatus: registration.registrationStatus,
+      teamSize: registration.teamSize,
+      teamName: registration.teamName,
+      participants: registration.participants,
+      totalAmount: registration.totalAmount,
+      event: registration.event,
+      user: registration.user
+    };
+
+    res.json({
+      success: true,
+      data: ticketData
+    });
+
+  } catch (error) {
+    console.error('❌ Error fetching ticket details:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error fetching ticket details',
+      error: error.message
+    });
+  }
+};
+
 module.exports = {
   getMyRegistrations,
   checkTimeConflict,
@@ -594,5 +640,6 @@ module.exports = {
   updateRegistrationStatus,
   getRegistrationStats,
   getUpcomingRegistrations,
-  getPastRegistrations
+  getPastRegistrations,
+  getTicketDetails
 };

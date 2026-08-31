@@ -1,4 +1,6 @@
-import React, { useState } from 'react';
+// src/pages/Login.jsx - Updated with Scroll Animations
+
+import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useSymposiumDate } from '../context/DateContext';
@@ -16,7 +18,36 @@ const Login = () => {
   const { login } = useAuth();
   const { symposiumName } = useSymposiumDate();
 
+  // Refs for scroll animations
+  const cardRef = useRef(null);
+  const infoRef = useRef(null);
+
   const from = location.state?.from || '/dashboard';
+
+  // ============================================
+  // SCROLL ANIMATIONS - Intersection Observer
+  // ============================================
+  useEffect(() => {
+    const observerOptions = {
+      threshold: 0.1,
+      rootMargin: '0px 0px -30px 0px'
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('section-visible');
+        }
+      });
+    }, observerOptions);
+
+    const sections = [cardRef.current, infoRef.current].filter(Boolean);
+    sections.forEach(section => {
+      if (section) observer.observe(section);
+    });
+
+    return () => observer.disconnect();
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -37,7 +68,10 @@ const Login = () => {
   return (
     <div className="auth-page">
       <div className="auth-container">
-        <div className="auth-card">
+        <div 
+          ref={cardRef}
+          className="auth-card section-animate"
+        >
           <div className="auth-header">
             <h1>Welcome Back</h1>
             <p className="auth-subtitle">Sign in to your {symposiumName} account</p>
@@ -125,7 +159,10 @@ const Login = () => {
           </div>
         </div>
 
-        <div className="auth-info">
+        <div 
+          ref={infoRef}
+          className="auth-info section-animate"
+        >
           <div className="info-badge">
             <span className="badge-icon">🎯</span>
             <span>{symposiumName}</span>
@@ -133,7 +170,7 @@ const Login = () => {
           <h2>Think Big • Act Smart • Win Together</h2>
           <p>Join hundreds of talented students, researchers, and innovators in this premier symposium.</p>
           
-          <div className="info-features">
+          <div className="info-features stagger-children">
             <div className="feature-item">
               <span className="feature-icon">⚡</span>
               <span>9+ Competitions</span>

@@ -1,4 +1,6 @@
-import React, { useState, useEffect, useCallback } from 'react';
+// src/pages/Dashboard.jsx - Updated with Scroll Animations
+
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useEvents } from '../context/EventContext';
@@ -27,6 +29,12 @@ const Dashboard = () => {
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [showPopup, setShowPopup] = useState(false);
 
+  // Refs for scroll animations
+  const profileSectionRef = useRef(null);
+  const tabsSectionRef = useRef(null);
+  const contentSectionRef = useRef(null);
+  const statsSectionRef = useRef(null);
+
   const [profileData, setProfileData] = useState({
     name: user?.name || '',
     college: user?.college || '',
@@ -37,6 +45,41 @@ const Dashboard = () => {
 
   const [profileUpdateStatus, setProfileUpdateStatus] = useState({ show: false, message: '', type: '' });
 
+  // ============================================
+  // SCROLL ANIMATIONS - Intersection Observer
+  // ============================================
+  useEffect(() => {
+    const observerOptions = {
+      threshold: 0.1,
+      rootMargin: '0px 0px -30px 0px'
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('section-visible');
+        }
+      });
+    }, observerOptions);
+
+    // Observe all section elements
+    const sections = [
+      profileSectionRef.current,
+      tabsSectionRef.current,
+      contentSectionRef.current,
+      statsSectionRef.current
+    ].filter(Boolean);
+
+    sections.forEach(section => {
+      if (section) observer.observe(section);
+    });
+
+    return () => observer.disconnect();
+  }, [loading, registeredEvents]);
+
+  // ============================================
+  // AUTH CHECK
+  // ============================================
   useEffect(() => {
     const token = localStorage.getItem('token');
     if (!token) {
@@ -44,6 +87,9 @@ const Dashboard = () => {
     }
   }, [navigate]);
 
+  // ============================================
+  // CHECK REGISTRATION STATUS
+  // ============================================
   useEffect(() => {
     const checkRegistrationStatus = async () => {
       try {
@@ -58,6 +104,9 @@ const Dashboard = () => {
     checkRegistrationStatus();
   }, []);
 
+  // ============================================
+  // STATUS DISPLAY HELPER
+  // ============================================
   const getStatusDisplay = (registration) => {
     const status = registration.paymentStatus;
     const regStatus = registration.registrationStatus;
@@ -103,6 +152,9 @@ const Dashboard = () => {
     }
   };
 
+  // ============================================
+  // FETCH USER REGISTRATIONS
+  // ============================================
   const fetchUserRegistrations = useCallback(async () => {
     try {
       setLoading(true);
@@ -147,6 +199,9 @@ const Dashboard = () => {
     }
   }, [navigate]);
 
+  // ============================================
+  // FETCH EVENT STATS
+  // ============================================
   const fetchAllEventRealStats = useCallback(async () => {
     if (!events || events.length === 0) return;
     
@@ -163,8 +218,6 @@ const Dashboard = () => {
             const pending = eventData.pendingCount || 0;
             const max = eventData.maxParticipants || 0;
             const availableSpots = max - (confirmed + pending);
-            
-            // ✅ FIX: Percentage = (Confirmed + Waitlist) / Capacity
             const percentage = max > 0 ? Math.round(((confirmed + pending) / max) * 100) : 0;
             
             return {
@@ -210,6 +263,9 @@ const Dashboard = () => {
     }
   }, [events]);
 
+  // ============================================
+  // EFFECTS
+  // ============================================
   useEffect(() => {
     fetchUserRegistrations();
   }, [fetchUserRegistrations]);
@@ -220,6 +276,9 @@ const Dashboard = () => {
     }
   }, [activeTab, events, fetchAllEventRealStats]);
 
+  // ============================================
+  // HANDLERS
+  // ============================================
   const handleViewDetails = async (event) => {
     if (!event || !event._id) return;
     
@@ -288,6 +347,9 @@ const Dashboard = () => {
     }
   };
 
+  // ============================================
+  // TICKET HTML GENERATOR
+  // ============================================
   const generateTicketHTML = (registration) => {
     const currentYear = new Date().getFullYear();
     const safeReg = {
@@ -455,7 +517,7 @@ const Dashboard = () => {
               <div>${p.email || ''} | ${p.phone || ''}</div></div>`).join('') : 
               `<div class="participant"><div><strong>${safeReg.user?.name || 'N/A'}</strong> (Team Lead)</div><div>${safeReg.user?.email || ''} | ${safeReg.user?.phone || ''}</div></div>`}
           </div>
-          <div class="qr"><img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${safeReg._id}" alt="QR Code"></div>
+          <div class="qr"><img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(window.location.origin + '/verify-ticket/' + safeReg._id)}" alt="QR Code"></div>
           <div class="footer">
           <p>This is your official ticket. Please show this at the event entrance.</p>
           <p>📱 Scan QR code for quick check-in</p>
@@ -465,6 +527,9 @@ const Dashboard = () => {
       </html>`;
   };
 
+  // ============================================
+  // RENDER
+  // ============================================
   if (loading) return <Loader />;
 
   return (
@@ -504,7 +569,11 @@ const Dashboard = () => {
           <EventDetailsPopup event={selectedEvent} onClose={handleClosePopup} registrationsOpen={registrationsOpen} />
         )}
 
-        <div className="profile-section">
+        {/* ========== PROFILE SECTION with Animation ========== */}
+        <div 
+          ref={profileSectionRef}
+          className="profile-section section-animate"
+        >
           <div className="profile-cover">
             <div className="profile-avatar">
               <span className="avatar-initials">
@@ -532,7 +601,11 @@ const Dashboard = () => {
           </div>
         </div>
 
-        <div className="dashboard-tabs">
+        {/* ========== TABS SECTION with Animation ========== */}
+        <div 
+          ref={tabsSectionRef}
+          className="dashboard-tabs section-animate"
+        >
           <button className={`tab-btn ${activeTab === 'myregistrations' ? 'active' : ''}`} onClick={() => setActiveTab('myregistrations')}>
             <span className="tab-icon">📋</span> My Registrations
           </button>
@@ -544,12 +617,16 @@ const Dashboard = () => {
           </button>
         </div>
 
-        <div className="tab-content">
+        {/* ========== CONTENT SECTION with Animation ========== */}
+        <div 
+          ref={contentSectionRef}
+          className="tab-content section-animate"
+        >
           {activeTab === 'myregistrations' && (
             <div className="registrations-tab">
               <h2 className="section-title">My Event Registrations</h2>
               {registeredEvents.length > 0 ? (
-                <div className="registrations-grid">
+                <div className="registrations-grid stagger-children">
                   {registeredEvents.map((registration) => {
                     const safeRegistration = {
                       _id: registration?._id || `temp-${Math.random()}`,
@@ -662,7 +739,7 @@ const Dashboard = () => {
               {statsLoading ? (
                 <div className="loading">Loading real-time event stats...</div>
               ) : events && events.length > 0 ? (
-                <div className="allevents-grid">
+                <div className="allevents-grid stagger-children">
                   {events.map((event) => {
                     if (!event || !event._id) return null;
                     const isRegistered = registeredEvents.some(re => re.event?._id === event._id || re.eventId === event._id);
@@ -671,14 +748,12 @@ const Dashboard = () => {
                       pendingCount: 0,
                       maxParticipants: event.maxParticipants || 0,
                       availableSpots: event.maxParticipants - (event.registeredCount || 0),
-                      // ✅ FIX: Percentage based on confirmed + pending (total occupancy)
                       percentage: event.maxParticipants > 0 
                         ? Math.round(((event.registeredCount || 0) / event.maxParticipants) * 100) 
                         : 0,
                       isFull: false
                     };
 
-                    // ✅ If using real stats, ensure percentage uses confirmed + pending
                     if (eventStats[event._id]) {
                       const realStats = eventStats[event._id];
                       stats.percentage = realStats.maxParticipants > 0 
@@ -739,7 +814,6 @@ const Dashboard = () => {
                             <span>₹{event.fee} per head</span>
                           </div>
                           
-                          {/* Registration Stats with FILL PERCENTAGE = Confirmed + Waitlist */}
                           <div className="detail-item-dashboard registration-progress-dashboard">
                             <span className="icon-dashboard">📊</span>
                             <div className="progress-info-dashboard">

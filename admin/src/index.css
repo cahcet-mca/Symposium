@@ -1,4 +1,4 @@
-/* client/src/index.css */
+/* P:\project\Symposium\admin\src\index.css */
 * {
   margin: 0;
   padding: 0;
@@ -31,12 +31,23 @@ body {
   background: #ffd700;
 }
 
+/* Selection */
 ::selection {
   background: #ffd700;
   color: #000000;
 }
 
+/* Link styles */
 a {
   text-decoration: none;
   color: inherit;
+}
+
+/* Utility classes */
+.text-gold {
+  color: #ffd700;
+}
+
+.text-center {
+  text-align: center;
 }

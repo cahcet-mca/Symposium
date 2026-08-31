@@ -15,6 +15,7 @@ const {
   getEventWaitlistStatus
 } = require('../controllers/eventController');
 const { protect, authorize } = require('../middleware/authMiddleware');
+const { adminAuth } = require('../middleware/adminMiddleware');
 
 // ============================================
 // PUBLIC ROUTES (No Authentication Required)
@@ -79,35 +80,36 @@ router.get('/:id/waitlist-status', getEventWaitlistStatus);
  * @desc    Create new event
  * @access  Private/Admin
  */
-router.post('/', protect, authorize('admin'), createEvent);
+router.post('/', adminAuth, createEvent);
+router.post('/admin/create', adminAuth, createEvent);
 
 /**
  * @route   PUT /api/events/:id
  * @desc    Update event details
  * @access  Private/Admin
  */
-router.put('/:id', protect, authorize('admin'), updateEvent);
+router.put('/:id', adminAuth, updateEvent);
 
 /**
  * @route   DELETE /api/events/:id
  * @desc    Delete event
  * @access  Private/Admin
  */
-router.delete('/:id', protect, authorize('admin'), deleteEvent);
+router.delete('/:id', adminAuth, deleteEvent);
 
 /**
  * @route   PUT /api/events/:id/image
  * @desc    Update event image only
  * @access  Private/Admin
  */
-router.put('/:id/image', protect, authorize('admin'), updateEventImage);
+router.put('/:id/image', adminAuth, updateEventImage);
 
 /**
  * @route   POST /api/events/admin/sync-counts
  * @desc    Sync all event counts with actual registrations
  * @access  Private/Admin
  */
-router.post('/admin/sync-counts', protect, authorize('admin'), syncEventCounts);
+router.post('/admin/sync-counts', adminAuth, syncEventCounts);
 
 // ============================================
 // BULK OPERATIONS (Admin Only)
