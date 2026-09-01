@@ -4,6 +4,23 @@
   box-sizing: border-box;
 }
 
+/* ============================================
+   SCROLL PROGRESS BAR
+   ============================================ */
+.scroll-progress-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #b8860b, #ffd700, #fff275, #ffd700);
+  box-shadow: 0 0 12px rgba(255, 215, 0, 0.8), 0 0 4px rgba(255, 215, 0, 0.4);
+  z-index: 99999;
+  transition: width 0.15s ease-out;
+  border-top-right-radius: 2px;
+  border-bottom-right-radius: 2px;
+  pointer-events: none;
+}
+
 .navbar {
   align-items: center;
   background: rgba(10,10,10,0.8);

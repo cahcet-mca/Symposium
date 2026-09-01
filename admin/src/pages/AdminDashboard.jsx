@@ -29,6 +29,9 @@ const AdminDashboard = () => {
   const statsRef = useRef(null);
   const contentRef = useRef(null);
   const sidebarRef = useRef(null);
+
+  // Scroll Progress state
+  const [scrollProgress, setScrollProgress] = useState(0);
   
   // Symposium Name update states
   const [newSymposiumName, setNewSymposiumName] = useState('');
@@ -711,6 +714,40 @@ const AdminDashboard = () => {
   }, [fetchRegistrations, fetchSettings, fetchEvents]);
 
   // ============================================
+  // SCROLL PROGRESS LISTENER
+  // ============================================
+  useEffect(() => {
+    const mainEl = contentRef.current;
+    
+    const handleScroll = () => {
+      if (mainEl && mainEl.scrollHeight > mainEl.clientHeight) {
+        const total = mainEl.scrollHeight - mainEl.clientHeight;
+        if (total > 0) {
+          setScrollProgress((mainEl.scrollTop / total) * 100);
+          return;
+        }
+      }
+      
+      const totalWindow = document.documentElement.scrollHeight - window.innerHeight;
+      if (totalWindow > 0) {
+        setScrollProgress((window.scrollY / totalWindow) * 100);
+      }
+    };
+
+    if (mainEl) {
+      mainEl.addEventListener('scroll', handleScroll, { passive: true });
+    }
+    window.addEventListener('scroll', handleScroll, { passive: true });
+
+    return () => {
+      if (mainEl) {
+        mainEl.removeEventListener('scroll', handleScroll);
+      }
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, [activeTab, loading, registrations, participants, events]);
+
+  // ============================================
   // HANDLE STATUS UPDATE (ACCEPT/REJECT)
   // ============================================
   const handleStatusUpdate = async (registrationId, status) => {
@@ -1125,6 +1162,12 @@ const AdminDashboard = () => {
   // ============================================
   return (
     <div className="admin-dashboard">
+      {/* Scroll Progress Bar */}
+      <div 
+        className="scroll-progress-bar" 
+        style={{ width: `${scrollProgress}%` }} 
+      />
+
       {/* Mobile Sidebar Toggle Button */}
       <button 
         className="mobile-sidebar-toggle" 

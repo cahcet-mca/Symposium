@@ -7,7 +7,7 @@ import './EventCard.css';
 
 const API_URL = import.meta.env.VITE_API_URL;
 
-const EventCard = ({ event, onViewDetails, registrationsOpen = true }) => {
+const EventCard = ({ event, onViewDetails, registrationsOpen = true, style = {}, className = '' }) => {
   const [realCounts, setRealCounts] = useState(null);
   const [loading, setLoading] = useState(true);
   const [eventDetails, setEventDetails] = useState(event);
@@ -134,7 +134,7 @@ const EventCard = ({ event, onViewDetails, registrationsOpen = true }) => {
   const imageSrc = getImageSource();
 
   return (
-    <div className={`event-card ${event.category?.toLowerCase()}`}>
+    <div className={`event-card ${event.category?.toLowerCase() || ''} ${className}`} style={style}>
       <div className="event-image-container">
         {imageSrc && !imageError ? (
           <img 
