@@ -31,6 +31,7 @@ const Home = () => {
   
   // Scroll animation state
   const [scrollY, setScrollY] = useState(0);
+  const [scrollProgress, setScrollProgress] = useState(0);
   
   const { symposiumDate, symposiumName, venue, venueDetails } = useSymposiumDate();
   const navigate = useNavigate();
@@ -71,13 +72,19 @@ const Home = () => {
     fetchData();
   }, []);
 
-  // Scroll animation effect
+  // Scroll animation & progress effect
   useEffect(() => {
     const handleScroll = () => {
-      setScrollY(window.scrollY);
+      const currentScroll = window.scrollY;
+      setScrollY(currentScroll);
+      
+      const totalScroll = document.documentElement.scrollHeight - window.innerHeight;
+      if (totalScroll > 0) {
+        setScrollProgress((currentScroll / totalScroll) * 100);
+      }
       
       // Hero fades as you scroll
-      setIsHeroVisible(window.scrollY < 300);
+      setIsHeroVisible(currentScroll < 300);
     };
     
     window.addEventListener('scroll', handleScroll, { passive: true });
@@ -154,6 +161,12 @@ const Home = () => {
 
   return (
     <div className="home">
+      {/* Scroll Progress Bar */}
+      <div 
+        className="scroll-progress-bar" 
+        style={{ width: `${scrollProgress}%` }} 
+      />
+
       {/* Hero Section with Parallax Effect */}
       <section 
         id="hero"

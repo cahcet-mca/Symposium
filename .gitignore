@@ -16,6 +16,7 @@ yarn.lock
 /dist
 /client/build
 /server/dist
+/admin/dist
 
 # Logs
 *.log
