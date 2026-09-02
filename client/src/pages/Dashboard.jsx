@@ -346,7 +346,6 @@ const Dashboard = () => {
       alert('Failed to download ticket. Please try again.');
     }
   };
-
   // ============================================
   // TICKET HTML GENERATOR
   // ============================================
@@ -357,7 +356,6 @@ const Dashboard = () => {
       eventName: registration.eventName || 'Event',
       event: registration.event || {},
       teamSize: registration.teamSize || 1,
-      teamName: registration.teamName || 'Individual',
       totalAmount: registration.totalAmount || 0,
       participants: registration.participants || [],
       user: registration.user || {}
@@ -373,106 +371,114 @@ const Dashboard = () => {
           body { 
           font-family: 'Inter', Arial, sans-serif; 
           background: #0a0a0a; 
+          color: #ffffff; 
           display: flex; 
           justify-content: center; 
-          align-items: center; 
-          min-height: 100vh; 
-          margin: 0; 
           padding: 20px; 
+          margin: 0;
           }
           .ticket { 
-          max-width: 700px; 
-          background: linear-gradient(145deg, #1a1a1a, #0d0d0d); 
+          max-width: 500px; 
+          width: 100%; 
           border: 2px solid #ffd700; 
-          border-radius: 20px; 
-          padding: 40px; 
-          color: white; 
-          box-shadow: 0 20px 40px rgba(0,0,0,0.8); 
-          position: relative; 
-          overflow: hidden; 
-          }
-          .ticket::before { 
-          content: ''; 
-          position: absolute; 
-          top: 0; left: 0; 
-          right: 0; 
-          height: 5px; 
-          background: linear-gradient(90deg, #b8860b, #ffd700, #b8860b); 
+          border-radius: 16px; 
+          padding: 25px; 
+          background: #141414; 
+          box-shadow: 0 10px 30px rgba(0,0,0,0.5);
           }
           .header { 
           text-align: center; 
-          border-bottom: 2px solid #ffd700; 
+          border-bottom: 2px dashed #333; 
           padding-bottom: 20px; 
-          margin-bottom: 20px; 
+          margin-bottom: 20px;
           }
           .header h1 { 
           color: #ffd700; 
           margin: 0; 
-          font-size: 2.5em; 
-          letter-spacing: 2px; 
+          font-size: 24px;
           }
           .header h2 { 
           color: #ffffff; 
           margin: 10px 0 0; 
-          font-size: 1.8em; 
+          font-size: 20px;
           }
           .details { 
-          margin: 20px 0; 
+          margin-bottom: 20px;
           }
           .detail-row { 
           display: flex; 
           justify-content: space-between; 
-          padding: 12px 0; 
-          border-bottom: 1px solid rgba(255,215,0,0.2); 
+          padding: 8px 0; 
+          border-bottom: 1px solid #222;
           }
           .label { 
-          color: #b0b0b0; 
-          font-weight: 600; 
+          color: #888; 
+          font-size: 14px;
           }
           .value { 
+          color: #fff; 
+          font-weight: 600; 
+          font-size: 14px;
+          }
+          .value.registration-id { 
           color: #ffd700; 
-          font-weight: 700; 
+          font-family: monospace; 
+          font-size: 13px;
           }
           .participants { 
-          margin-top: 20px; 
+          background: #1a1a1a; 
+          padding: 15px; 
+          border-radius: 8px; 
+          margin-bottom: 20px;
           }
           .participants h3 { 
           color: #ffd700; 
-          margin-bottom: 15px; 
+          margin: 0 0 10px; 
+          font-size: 16px;
           }
           .participant { 
-          background: rgba(255,215,0,0.1); 
-          padding: 12px; 
-          border-radius: 10px; 
-          margin-bottom: 10px; 
-          border-left: 3px solid #ffd700; 
-          }
-          .participant strong { 
-          color: #ffd700; 
+          padding: 5px 0; 
+          font-size: 13px; 
+          color: #ccc; 
+          display: flex; 
+          justify-content: space-between;
           }
           .qr { 
           text-align: center; 
-          margin: 30px 0; 
-          }
-          .qr img { 
-          width: 150px; 
-          height: 150px; 
-          border: 2px solid #ffd700; 
-          border-radius: 10px; 
-          padding: 5px; 
-          background: white; 
+          margin: 20px 0; 
+          padding: 10px; 
+          background: #fff; 
+          border-radius: 8px; 
+          display: inline-block;
           }
           .footer { 
           text-align: center; 
-          margin-top: 30px; 
-          color: #b0b0b0; 
-          font-size: 0.9em; 
-          border-top: 1px solid rgba(255,215,0,0.2); 
-          padding-top: 20px; }
-          .registration-id { 
-          font-family: monospace; 
-          color: #ffd700; 
-          font-size: 1.1em; 
+          color: #666; 
+          font-size: 12px; 
+          border-top: 2px dashed #333; 
+          padding-top: 20px;
+          }
+          @media print {
+          body { 
+          background: #fff; 
+          color: #000;
+          }
+          .ticket { 
+          border-color: #000; 
+          background: #fff; 
+          box-shadow: none;
+          }
+          .header h1 { color: #000; }
+          .header h2 { color: #000; }
+          .label { color: #555; }
+          .value { color: #000; }
+          .value.registration-id { color: #000; }
+          .participants { 
+          background: #f5f5f5; 
+          color: #000;
+          }
+          .participants h3 { color: #000; }
+          .participant { color: #000; }
           }
         </style>
       </head>
@@ -503,7 +509,6 @@ const Dashboard = () => {
             <span class="label">Team Size:</span>
             <span class="value">${safeReg.teamSize} members</span>
             </div>
-            ${safeReg.teamName && safeReg.teamName !== 'Individual' ? `<div class="detail-row"><span class="label">Team Name:</span><span class="value">${safeReg.teamName}</span></div>` : ''}
             <div class="detail-row">
             <span class="label">Amount Paid:</span>
             <span class="value">₹${safeReg.totalAmount}</span>
@@ -633,7 +638,6 @@ const Dashboard = () => {
                       paymentStatus: registration?.paymentStatus || 'pending',
                       registrationStatus: registration?.registrationStatus || 'pending',
                       eventName: registration?.eventName || 'Unknown Event',
-                      teamName: registration?.teamName || 'Individual',
                       teamSize: registration?.teamSize || 1,
                       totalAmount: registration?.totalAmount || 0,
                       transactionId: registration?.transactionId || 'N/A',
@@ -671,7 +675,6 @@ const Dashboard = () => {
                             <span className="detail-label">📍 Venue:</span>
                             <span className="detail-value">{safeRegistration.event?.venue || 'TBA'}</span>
                           </div>
-                          {safeRegistration.teamName && safeRegistration.teamName !== 'Individual' && (<div className="detail-row"><span className="detail-label">👥 Team:</span><span className="detail-value">{safeRegistration.teamName}</span></div>)}
                           <div className="detail-row">
                             <span className="detail-label">📊 Team Size:</span>
                             <span className="detail-value">{safeRegistration.teamSize} members</span>

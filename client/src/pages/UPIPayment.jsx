@@ -30,7 +30,6 @@ const UPIPayment = () => {
 
   const [formData, setFormData] = useState({
     teamSize: 1,
-    teamName: '',
     participants: [],
     transactionId: '',
     screenshot: null,
@@ -260,11 +259,6 @@ const UPIPayment = () => {
       return false;
     }
 
-    if (event.type === 'Team' && !formData.teamName.trim()) {
-      setError('Please enter a team name');
-      return false;
-    }
-
     for (let i = 0; i < formData.participants.length; i++) {
       const p = formData.participants[i];
       if (!p.name?.trim()) {
@@ -361,7 +355,6 @@ const UPIPayment = () => {
           endTime: event.endTime || 'TBA'
         },
         teamSize: formData.teamSize,
-        teamName: formData.teamName.trim() || 'Individual',
         participants: participantsData,
         totalAmount: totalAmount,
         user: {
@@ -388,7 +381,6 @@ const UPIPayment = () => {
         // Clear form
         setFormData({
           teamSize: 1,
-          teamName: '',
           participants: [],
           transactionId: '',
           screenshot: null,
@@ -652,19 +644,6 @@ const UPIPayment = () => {
                   ))}
                 </select>
               </div>
-
-              {event.type === 'Team' && (
-                <div className="form-group">
-                  <label>Team Name</label>
-                  <input
-                    type="text"
-                    value={formData.teamName}
-                    onChange={(e) => setFormData(prev => ({ ...prev, teamName: e.target.value }))}
-                    placeholder="Enter your team name"
-                    className="form-input"
-                  />
-                </div>
-              )}
 
               <h4>Participant Details</h4>
               {formData.participants.map((participant, index) => (

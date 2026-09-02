@@ -410,6 +410,18 @@ const EventDetailsPopup = ({ event, onClose, registrationsOpen = true }) => {
             </div>
           )}
 
+          {/* Rules & Guidelines */}
+          {eventDetails.rules && eventDetails.rules.length > 0 && (
+            <div className="popup-section">
+              <h3>📜 Rules & Guidelines</h3>
+              <ul className="rules-list">
+                {eventDetails.rules.map((rule, index) => (
+                  <li key={index}>{rule}</li>
+                ))}
+              </ul>
+            </div>
+          )}
+
           {/* Prizes */}
           <div className="popup-section">
             <h3>🏆 Prizes</h3>

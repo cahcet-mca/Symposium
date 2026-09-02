@@ -117,9 +117,6 @@ const VerifyTicket = () => {
           <div className="detail-group">
             <label>Registration Type</label>
             <div className="value">{ticketData.teamSize > 1 ? `Team (${ticketData.teamSize} members)` : 'Individual'}</div>
-            {ticketData.teamName && ticketData.teamName !== 'Individual' && (
-              <div className="sub-value">Team Name: {ticketData.teamName}</div>
-            )}
           </div>
 
           {ticketData.participants && ticketData.participants.length > 0 && (

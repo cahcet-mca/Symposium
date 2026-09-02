@@ -66,6 +66,7 @@ const AdminDashboard = () => {
     endTime: '12:30 PM',
     venue: '',
     requirements: [],
+    rules: [],
     prizes: {
       first: '',
       second: '',
@@ -77,6 +78,41 @@ const AdminDashboard = () => {
   });
   const [creatingEvent, setCreatingEvent] = useState(false);
   const [tempRequirement, setTempRequirement] = useState('');
+  const [tempRule, setTempRule] = useState('');
+
+  const addRequirement = () => {
+    if (tempRequirement.trim()) {
+      setNewEvent(prev => ({
+        ...prev,
+        requirements: [...(prev.requirements || []), tempRequirement.trim()]
+      }));
+      setTempRequirement('');
+    }
+  };
+
+  const removeRequirement = (index) => {
+    setNewEvent(prev => ({
+      ...prev,
+      requirements: (prev.requirements || []).filter((_, i) => i !== index)
+    }));
+  };
+
+  const addRule = () => {
+    if (tempRule.trim()) {
+      setNewEvent(prev => ({
+        ...prev,
+        rules: [...(prev.rules || []), tempRule.trim()]
+      }));
+      setTempRule('');
+    }
+  };
+
+  const removeRule = (index) => {
+    setNewEvent(prev => ({
+      ...prev,
+      rules: (prev.rules || []).filter((_, i) => i !== index)
+    }));
+  };
   
   // Event Management states
   const [events, setEvents] = useState([]);
@@ -421,26 +457,6 @@ const AdminDashboard = () => {
     }
   };
 
-  // ============================================
-  // EVENT MANAGEMENT FUNCTIONS
-  // ============================================
-  const addRequirement = (e) => {
-    e.preventDefault();
-    if (tempRequirement.trim()) {
-      setNewEvent(prev => ({
-        ...prev,
-        requirements: [...prev.requirements, tempRequirement.trim()]
-      }));
-      setTempRequirement('');
-    }
-  };
-
-  const removeRequirement = (indexToRemove) => {
-    setNewEvent(prev => ({
-      ...prev,
-      requirements: prev.requirements.filter((_, idx) => idx !== indexToRemove)
-    }));
-  };
 
   const fetchEvents = useCallback(async () => {
     try {
@@ -473,6 +489,7 @@ const AdminDashboard = () => {
       endTime: '12:30 PM',
       venue: '',
       requirements: [],
+      rules: [],
       prizes: {
         first: '',
         second: '',
@@ -483,6 +500,7 @@ const AdminDashboard = () => {
       image: 'default-event.jpg'
     });
     setTempRequirement('');
+    setTempRule('');
     setShowEventModal(true);
   };
 
@@ -503,6 +521,7 @@ const AdminDashboard = () => {
       endTime: event.endTime || '12:30 PM',
       venue: event.venue || '',
       requirements: event.requirements || [],
+      rules: event.rules || [],
       prizes: {
         first: event.prizes?.first || '',
         second: event.prizes?.second || '',
@@ -513,6 +532,7 @@ const AdminDashboard = () => {
       image: event.image || 'default-event.jpg'
     });
     setTempRequirement('');
+    setTempRule('');
     setShowEventModal(true);
   };
 
@@ -660,7 +680,6 @@ const AdminDashboard = () => {
                   eventSubName: reg.event?.subEventName || '',
                   college: reg.user?.college || 'N/A',
                   year: reg.user?.year,
-                  teamName: reg.teamName || 'Individual',
                   isTeamLead: index === 0
                 });
               });
@@ -672,7 +691,6 @@ const AdminDashboard = () => {
                 eventSubName: reg.event?.subEventName || '',
                 college: reg.user?.college || 'N/A',
                 year: reg.user?.year,
-                teamName: 'Individual',
                 isTeamLead: true
               });
             }
@@ -955,7 +973,7 @@ const AdminDashboard = () => {
     if (activeTab === 'participants') {
       return ['S.No', 'Participant Name', 'Mobile', 'Event', 'College', 'Year'];
     }
-    const baseHeaders = ['Date', 'Transaction ID', 'User', 'Event', 'Team', 'Amount', 'Status'];
+    const baseHeaders = ['Date', 'Transaction ID', 'User', 'Event', 'Team Size', 'Amount', 'Status'];
     return activeTab === 'pending' ? [...baseHeaders, 'Actions'] : baseHeaders;
   };
 
@@ -972,7 +990,6 @@ const AdminDashboard = () => {
       createdAt: reg?.createdAt || new Date().toISOString(),
       transactionId: reg?.transactionId || 'N/A',
       totalAmount: reg?.totalAmount || 0,
-      teamName: reg?.teamName || 'Individual',
       teamSize: reg?.teamSize || 1,
       event: reg?.event || {
         name: reg?.eventName || 'Unknown Event',
@@ -1037,16 +1054,9 @@ const AdminDashboard = () => {
           </div>
           
           <div className="mobile-info-row">
-            <span className="mobile-info-label">Team:</span>
+            <span className="mobile-info-label">Type:</span>
             <div className="mobile-info-value">
-              {safeReg.teamName !== 'Individual' ? (
-                <>
-                  <strong>{safeReg.teamName}</strong>
-                  <div className="mobile-event-details">{safeReg.teamSize} members</div>
-                </>
-              ) : (
-                'Individual'
-              )}
+              {safeReg.teamSize > 1 ? `${safeReg.teamSize} members` : 'Individual'}
             </div>
           </div>
           
@@ -1145,13 +1155,6 @@ const AdminDashboard = () => {
             <span className="mobile-info-label">Year:</span>
             <span className="mobile-info-value">{formatYear(participant.year)}</span>
           </div>
-          
-          {participant.teamName !== 'Individual' && (
-            <div className="mobile-info-row">
-              <span className="mobile-info-label">Team:</span>
-              <span className="mobile-info-value">{participant.teamName}</span>
-            </div>
-          )}
         </div>
       </div>
     );
@@ -1671,9 +1674,6 @@ const AdminDashboard = () => {
                                     {p.eventSubName && (
                                       <span className="event-sub">📌 {p.eventSubName}</span>
                                     )}
-                                    {p.teamName !== 'Individual' && (
-                                      <span className="event-team">👥 {p.teamName}</span>
-                                    )}
                                   </td>
                                   <td className="participant-college-cell">{p.college}</td>
                                   <td className="participant-year-cell">{formatYear(p.year)}</td>
@@ -1693,7 +1693,6 @@ const AdminDashboard = () => {
                                   transactionId: reg?.transactionId || 'N/A',
                                   user: reg?.user || { name: 'N/A', email: '', phone: '', college: '' },
                                   event: reg?.event || { name: reg?.eventName || 'N/A', subEventName: '', category: '' },
-                                  teamName: reg?.teamName || 'Individual',
                                   teamSize: reg?.teamSize || 1,
                                   totalAmount: reg?.totalAmount || 0,
                                   paymentStatus: reg?.paymentStatus || 'pending'
@@ -1723,11 +1722,8 @@ const AdminDashboard = () => {
                                       </div>
                                     </td>
                                     <td>
-                                      {safeReg.teamName !== 'Individual' ? (
-                                        <div className="team-info">
-                                          <strong>{safeReg.teamName}</strong>
-                                          <span className="team-size">{safeReg.teamSize} members</span>
-                                        </div>
+                                      {safeReg.teamSize > 1 ? (
+                                        <span className="team-size">{safeReg.teamSize} members</span>
                                       ) : (
                                         <span className="individual-tag">Individual</span>
                                       )}
@@ -2171,7 +2167,7 @@ const AdminDashboard = () => {
                         Add
                       </button>
                     </div>
-                    {newEvent.requirements.length > 0 && (
+                    {newEvent.requirements && newEvent.requirements.length > 0 && (
                       <div className="mobile-participants" style={{ background: 'rgba(255, 215, 0, 0.05)', padding: '10px', borderRadius: '8px' }}>
                         {newEvent.requirements.map((req, idx) => (
                           <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '5px 0', borderBottom: '1px solid rgba(255,215,0,0.1)' }}>
@@ -2179,6 +2175,44 @@ const AdminDashboard = () => {
                             <button 
                               type="button" 
                               onClick={() => removeRequirement(idx)}
+                              style={{ background: 'transparent', border: 'none', color: '#ff4757', cursor: 'pointer', fontSize: '1rem', marginLeft: 'auto' }}
+                            >
+                              ✕
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="form-group full-width">
+                    <label>Rules & Guidelines</label>
+                    <div style={{ display: 'flex', gap: '10px', marginBottom: '10px' }}>
+                      <input
+                        type="text"
+                        value={tempRule}
+                        onChange={(e) => setTempRule(e.target.value)}
+                        placeholder="Add rule (e.g. Maximum 10 minutes presentation time)"
+                        className="settings-input"
+                        style={{ flex: 1 }}
+                      />
+                      <button 
+                        type="button" 
+                        onClick={addRule}
+                        className="btn-close"
+                        style={{ padding: '0 20px', whiteSpace: 'nowrap' }}
+                      >
+                        Add
+                      </button>
+                    </div>
+                    {newEvent.rules && newEvent.rules.length > 0 && (
+                      <div className="mobile-participants" style={{ background: 'rgba(255, 215, 0, 0.05)', padding: '10px', borderRadius: '8px' }}>
+                        {newEvent.rules.map((rule, idx) => (
+                          <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '5px 0', borderBottom: '1px solid rgba(255,215,0,0.1)' }}>
+                            <span style={{ color: '#ffffff', fontSize: '0.85rem' }}>• {rule}</span>
+                            <button 
+                              type="button" 
+                              onClick={() => removeRule(idx)}
                               style={{ background: 'transparent', border: 'none', color: '#ff4757', cursor: 'pointer', fontSize: '1rem', marginLeft: 'auto' }}
                             >
                               ✕
