@@ -74,6 +74,9 @@ const eventSchema = new mongoose.Schema({
   requirements: [{
     type: String
   }],
+  rules: [{
+    type: String
+  }],
   prizes: {
     first: { type: String, default: 'TBD' },
     second: { type: String, default: 'TBD' },

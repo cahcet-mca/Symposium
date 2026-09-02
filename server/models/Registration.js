@@ -15,10 +15,6 @@ const registrationSchema = new mongoose.Schema({
     ref: 'User',
     required: true
   },
-  teamName: {
-    type: String,
-    default: 'Individual'
-  },
   teamSize: {
     type: Number,
     default: 1

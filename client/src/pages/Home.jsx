@@ -1,7 +1,7 @@
-// src/pages/Home.jsx
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSymposiumDate } from '../context/DateContext';
+import { useAuth } from '../context/AuthContext';
 import axios from 'axios';
 import HomeEventCard from '../components/events/HomeEventCard';
 import './Home.css';
@@ -34,6 +34,7 @@ const Home = () => {
   const [scrollProgress, setScrollProgress] = useState(0);
   
   const { symposiumDate, symposiumName, venue, venueDetails } = useSymposiumDate();
+  const { user, isAuthenticated } = useAuth();
   const navigate = useNavigate();
 
   // Google Maps location link
@@ -128,7 +129,12 @@ const Home = () => {
       return;
     }
     
-    navigate('/register');
+    // If user is logged in, navigate to events page; otherwise, open register page
+    if (isAuthenticated || user) {
+      navigate('/events');
+    } else {
+      navigate('/register');
+    }
   };
 
   const handleExploreEventsClick = (e) => {

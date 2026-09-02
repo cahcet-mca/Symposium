@@ -607,7 +607,6 @@ const getTicketDetails = async (req, res) => {
       paymentStatus: registration.paymentStatus,
       registrationStatus: registration.registrationStatus,
       teamSize: registration.teamSize,
-      teamName: registration.teamName,
       participants: registration.participants,
       totalAmount: registration.totalAmount,
       event: registration.event,

@@ -30,10 +30,6 @@ const eventRegisterSchema = new mongoose.Schema({
     type: Number,
     required: true
   },
-  teamName: {
-    type: String,
-    default: 'Individual'
-  },
   paymentStatus: {
     type: String,
     enum: ['pending', 'verified', 'failed'],

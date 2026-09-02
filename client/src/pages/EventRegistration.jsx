@@ -16,7 +16,6 @@ const EventRegistration = () => {
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [teamSize, setTeamSize] = useState(1);
-  const [teamName, setTeamName] = useState('');
   const [participants, setParticipants] = useState([]);
   const [agreed, setAgreed] = useState(false);
   const [error, setError] = useState('');
@@ -94,12 +93,6 @@ const EventRegistration = () => {
   };
 
   const validateForm = () => {
-    // Check team name for team events
-    if (event?.type === 'Team' && !teamName.trim()) {
-      alert('Please enter a team name');
-      return false;
-    }
-
     // Check all participants
     for (let i = 0; i < participants.length; i++) {
       const p = participants[i];
@@ -140,7 +133,6 @@ const EventRegistration = () => {
         eventId: event._id,
         eventName: event.name,
         teamSize,
-        teamName: event.type === 'Team' ? teamName : undefined,
         participants,
         totalAmount: event.fee * teamSize,
         registeredBy: user?._id,
@@ -223,21 +215,6 @@ const EventRegistration = () => {
               )}
             </div>
           </div>
-
-          {/* Team Name for Team Events */}
-          {event.type === 'Team' && (
-            <div className="form-group">
-              <label>Team Name</label>
-              <input
-                type="text"
-                value={teamName}
-                onChange={(e) => setTeamName(e.target.value)}
-                placeholder="Enter your team name"
-                className="mirror-input"
-                required
-              />
-            </div>
-          )}
 
           {/* Participants Section */}
           <div className="participants-section">

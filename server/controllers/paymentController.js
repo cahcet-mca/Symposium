@@ -16,7 +16,6 @@ const verifyPayment = async (req, res) => {
       eventId,
       eventName,
       eventTime,
-      teamName,
       teamSize,
       participants,
       totalAmount,
@@ -185,7 +184,6 @@ const verifyPayment = async (req, res) => {
       event: event._id,
       eventName: event.name,
       user: req.user._id,
-      teamName: teamName || 'Individual',
       teamSize: teamSize || 1,
       participants: participants || [{
         name: req.user.name,
@@ -217,7 +215,6 @@ const verifyPayment = async (req, res) => {
       })),
       timeSize: teamSize || 1,
       amount: totalAmount,
-      teamName: teamName || 'Individual',
       paymentStatus: 'pending',
       registrationStatus: registrationStatus,
       registrationId: registration._id,

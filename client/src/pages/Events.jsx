@@ -353,19 +353,19 @@ const Events = () => {
               className={`type-filter-btn ${eventType === 'Individual' ? 'active' : ''}`}
               onClick={() => handleTypeFilter('Individual')}
             >
-              👤 Individual ({typeCounts.individual})
+              Individual ({typeCounts.individual})
             </button>
             <button
               className={`type-filter-btn ${eventType === 'Team' ? 'active' : ''}`}
               onClick={() => handleTypeFilter('Team')}
             >
-              👥 Team ({typeCounts.team})
+              Team ({typeCounts.team})
             </button>
             <button
               className={`type-filter-btn ${eventType === 'Individual & Team' ? 'active' : ''}`}
               onClick={() => handleTypeFilter('Individual & Team')}
             >
-              👥👤 Individual & Team ({typeCounts.both})
+              Individual & Team ({typeCounts.both})
             </button>
           </div>
         </div>
