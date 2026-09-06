@@ -120,7 +120,7 @@ const allowedOrigins = [
   `http://${LOCAL_IP}:3001`,
   
   // Client (User App) - Production
-  'https://tecno-rendezvous.netlify.app',
+  'https://techno-rendezvous.netlify.app',
   
   // Admin App - Production
   'https://tecnorendezous-admin.netlify.app',

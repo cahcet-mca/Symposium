@@ -1,9 +1,9 @@
 # robots.txt for TECHNO RENDEZVOUS
-# This file tells search engines which pages to crawl
+# https://techno-rendezvous.netlify.app
 
 User-agent: *
 Allow: /
+Disallow: /payment/
 
 # Tell Google where to find your sitemap
-# ⚠️ IMPORTANT: Replace with YOUR actual Netlify URL
-Sitemap: https://tecno-rendezvous.netlify.app/sitemap.xml
+Sitemap: https://techno-rendezvous.netlify.app/sitemap.xml
