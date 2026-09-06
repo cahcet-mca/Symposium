@@ -1,15 +1,38 @@
-// src/pages/AdminDashboard.jsx - Complete with Scroll Animations
-
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import * as XLSX from 'xlsx';
 import { useSymposiumDate } from '../context/DateContext';
+import { useTheme } from '../context/ThemeContext';
+import trLogo from '../assets/tr-logo.png';
+import { 
+  CheckIcon, 
+  XIcon, 
+  RefreshIcon, 
+  EyeIcon, 
+  CameraIcon, 
+  DownloadIcon, 
+  ChartIcon, 
+  ListIcon, 
+  BoltIcon, 
+  AlertIcon,
+  UsersIcon,
+  DollarIcon,
+  CalendarIcon,
+  MapPinIcon,
+  EditIcon,
+  TrashIcon,
+  PlusIcon,
+  TagIcon,
+  HourglassIcon,
+  SparklesIcon
+} from '../components/Icons';
 import './AdminDashboard.css';
 
 const API_URL = import.meta.env.VITE_API_URL;
 
 const AdminDashboard = () => {
+  const { theme, toggleTheme } = useTheme();
   const [activeTab, setActiveTab] = useState('all');
   const [registrations, setRegistrations] = useState([]);
   const [participants, setParticipants] = useState([]);
@@ -1044,7 +1067,7 @@ const AdminDashboard = () => {
               <strong>{safeReg.event?.name || safeReg.eventName}</strong>
               {safeReg.event?.subEventName && (
                 <div className="mobile-event-details">
-                  📌 {safeReg.event.subEventName}
+                  <TagIcon size={12} /> {safeReg.event.subEventName}
                 </div>
               )}
               <div className="mobile-event-details">
@@ -1062,7 +1085,7 @@ const AdminDashboard = () => {
           
           <div className="mobile-info-row">
             <span className="mobile-info-label">Amount:</span>
-            <span className="mobile-info-value" style={{ color: '#ffd700' }}>₹{safeReg.totalAmount}</span>
+            <span className="mobile-info-value" style={{ color: '#2563eb', fontWeight: 'bold' }}>₹{safeReg.totalAmount}</span>
           </div>
           
           {safeReg.participants && safeReg.participants.length > 0 && (
@@ -1089,14 +1112,14 @@ const AdminDashboard = () => {
                 className={`mobile-action-btn accept${safeReg.paymentStatus === 'verified' ? ' active-status' : ''}`}
                 disabled={processingId === safeReg._id || safeReg.paymentStatus === 'verified'}
               >
-                {processingId === safeReg._id ? '⏳' : '✓'} Accept
+                {processingId === safeReg._id ? <HourglassIcon size={14} /> : <CheckIcon size={14} />} Accept
               </button>
               <button
                 onClick={() => handleStatusUpdate(safeReg._id, 'rejected')}
                 className={`mobile-action-btn reject${safeReg.paymentStatus === 'rejected' ? ' active-status' : ''}`}
                 disabled={processingId === safeReg._id || safeReg.paymentStatus === 'rejected'}
               >
-                {processingId === safeReg._id ? '⏳' : '✗'} Reject
+                {processingId === safeReg._id ? <HourglassIcon size={14} /> : <XIcon size={14} />} Reject
               </button>
               {activeTab === 'all' && (
                 <button
@@ -1104,14 +1127,14 @@ const AdminDashboard = () => {
                   className={`mobile-action-btn pending-btn${safeReg.paymentStatus === 'pending' ? ' active-status' : ''}`}
                   disabled={processingId === safeReg._id || safeReg.paymentStatus === 'pending'}
                 >
-                  {processingId === safeReg._id ? '⏳' : '⟳'} Pending
+                  {processingId === safeReg._id ? <HourglassIcon size={14} /> : <RefreshIcon size={14} />} Pending
                 </button>
               )}
               <button
                 onClick={() => viewScreenshot(reg)}
                 className="mobile-action-btn view"
               >
-                📷 Screenshot
+                <CameraIcon size={14} /> Screenshot
               </button>
             </div>
           )}
@@ -1180,7 +1203,7 @@ const AdminDashboard = () => {
         onClick={toggleMobileSidebar}
         aria-label="Toggle menu"
       >
-        {mobileSidebarOpen ? '✕' : '☰'}
+        {mobileSidebarOpen ? <XIcon size={20} /> : <ListIcon size={20} />}
       </button>
 
       {/* Sidebar Overlay for mobile */}
@@ -1195,9 +1218,38 @@ const AdminDashboard = () => {
         className={`admin-sidebar section-animate ${mobileSidebarOpen ? 'mobile-open' : ''}`}
       >
         <div className="sidebar-header">
-          <h2>Admin Dashboard</h2>
-          <p>{symposiumName}</p>
-          <p style={{ fontSize: '0.8rem', color: '#ffd700' }}>{symposiumDate}</p>
+          <div className="sidebar-brand-wrapper">
+            <img src={trLogo} alt="TR Logo" className="admin-brand-logo" />
+            <div className="sidebar-brand-text">
+              <h2>Admin Panel</h2>
+              <p className="admin-brand-sub">{symposiumName}</p>
+            </div>
+            <button 
+              onClick={toggleTheme} 
+              className="admin-theme-toggle-btn"
+              title={theme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+              aria-label={theme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+            >
+              {theme === 'dark' ? (
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="12" cy="12" r="5"></circle>
+                  <line x1="12" y1="1" x2="12" y2="3"></line>
+                  <line x1="12" y1="21" x2="12" y2="23"></line>
+                  <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                  <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                  <line x1="1" y1="12" x2="3" y2="12"></line>
+                  <line x1="21" y1="12" x2="23" y2="12"></line>
+                  <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                  <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                </svg>
+              ) : (
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                </svg>
+              )}
+            </button>
+          </div>
+          <p className="sidebar-date-tag">{symposiumDate}</p>
         </div>
 
         <nav className="sidebar-nav">
@@ -1205,14 +1257,24 @@ const AdminDashboard = () => {
             className={`nav-item ${activeTab === 'all' ? 'active' : ''}`} 
             onClick={() => setActiveTab('all')}
           >
-            <span className="nav-icon">📋</span> 
+            <span className="nav-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/>
+                <line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/>
+              </svg>
+            </span> 
             All Registrations
           </button>
           <button 
             className={`nav-item ${activeTab === 'pending' ? 'active' : ''}`} 
             onClick={() => setActiveTab('pending')}
           >
-            <span className="nav-icon">⏳</span> 
+            <span className="nav-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="12" cy="12" r="10"/>
+                <polyline points="12 6 12 12 16 14"/>
+              </svg>
+            </span> 
             Pending 
             {stats.pending > 0 && <span className="badge">{stats.pending}</span>}
           </button>
@@ -1220,7 +1282,11 @@ const AdminDashboard = () => {
             className={`nav-item ${activeTab === 'verified' || activeTab === 'accepted' ? 'active' : ''}`} 
             onClick={() => setActiveTab('verified')}
           >
-            <span className="nav-icon">✅</span> 
+            <span className="nav-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="20 6 9 17 4 12"/>
+              </svg>
+            </span> 
             Accepted 
             {stats.accepted > 0 && <span className="badge success">{stats.accepted}</span>}
           </button>
@@ -1228,7 +1294,11 @@ const AdminDashboard = () => {
             className={`nav-item ${activeTab === 'rejected' ? 'active' : ''}`} 
             onClick={() => setActiveTab('rejected')}
           >
-            <span className="nav-icon">❌</span> 
+            <span className="nav-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+              </svg>
+            </span> 
             Rejected 
             {stats.rejected > 0 && <span className="badge danger">{stats.rejected}</span>}
           </button>
@@ -1236,7 +1306,13 @@ const AdminDashboard = () => {
             className={`nav-item ${activeTab === 'participants' ? 'active' : ''}`} 
             onClick={() => setActiveTab('participants')}
           >
-            <span className="nav-icon">👥</span> 
+            <span className="nav-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+                <circle cx="9" cy="7" r="4"/>
+                <path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+              </svg>
+            </span> 
             Participants 
             {stats.participants > 0 && <span className="badge info">{stats.participants}</span>}
           </button>
@@ -1244,14 +1320,23 @@ const AdminDashboard = () => {
             className={`nav-item ${activeTab === 'events' ? 'active' : ''}`} 
             onClick={() => setActiveTab('events')}
           >
-            <span className="nav-icon">🎪</span> 
+            <span className="nav-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+              </svg>
+            </span> 
             Manage Events
           </button>
           <button 
             className={`nav-item ${activeTab === 'settings' ? 'active' : ''}`} 
             onClick={() => setActiveTab('settings')}
           >
-            <span className="nav-icon">⚙️</span> 
+            <span className="nav-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="12" cy="12" r="3"/>
+                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+              </svg>
+            </span> 
             Symposium Settings
           </button>
         </nav>
@@ -1262,7 +1347,13 @@ const AdminDashboard = () => {
               onClick={toggleRegistrations}
               className={`toggle-btn ${registrationsOpen ? 'on' : 'off'}`}
             >
-              <span className="toggle-icon">{registrationsOpen ? '🔓' : '🔒'}</span>
+              <span className="toggle-icon">
+                {registrationsOpen ? (
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 9.9-1"/></svg>
+                ) : (
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                )}
+              </span>
               <span className="toggle-text">
                 {registrationsOpen ? 'Registrations ON' : 'Registrations OFF'}
               </span>
@@ -1270,7 +1361,9 @@ const AdminDashboard = () => {
           </div>
           
           <button onClick={handleLogout} className="logout-btn">
-            <span className="nav-icon">🚪</span> Logout
+            <span className="nav-icon">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+            </span> Logout
           </button>
         </div>
       </div>
@@ -1304,35 +1397,35 @@ const AdminDashboard = () => {
             className="stats-grid section-animate"
           >
             <div className="stat-card">
-              <div className="stat-icon">⏳</div>
+              <div className="stat-icon"><HourglassIcon size={24} /></div>
               <div className="stat-info">
                 <h3>{stats.pending}</h3>
                 <p>Pending</p>
               </div>
             </div>
             <div className="stat-card">
-              <div className="stat-icon">✅</div>
+              <div className="stat-icon"><CheckIcon size={24} /></div>
               <div className="stat-info">
                 <h3>{stats.accepted}</h3>
                 <p>Accepted</p>
               </div>
             </div>
             <div className="stat-card">
-              <div className="stat-icon">❌</div>
+              <div className="stat-icon"><XIcon size={24} /></div>
               <div className="stat-info">
                 <h3>{stats.rejected}</h3>
                 <p>Rejected</p>
               </div>
             </div>
             <div className="stat-card">
-              <div className="stat-icon">👥</div>
+              <div className="stat-icon"><UsersIcon size={24} /></div>
               <div className="stat-info">
                 <h3>{stats.participants}</h3>
                 <p>Participants</p>
               </div>
             </div>
             <div className="stat-card revenue-card">
-              <div className="stat-icon">💰</div>
+              <div className="stat-icon"><DollarIcon size={24} /></div>
               <div className="stat-info">
                 <h3>₹{stats.totalRevenue}</h3>
                 <p>Revenue</p>
@@ -1362,7 +1455,7 @@ const AdminDashboard = () => {
                     className="btn-download-excel"
                     disabled={participants.length === 0}
                   >
-                    <span className="btn-icon">📥</span>
+                    <span className="btn-icon"><DownloadIcon size={16} /></span>
                     Download Excel {participants.length > 0 ? `(${participants.length})` : ''}
                   </button>
                 )}
@@ -1376,9 +1469,9 @@ const AdminDashboard = () => {
                 {activeTab === 'events' ? (
                   <div className="events-management">
                     <div className="section-header" style={{ marginBottom: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <h2>🎪 Manage Events</h2>
-                      <button onClick={openCreateEventModal} className="btn-download-excel" style={{ background: 'linear-gradient(135deg, #b8860b, #ffd700)', color: '#000000', padding: '10px 20px', borderRadius: '8px', border: 'none', fontWeight: 'bold', cursor: 'pointer' }}>
-                        ➕ Add New Event
+                      <h2>Manage Events</h2>
+                      <button onClick={openCreateEventModal} className="btn-download-excel" style={{ background: 'linear-gradient(135deg, #2563eb, #8b5cf6)', color: '#ffffff', padding: '10px 20px', borderRadius: '10px', border: 'none', fontWeight: 'bold', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <PlusIcon size={16} /> Add New Event
                       </button>
                     </div>
 
@@ -1416,7 +1509,7 @@ const AdminDashboard = () => {
                                 <td>
                                   <div style={{ display: 'flex', flexDirection: 'column' }}>
                                     <span>{event.coordinatorName}</span>
-                                    <span style={{ fontSize: '0.75rem', color: '#2ecc71' }}>{event.coordinatorPhone}</span>
+                                    <span style={{ fontSize: '0.75rem', color: '#2563eb' }}>{event.coordinatorPhone}</span>
                                   </div>
                                 </td>
                                 <td>{(event.confirmedCount || 0) + (event.pendingCount || 0)} / {event.maxParticipants}</td>
@@ -1428,14 +1521,14 @@ const AdminDashboard = () => {
                                       title="Edit Event"
                                       style={{ marginRight: '10px' }}
                                     >
-                                      📝
+                                      <EditIcon size={15} />
                                     </button>
                                     <button 
                                       onClick={() => handleDeleteEvent(event._id)} 
                                       className="btn-reject" 
                                       title="Delete Event"
                                     >
-                                      🗑️
+                                      <TrashIcon size={15} />
                                     </button>
                                   </div>
                                 </td>
@@ -1471,7 +1564,7 @@ const AdminDashboard = () => {
 
                     {/* Update Symposium Name Section */}
                     <div className="settings-card">
-                      <h3>📝 Update Symposium Name</h3>
+                      <h3><EditIcon size={18} /> Update Symposium Name</h3>
                       <p className="current-setting">
                         Current Name: <strong>{symposiumName}</strong>
                       </p>
@@ -1502,7 +1595,7 @@ const AdminDashboard = () => {
 
                     {/* Update Date Section */}
                     <div className="settings-card">
-                      <h3>📅 Update Symposium Date</h3>
+                      <h3><CalendarIcon size={18} /> Update Symposium Date</h3>
                       <p className="current-setting">
                         Current Date: <strong>{symposiumDate}</strong>
                       </p>
@@ -1537,7 +1630,7 @@ const AdminDashboard = () => {
 
                     {/* Update Venue Section */}
                     <div className="settings-card">
-                      <h3>📍 Update Venue Details</h3>
+                      <h3><MapPinIcon size={18} /> Update Venue Details</h3>
                       <p className="current-setting">
                         Current Venue: <strong>{venue}</strong><br />
                         Current Details: <strong>{venueDetails}</strong>
@@ -1580,7 +1673,7 @@ const AdminDashboard = () => {
 
                     {/* Update UPI ID Section */}
                     <div className="settings-card">
-                      <h3>💰 Update UPI ID</h3>
+                      <h3><DollarIcon size={18} /> Update UPI ID</h3>
                       <p className="current-setting">
                         Current UPI ID: <strong>{upiId}</strong>
                       </p>
@@ -1675,7 +1768,7 @@ const AdminDashboard = () => {
                                   <td className="participant-event-cell">
                                     <span className="event-main">{p.eventName}</span>
                                     {p.eventSubName && (
-                                      <span className="event-sub">📌 {p.eventSubName}</span>
+                                      <span className="event-sub"><TagIcon size={12} /> {p.eventSubName}</span>
                                     )}
                                   </td>
                                   <td className="participant-college-cell">{p.college}</td>
@@ -1719,7 +1812,7 @@ const AdminDashboard = () => {
                                       <div className="event-info">
                                         <strong>{safeReg.event?.name || safeReg.eventName}</strong>
                                         {safeReg.event?.subEventName && (
-                                          <span className="event-subname">📌 {safeReg.event.subEventName}</span>
+                                          <span className="event-subname"><TagIcon size={12} /> {safeReg.event.subEventName}</span>
                                         )}
                                         <span className="event-category">{safeReg.event?.category || ''}</span>
                                       </div>
@@ -1748,7 +1841,7 @@ const AdminDashboard = () => {
                                              disabled={processingId === safeReg._id || safeReg.paymentStatus === 'verified'}
                                              title="Accept"
                                            >
-                                             {processingId === safeReg._id ? '⏳' : '✓'}
+                                             {processingId === safeReg._id ? <HourglassIcon size={14} /> : <CheckIcon size={14} />}
                                            </button>
                                            <button
                                              onClick={() => handleStatusUpdate(safeReg._id, 'rejected')}
@@ -1756,7 +1849,7 @@ const AdminDashboard = () => {
                                              disabled={processingId === safeReg._id || safeReg.paymentStatus === 'rejected'}
                                              title="Reject"
                                            >
-                                             {processingId === safeReg._id ? '⏳' : '✗'}
+                                             {processingId === safeReg._id ? <HourglassIcon size={14} /> : <XIcon size={14} />}
                                            </button>
                                            {activeTab === 'all' && (
                                              <button
@@ -1765,7 +1858,7 @@ const AdminDashboard = () => {
                                                disabled={processingId === safeReg._id || safeReg.paymentStatus === 'pending'}
                                                title="Revert to Pending"
                                              >
-                                               {processingId === safeReg._id ? '⏳' : '⟳'}
+                                               {processingId === safeReg._id ? <HourglassIcon size={14} /> : <RefreshIcon size={14} />}
                                              </button>
                                            )}
                                            <button
@@ -1773,7 +1866,7 @@ const AdminDashboard = () => {
                                              className="btn-screenshot"
                                              title="View Screenshot"
                                            >
-                                             📷
+                                             <CameraIcon size={14} />
                                            </button>
                                          </div>
                                        </td>

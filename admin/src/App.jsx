@@ -1,6 +1,6 @@
-// admin/src/App.jsx
 import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
+import { ThemeProvider } from './context/ThemeContext';
 import { AuthProvider } from './context/AuthContext';
 import { DateProvider } from './context/DateContext';
 import { EventProvider } from './context/EventContext';
@@ -59,25 +59,27 @@ function App() {
   }
 
   return (
-    <AuthProvider>
-      <DateProvider>
-        <EventProvider>
-          <Routes>
-            <Route path="/admin/login" element={<AdminLogin />} />
-            <Route 
-              path="/admin/dashboard" 
-              element={
-                <ProtectedAdminRoute>
-                  <AdminDashboard />
-                </ProtectedAdminRoute>
-              } 
-            />
-            <Route path="/" element={<Navigate to="/admin/login" replace />} />
-            <Route path="*" element={<Navigate to="/admin/login" replace />} />
-          </Routes>
-        </EventProvider>
-      </DateProvider>
-    </AuthProvider>
+    <ThemeProvider>
+      <AuthProvider>
+        <DateProvider>
+          <EventProvider>
+            <Routes>
+              <Route path="/admin/login" element={<AdminLogin />} />
+              <Route 
+                path="/admin/dashboard" 
+                element={
+                  <ProtectedAdminRoute>
+                    <AdminDashboard />
+                  </ProtectedAdminRoute>
+                } 
+              />
+              <Route path="/" element={<Navigate to="/admin/login" replace />} />
+              <Route path="*" element={<Navigate to="/admin/login" replace />} />
+            </Routes>
+          </EventProvider>
+        </DateProvider>
+      </AuthProvider>
+    </ThemeProvider>
   );
 }
 

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSymposiumDate } from '../../context/DateContext';
 import { getEventImageUrl } from '../../services/api';
+import { ClockIcon, CalendarIcon } from '../common/Icons';
 import './HomeEventCard.css';
 
 const HomeEventCard = ({ event }) => {
@@ -67,10 +68,10 @@ const HomeEventCard = ({ event }) => {
         
         <div className="home-event-meta">
           <div className="home-event-time">
-            <span>🕐</span> {event.startTime}
+            <ClockIcon size={14} /> <span>{event.startTime}</span>
           </div>
           <div className="home-event-date">
-            <span>📅</span> {symposiumDate} 
+            <CalendarIcon size={14} /> <span>{symposiumDate}</span>
           </div>
         </div>
         

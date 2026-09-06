@@ -274,3 +274,70 @@
     font-size: 1.25rem;
   }
 }
+
+/* ==========================================================================
+   LIGHT THEME OVERRIDES — VerifyTicket (White & Blue ONLY, No Gold/Black)
+   ========================================================================== */
+[data-theme="light"] .verify-page {
+  background: radial-gradient(ellipse at top, #f8fbff 0%, #eff6ff 70%);
+}
+
+[data-theme="light"] .verify-card {
+  background: #ffffff;
+  border: 1.5px solid #dbeafe;
+  box-shadow: 0 20px 60px rgba(37, 99, 235, 0.08);
+}
+
+[data-theme="light"] .verify-header {
+  border-bottom: 1px solid #e2e8f0;
+}
+
+[data-theme="light"] .verify-header h2 {
+  color: #0f172a;
+}
+
+[data-theme="light"] .ticket-id {
+  color: #64748b;
+}
+
+[data-theme="light"] .detail-group {
+  border-bottom: 1px solid #f1f5f9;
+}
+
+[data-theme="light"] .detail-group label {
+  color: #64748b;
+}
+
+[data-theme="light"] .detail-group .value {
+  color: #0f172a;
+}
+
+[data-theme="light"] .detail-group .event-name {
+  color: #2563eb;
+}
+
+[data-theme="light"] .detail-group .sub-value {
+  color: #64748b;
+}
+
+[data-theme="light"] .members-list {
+  color: #334155;
+}
+
+[data-theme="light"] .verify-footer {
+  background: #f8fbff;
+  border-top: 1px solid #e2e8f0;
+}
+
+[data-theme="light"] .btn-home {
+  background: transparent;
+  border: 2px solid #2563eb;
+  color: #2563eb;
+}
+
+[data-theme="light"] .btn-home:hover {
+  background: #2563eb;
+  color: #ffffff;
+  box-shadow: 0 5px 20px rgba(37, 99, 235, 0.35);
+}
+

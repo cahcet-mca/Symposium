@@ -419,3 +419,191 @@
     margin-left: 0;
   }
 }
+
+/* ==========================================================================
+   LIGHT THEME OVERRIDES — EventRegistration (White & Blue ONLY, No Gold/Black)
+   ========================================================================== */
+[data-theme="light"] .register-page {
+  background: #f8fbff;
+}
+
+[data-theme="light"] .register-header {
+  color: #0f172a;
+}
+
+[data-theme="light"] .register-header h1 {
+  background: linear-gradient(135deg, #0f172a 0%, #2563eb 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+[data-theme="light"] .event-summary-card {
+  background: #ffffff;
+  border: 1.5px solid #dbeafe;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
+}
+
+[data-theme="light"] .event-summary-card h2 {
+  color: #0f172a;
+}
+
+[data-theme="light"] .category-badge.technical {
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  color: #ffffff;
+}
+
+[data-theme="light"] .category-badge.non-technical {
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
+  color: #ffffff;
+}
+
+[data-theme="light"] .fee-summary {
+  border-top: 1px solid #e2e8f0;
+  color: #0f172a;
+}
+
+[data-theme="light"] .fee-amount {
+  color: #2563eb;
+}
+
+[data-theme="light"] .register-form {
+  background: #ffffff;
+  border: 1.5px solid #dbeafe;
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.05);
+}
+
+[data-theme="light"] .register-form h3 {
+  color: #0f172a;
+}
+
+[data-theme="light"] .register-form h3::after {
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+}
+
+[data-theme="light"] .form-group label {
+  color: #334155;
+}
+
+[data-theme="light"] .mirror-input {
+  background: #f8fafc;
+  border: 1.5px solid #e2e8f0;
+  color: #0f172a;
+}
+
+[data-theme="light"] .mirror-input:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
+}
+
+[data-theme="light"] .mirror-select {
+  background: #f8fafc;
+  border: 1.5px solid #e2e8f0;
+  color: #0f172a;
+}
+
+[data-theme="light"] .mirror-select:focus {
+  border-color: #2563eb;
+}
+
+[data-theme="light"] .mirror-select option {
+  background: #ffffff;
+  color: #0f172a;
+}
+
+[data-theme="light"] .fixed-size-indicator {
+  color: #2563eb;
+}
+
+[data-theme="light"] .participants-section h4 {
+  color: #0f172a;
+}
+
+[data-theme="light"] .participant-card {
+  background: #f8fbff;
+  border: 1.5px solid #dbeafe;
+  border-left: 5px solid #2563eb;
+}
+
+[data-theme="light"] .participant-number {
+  color: #2563eb;
+}
+
+[data-theme="light"] .team-lead-badge {
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  color: #ffffff;
+}
+
+[data-theme="light"] .payment-summary {
+  background: linear-gradient(135deg, #eff6ff, #dbeafe);
+  border: 1.5px solid #bfdbfe;
+  color: #0f172a;
+}
+
+[data-theme="light"] .payment-summary h4 {
+  color: #0f172a;
+}
+
+[data-theme="light"] .summary-row {
+  border-bottom: 1px solid rgba(37, 99, 235, 0.15);
+}
+
+[data-theme="light"] .summary-row.total {
+  border-top: 2px solid rgba(37, 99, 235, 0.3);
+}
+
+[data-theme="light"] .total-amount {
+  color: #2563eb;
+}
+
+[data-theme="light"] .terms-section {
+  background: #f8fbff;
+  border: 1.5px solid #dbeafe;
+}
+
+[data-theme="light"] .checkbox-container {
+  color: #475569;
+}
+
+[data-theme="light"] .checkmark {
+  border: 2px solid #2563eb;
+}
+
+[data-theme="light"] .checkbox-container input:checked ~ .checkmark {
+  background: #2563eb;
+}
+
+[data-theme="light"] .checkmark::after {
+  border-color: #ffffff;
+}
+
+[data-theme="light"] .terms-text a {
+  color: #2563eb;
+}
+
+[data-theme="light"] .btn-submit-glow {
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  color: #ffffff;
+  box-shadow: 0 8px 25px rgba(37, 99, 235, 0.35);
+}
+
+[data-theme="light"] .btn-submit-glow:hover {
+  background: linear-gradient(135deg, #1d4ed8, #1e40af);
+  box-shadow: 0 12px 30px rgba(37, 99, 235, 0.45);
+}
+
+[data-theme="light"] .btn-cancel {
+  border: 2px solid #e2e8f0;
+  color: #64748b;
+}
+
+[data-theme="light"] .btn-cancel:hover {
+  border-color: #ff4757;
+  color: #ff4757;
+}
+
+[data-theme="light"] .error-container {
+  background: #ffffff;
+  border: 1.5px solid #fecaca;
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.05);
+}

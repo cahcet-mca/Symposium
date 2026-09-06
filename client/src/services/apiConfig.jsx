@@ -1,4 +1,4 @@
-// API Configuration for tecno rendezvous Frontend
+// API Configuration for techno rendezvous Frontend
 
 // Base URL for backend API - Updated to Render
 export const API_BASE_URL = import.meta.env.VITE_API_URL;

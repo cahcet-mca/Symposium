@@ -5,6 +5,15 @@ import { useAuth } from '../context/AuthContext';
 import { useSymposiumDate } from '../context/DateContext';
 import api from '../services/api';
 import axios from 'axios';
+import { 
+  AlertTriangleIcon, 
+  LockIcon, 
+  MapPinIcon, 
+  XIcon, 
+  CheckIcon, 
+  FileTextIcon,
+  ClockIcon 
+} from '../components/common/Icons';
 import './UPIPayment.css';
 
 const API_URL = import.meta.env.VITE_API_URL;
@@ -432,7 +441,9 @@ const UPIPayment = () => {
           margin: '100px auto',
           border: '2px solid #ffa502'
         }}>
-          <span style={{ fontSize: '4rem', display: 'block', marginBottom: '20px' }}>🚫</span>
+          <span style={{ color: '#ffa502', display: 'flex', justifyContent: 'center', marginBottom: '20px' }}>
+            <AlertTriangleIcon size={56} />
+          </span>
           <h2 style={{ color: '#ffa502', marginBottom: '15px' }}>Event Completely Full</h2>
           <p style={{ color: '#b0b0b0', marginBottom: '30px', lineHeight: '1.6', fontSize: '1.1rem' }}>
             {eventFullMessage}
@@ -526,7 +537,9 @@ const UPIPayment = () => {
           margin: '100px auto',
           border: '2px solid #ff4757'
         }}>
-          <span style={{ fontSize: '4rem', display: 'block', marginBottom: '20px' }}>🔒</span>
+          <span style={{ color: '#ff4757', display: 'flex', justifyContent: 'center', marginBottom: '20px' }}>
+            <LockIcon size={56} />
+          </span>
           <h2 style={{ color: '#ff4757', marginBottom: '15px' }}>Online Registration Closed</h2>
           <p style={{ color: '#b0b0b0', marginBottom: '30px', lineHeight: '1.6' }}>
             Online registration is finished.<br />
@@ -590,12 +603,12 @@ const UPIPayment = () => {
             <span className={`category-badge ${event.category?.toLowerCase()}`}>
               {event.category}
             </span>
-            <div className="event-time-info">
-              <span className="time-icon">⏰</span>
+            <div className="event-time-info" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <span className="time-icon"><ClockIcon size={14} /></span>
               <span>{event.startTime} - {event.endTime}</span>
             </div>
-            <div className="event-venue-info" style={{ marginTop: '10px', color: '#b0b0b0' }}>
-              <span className="venue-icon">📍</span>
+            <div className="event-venue-info" style={{ marginTop: '10px', color: '#b0b0b0', display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <span className="venue-icon"><MapPinIcon size={15} /></span>
               <span>{event.venue || 'Venue TBA'}</span>
             </div>
           </div>
@@ -610,7 +623,7 @@ const UPIPayment = () => {
 
         {timeConflict && (
           <div className="time-conflict-error">
-            <span className="error-icon">⚠️</span>
+            <span className="error-icon"><AlertTriangleIcon size={18} /></span>
             <h3>Time Conflict Detected</h3>
             <p>{timeConflict}</p>
             <button onClick={() => navigate('/events')} className="btn-browse">
@@ -785,14 +798,16 @@ const UPIPayment = () => {
 
               {error && (
                 <div className="error-message">
-                  <span className="error-icon">❌</span>
+                  <span className="error-icon"><XIcon size={16} /></span>
                   <span>{error}</span>
                 </div>
               )}
 
               {successMessage && (
                 <div className="success-message">
-                  <span className="success-icon">{isWaitlistRegistration ? '📋' : '✅'}</span>
+                  <span className="success-icon">
+                    {isWaitlistRegistration ? <FileTextIcon size={18} /> : <CheckIcon size={18} />}
+                  </span>
                   <div>
                     <h4>{isWaitlistRegistration ? 'Added to Waitlist!' : 'Registration Submitted!'}</h4>
                     <p>{successMessage}</p>

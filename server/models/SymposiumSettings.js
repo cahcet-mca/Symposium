@@ -9,7 +9,7 @@ const symposiumSettingsSchema = new mongoose.Schema({
   symposiumName: {
     type: String,
     required: true,
-    default: 'TECNO RENDEZVOUS'
+    default: 'TECHNO RENDEZVOUS'
   },
   venue: {
     type: String,
@@ -43,7 +43,7 @@ symposiumSettingsSchema.statics.getSettings = async function() {
     if (!settings) {
       settings = await this.create({ 
         symposiumDate: new Date('2026-07-26'),
-        symposiumName: 'TECNO RENDEZVOUS',
+        symposiumName: 'TECHNO RENDEZVOUS',
         upiId: '8098932041@ptsbi',
         updatedBy: 'system'
       });

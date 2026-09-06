@@ -7,6 +7,7 @@ import { useSymposiumDate } from '../context/DateContext';
 import EventCard from '../components/events/EventCard';
 import Loader from '../components/common/Loader';
 import EventDetailsPopup from '../components/events/EventDetailsPopup';
+import { LockIcon, SearchIcon, XIcon, BoltIcon, PaletteIcon } from '../components/common/Icons';
 import axios from 'axios';
 import './Events.css';
 
@@ -262,7 +263,7 @@ const Events = () => {
       {/* Registration Closed Banner */}
       {showRegistrationBanner && (
         <div className="registration-closed-banner">
-          <span className="banner-icon">🔒</span>
+          <span className="banner-icon"><LockIcon size={18} /></span>
           <span className="banner-text">
             Online registration is finished. Only on-time registration is available at the venue.
           </span>
@@ -293,7 +294,7 @@ const Events = () => {
           className="search-section section-animate"
         >
           <div className="search-wrapper">
-            <span className="search-icon-anim">🔍</span>
+            <span className="search-icon-anim"><SearchIcon size={18} /></span>
             <input
               type="text"
               placeholder="Search events by name, sub-event, or description..."
@@ -308,7 +309,7 @@ const Events = () => {
                 onClick={() => setSearchTerm('')}
                 title="Clear search"
               >
-                ✕
+                <XIcon size={14} />
               </button>
             )}
           </div>
@@ -380,7 +381,9 @@ const Events = () => {
                 className="category-section section-animate"
               >
                 <div className="category-header">
-                  <h2>⚡ Technical Events</h2>
+                  <h2 style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <BoltIcon size={24} className="text-blue-500" /> Technical Events
+                  </h2>
                   <p className="category-fee">₹50 per head | Individual & Team events</p>
                 </div>
                 <div className="event-grid stagger-children">
@@ -403,7 +406,9 @@ const Events = () => {
                 className="category-section section-animate"
               >
                 <div className="category-header">
-                  <h2>🎨 Non-Technical Events</h2>
+                  <h2 style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <PaletteIcon size={24} className="text-purple-500" /> Non-Technical Events
+                  </h2>
                   <p className="category-fee">₹50 per head | Individual & Team events</p>
                 </div>
                 <div className="event-grid stagger-children">
@@ -435,8 +440,12 @@ const Events = () => {
             {filteredEvents.length > 0 ? (
               <section className="category-section section-animate section-visible">
                 <div className="category-header">
-                  <h2>
-                    {category === 'Technical' ? '⚡ Technical Events' : '🎨 Non-Technical Events'}
+                  <h2 style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    {category === 'Technical' ? (
+                      <><BoltIcon size={24} className="text-blue-500" /> Technical Events</>
+                    ) : (
+                      <><PaletteIcon size={24} className="text-purple-500" /> Non-Technical Events</>
+                    )}
                   </h2>
                   <p className="category-fee">₹50 per head | Individual & Team events</p>
                 </div>

@@ -10,7 +10,7 @@ export const useSymposiumDate = () => useContext(DateContext);
 export const DateProvider = ({ children }) => {
   const [symposiumDate, setSymposiumDate] = useState('26th July 2026');
   const [symposiumDateObj, setSymposiumDateObj] = useState(null);
-  const [symposiumName, setSymposiumName] = useState('TECNO RENDEZVOUS');
+  const [symposiumName, setSymposiumName] = useState('TECHNO RENDEZVOUS');
   const [venue, setVenue] = useState('C. Abdul Hakeem College of Engineering and Technology');
   const [venueDetails, setVenueDetails] = useState('Master of Computer Application');
   const [upiId, setUpiId] = useState('8098932041@ptsbi');
@@ -33,7 +33,7 @@ export const DateProvider = ({ children }) => {
         const data = response.data.data;
         setSymposiumDate(data.formattedDate || '26th July 2026');
         setSymposiumDateObj(new Date(data.symposiumDate));
-        setSymposiumName(data.symposiumName || 'TECNO RENDEZVOUS');
+        setSymposiumName(data.symposiumName || 'TECHNO RENDEZVOUS');
         setVenue(data.venue || 'C. Abdul Hakeem College of Engineering and Technology');
         setVenueDetails(data.venueDetails || 'Master of Computer Application');
         setUpiId(data.upiId || '8098932041@ptsbi');
@@ -51,7 +51,7 @@ export const DateProvider = ({ children }) => {
       
       // Fallback to defaults
       setSymposiumDate('26th July 2026');
-      setSymposiumName('TECNO RENDEZVOUS');
+      setSymposiumName('TECHNO RENDEZVOUS');
       setUpiId('8098932041@ptsbi');
     } finally {
       setLoading(false);

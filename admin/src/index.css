@@ -1,4 +1,6 @@
 /* P:\project\Symposium\admin\src\index.css */
+@import './theme.css';
+
 * {
   margin: 0;
   padding: 0;

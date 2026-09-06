@@ -3,6 +3,25 @@ import axios from 'axios';
 import { useAuth } from '../../context/AuthContext';
 import { useSymposiumDate } from '../../context/DateContext';
 import { getEventImageUrl } from '../../services/api';
+import { 
+  TagIcon, 
+  BarChartIcon, 
+  BookIcon, 
+  UsersIcon, 
+  PhoneIcon, 
+  FileTextIcon, 
+  TrophyIcon, 
+  AwardIcon,
+  LockIcon, 
+  HourglassIcon, 
+  CheckIcon, 
+  XIcon, 
+  RefreshIcon, 
+  EditIcon, 
+  SparklesIcon,
+  ClockIcon,
+  MapPinIcon
+} from '../common/Icons';
 import './EventDetailsPopup.css';
 
 const API_URL = import.meta.env.VITE_API_URL;
@@ -196,7 +215,7 @@ const EventDetailsPopup = ({ event, onClose, registrationsOpen = true }) => {
 
           {eventDetails.subEventName && (
             <div className="sub-event-name">
-              <span className="sub-event-label">🏷️ Sub Event:</span>
+              <span className="sub-event-label"><TagIcon size={14} /> Sub Event:</span>
               <span className="sub-event-value">{eventDetails.subEventName}</span>
             </div>
           )}
@@ -212,7 +231,7 @@ const EventDetailsPopup = ({ event, onClose, registrationsOpen = true }) => {
         <div className="popup-content">
           {/* Registration Status Section */}
           <div className="popup-section registration-status-section">
-            <h3>📊 Registration Status</h3>
+            <h3><BarChartIcon size={18} /> Registration Status</h3>
             {loading ? (
               <div className="status-loading">Loading registration data...</div>
             ) : (
@@ -248,17 +267,17 @@ const EventDetailsPopup = ({ event, onClose, registrationsOpen = true }) => {
                 </div>
 
                 {/* Progress Bar */}
-                <div className="progress-container">
+                <div className="progress-bar-container">
                   <div className="progress-info">
-                    <span>Total Occupancy</span>
-                    <span style={{ color: getStatusColor(), fontWeight: 'bold' }}>
-                      {registrationStats.percentage}% ({registrationStats.registeredCount + registrationStats.waitlistCount}/{registrationStats.maxParticipants})
+                    <span className="progress-label">Registration Fill</span>
+                    <span className="progress-percent" style={{ color: '#2563eb', fontWeight: 'bold' }}>
+                      {registrationStats.percentage}%
                     </span>
                   </div>
-                  <div className="progress-bar-bg">
-                    <div
-                      className="progress-fill"
-                      style={{
+                  <div className="progress-track">
+                    <div 
+                      className="progress-fill" 
+                      style={{ 
                         width: `${registrationStats.percentage}%`,
                         backgroundColor: getStatusColor()
                       }}
@@ -268,19 +287,19 @@ const EventDetailsPopup = ({ event, onClose, registrationsOpen = true }) => {
 
                 {!isEventFull() && registrationStats.availableSpots <= 5 && (
                   <div className="limited-spots-warning">
-                    🏃 Hurry! Only {registrationStats.availableSpots} spots left!
+                    <SparklesIcon size={15} /> Hurry! Only {registrationStats.availableSpots} spots left!
                   </div>
                 )}
 
                 {isEventFull() && (
                   <div className="waitlist-warning">
-                    ⏳ Event is full! You can join the waitlist. {registrationStats.waitlistCount > 0 && `${registrationStats.waitlistCount} people on waitlist`}
+                    <HourglassIcon size={15} /> Event is full! You can join the waitlist. {registrationStats.waitlistCount > 0 && `${registrationStats.waitlistCount} people on waitlist`}
                   </div>
                 )}
 
                 {!registrationsOpen && (
                   <div className="global-closure-warning">
-                    🔒 Online registration is finished. Only on-time registration is available at the venue.
+                    <LockIcon size={15} /> Online registration is finished. Only on-time registration is available at the venue.
                   </div>
                 )}
 
@@ -289,25 +308,25 @@ const EventDetailsPopup = ({ event, onClose, registrationsOpen = true }) => {
                     <div className={`status-badge ${userRegistration.registrationStatus === 'waitlist' ? 'waitlist' : userRegistration.paymentStatus}`}>
                       {userRegistration.registrationStatus === 'waitlist' && (
                         <>
-                          <span className="status-icon">📋</span>
+                          <span className="status-icon"><FileTextIcon size={16} /></span>
                           You are on the waitlist for this event
                         </>
                       )}
                       {userRegistration.paymentStatus === 'pending' && userRegistration.registrationStatus !== 'waitlist' && (
                         <>
-                          <span className="status-icon">⏳</span>
+                          <span className="status-icon"><HourglassIcon size={16} /></span>
                           Your registration is pending approval
                         </>
                       )}
                       {userRegistration.paymentStatus === 'verified' && (
                         <>
-                          <span className="status-icon">✅</span>
+                          <span className="status-icon"><CheckIcon size={16} /></span>
                           You are registered for this event
                         </>
                       )}
                       {userRegistration.paymentStatus === 'rejected' && (
                         <>
-                          <span className="status-icon">❌</span>
+                          <span className="status-icon"><XIcon size={16} /></span>
                           Your previous registration was rejected
                         </>
                       )}
@@ -315,7 +334,7 @@ const EventDetailsPopup = ({ event, onClose, registrationsOpen = true }) => {
 
                     {userRegistration.paymentStatus === 'rejected' && (
                       <div className="rejected-message-small">
-                        <p>✨ You can register again for this event.</p>
+                        <p><SparklesIcon size={14} /> You can register again for this event.</p>
                       </div>
                     )}
                   </div>
@@ -326,7 +345,7 @@ const EventDetailsPopup = ({ event, onClose, registrationsOpen = true }) => {
 
           {/* Full Description */}
           <div className="popup-section">
-            <h3>📖 About the Event</h3>
+            <h3><BookIcon size={18} /> About the Event</h3>
             <div className="event-full-description">
               {eventDetails.description || 'No description available.'}
             </div>
@@ -334,7 +353,7 @@ const EventDetailsPopup = ({ event, onClose, registrationsOpen = true }) => {
 
           {/* Time & Venue */}
           <div className="popup-section">
-            <h3>⏰ Time & Venue</h3>
+            <h3><ClockIcon size={18} /> Time & Venue</h3>
             <div className="info-grid">
               <div className="info-item">
                 <span className="info-label">Start Time:</span>
@@ -357,7 +376,7 @@ const EventDetailsPopup = ({ event, onClose, registrationsOpen = true }) => {
 
           {/* Team Details */}
           <div className="popup-section">
-            <h3>👥 Team Details</h3>
+            <h3><UsersIcon size={18} /> Team Details</h3>
             <div className="info-grid">
               <div className="info-item">
                 <span className="info-label">Team Size:</span>
@@ -377,7 +396,7 @@ const EventDetailsPopup = ({ event, onClose, registrationsOpen = true }) => {
 
           {/* Coordinator Details */}
           <div className="popup-section">
-            <h3>📞 Coordinator Details</h3>
+            <h3><PhoneIcon size={18} /> Coordinator Details</h3>
             <div className="info-grid coordinator-grid">
               <div className="info-item">
                 <span className="info-label">Coordinator Name:</span>
@@ -390,7 +409,7 @@ const EventDetailsPopup = ({ event, onClose, registrationsOpen = true }) => {
                   <span className="info-label">Mobile Number:</span>
                   <span className="info-value coordinator-phone">
                     <a href={`tel:${eventDetails.coordinatorPhone}`} className="phone-link">
-                      📞 {eventDetails.coordinatorPhone}
+                      <PhoneIcon size={13} /> {eventDetails.coordinatorPhone}
                     </a>
                   </span>
                 </div>
@@ -401,7 +420,7 @@ const EventDetailsPopup = ({ event, onClose, registrationsOpen = true }) => {
           {/* Requirements */}
           {eventDetails.requirements && eventDetails.requirements.length > 0 && (
             <div className="popup-section">
-              <h3>📋 Requirements</h3>
+              <h3><FileTextIcon size={18} /> Requirements</h3>
               <ul className="requirements-list">
                 {eventDetails.requirements.map((req, index) => (
                   <li key={index}>{req}</li>
@@ -413,7 +432,7 @@ const EventDetailsPopup = ({ event, onClose, registrationsOpen = true }) => {
           {/* Rules & Guidelines */}
           {eventDetails.rules && eventDetails.rules.length > 0 && (
             <div className="popup-section">
-              <h3>📜 Rules & Guidelines</h3>
+              <h3><FileTextIcon size={18} /> Rules & Guidelines</h3>
               <ul className="rules-list">
                 {eventDetails.rules.map((rule, index) => (
                   <li key={index}>{rule}</li>
@@ -424,23 +443,23 @@ const EventDetailsPopup = ({ event, onClose, registrationsOpen = true }) => {
 
           {/* Prizes */}
           <div className="popup-section">
-            <h3>🏆 Prizes</h3>
+            <h3><TrophyIcon size={18} /> Prizes</h3>
             <div className="prizes-grid">
               {eventDetails.prizes?.first && (
                 <div className="prize-item first">
-                  <span className="prize-place">🥇 First</span>
+                  <span className="prize-place"><TrophyIcon size={14} /> First</span>
                   <span className="prize-desc">{eventDetails.prizes.first}</span>
                 </div>
               )}
               {eventDetails.prizes?.second && (
                 <div className="prize-item second">
-                  <span className="prize-place">🥈 Second</span>
+                  <span className="prize-place"><AwardIcon size={14} /> Second</span>
                   <span className="prize-desc">{eventDetails.prizes.second}</span>
                 </div>
               )}
               {eventDetails.prizes?.third && (
                 <div className="prize-item third">
-                  <span className="prize-place">🥉 Third</span>
+                  <span className="prize-place"><AwardIcon size={14} /> Third</span>
                   <span className="prize-desc">{eventDetails.prizes.third}</span>
                 </div>
               )}
@@ -462,14 +481,14 @@ const EventDetailsPopup = ({ event, onClose, registrationsOpen = true }) => {
             isEventFull() ? (
               <button
                 onClick={() => {
-                  const confirmMessage = `⚠️ "${eventDetails.name}" is full!\n\nYou will be added to the waitlist. Payment will be required. Do you want to continue?`;
+                  const confirmMessage = `"${eventDetails.name}" is full!\n\nYou will be added to the waitlist. Payment will be required. Do you want to continue?`;
                   if (window.confirm(confirmMessage)) {
                     window.location.href = `/payment/${eventDetails._id}`;
                   }
                 }}
                 className={`btn-register-popup waitlist-btn ${userRegistration?.paymentStatus === 'rejected' ? 'rejected' : ''}`}
               >
-                <span className="btn-icon">⏳</span>
+                <span className="btn-icon"><HourglassIcon size={14} /></span>
                 Join Waitlist
               </button>
             ) : (
@@ -479,12 +498,12 @@ const EventDetailsPopup = ({ event, onClose, registrationsOpen = true }) => {
               >
                 {userRegistration?.paymentStatus === 'rejected' ? (
                   <>
-                    <span className="btn-icon">🔄</span>
+                    <span className="btn-icon"><RefreshIcon size={14} /></span>
                     Register Again
                   </>
                 ) : (
                   <>
-                    <span className="btn-icon">📝</span>
+                    <span className="btn-icon"><EditIcon size={14} /></span>
                     Register Now
                   </>
                 )}
@@ -492,7 +511,7 @@ const EventDetailsPopup = ({ event, onClose, registrationsOpen = true }) => {
             )
           ) : !registrationsOpen ? (
             <div className="registrations-closed-message">
-              <span className="closed-icon">🔒</span>
+              <span className="closed-icon"><LockIcon size={16} /></span>
               <p>Online registration is finished.</p>
             </div>
           ) : null}
@@ -502,7 +521,7 @@ const EventDetailsPopup = ({ event, onClose, registrationsOpen = true }) => {
               onClick={() => window.location.href = '/dashboard'}
               className="btn-register-popup verified"
             >
-              <span className="btn-icon">📋</span>
+              <span className="btn-icon"><FileTextIcon size={14} /></span>
               View in Dashboard
             </button>
           )}

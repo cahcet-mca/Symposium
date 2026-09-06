@@ -1,9 +1,9 @@
-# TECNO RENDEZVOUS 2026 - National Level Technical Symposium
+# TECHNO RENDEZVOUS 2026 - National Level Technical Symposium
 
 🎯 **Think Big • Act Smart • Win Together**
 
 ## 📋 About
-TECNO RENDEZVOUS is a national-level technical symposium organized by C. Abdul Hakeem College of Engineering and Technology, featuring 15+ exciting events across Technical and Non-Technical categories. This comprehensive event management platform allows students to register for events, make UPI payments, form teams, track their registrations in real-time, and download event tickets.
+TECHNO RENDEZVOUS is a national-level technical symposium organized by C. Abdul Hakeem College of Engineering and Technology, featuring 15+ exciting events across Technical and Non-Technical categories. This comprehensive event management platform allows students to register for events, make UPI payments, form teams, track their registrations in real-time, and download event tickets.
 
 **Date:** 26th July 2026  
 **Venue:** C. Abdul Hakeem College of Engineering and Technology, Melvisharam

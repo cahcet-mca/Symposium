@@ -1,7 +1,7 @@
 {
   "name": "tecno-rendezvous-backend",
   "version": "1.0.0",
-  "description": "TECNO RENDEZVOUS 2025 Symposium Backend",
+  "description": "TECHNO RENDEZVOUS 2025 Symposium Backend",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",

@@ -301,3 +301,75 @@
     justify-content: center;
   }
 }
+
+/* ==========================================================================
+   LIGHT THEME OVERRIDES — HomeEventCard (White & Blue ONLY, No Gold/Black)
+   ========================================================================== */
+[data-theme="light"] .home-event-card {
+  background: #ffffff;
+  border: 1.5px solid #dbeafe;
+  box-shadow: 0 5px 20px rgba(37, 99, 235, 0.06);
+}
+
+[data-theme="light"] .home-event-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 30px rgba(37, 99, 235, 0.14);
+  border-color: #93c5fd;
+}
+
+[data-theme="light"] .sunshine-effect {
+  display: none;
+}
+
+[data-theme="light"] .home-event-image-container {
+  border-bottom: 2px solid #dbeafe;
+}
+
+[data-theme="light"] .home-event-image-placeholder {
+  background: linear-gradient(135deg, #eff6ff, #dbeafe);
+  color: rgba(37, 99, 235, 0.25);
+}
+
+[data-theme="light"] .home-event-category {
+  background: #eff6ff;
+  color: #2563eb;
+  border: 1px solid #bfdbfe;
+}
+
+[data-theme="light"] .home-event-subname {
+  color: #2563eb;
+}
+
+[data-theme="light"] .home-event-name {
+  color: #0f172a;
+}
+
+[data-theme="light"] .home-event-meta {
+  background: #f8fbff;
+  border: 1px solid #e2e8f0;
+  color: #64748b;
+}
+
+[data-theme="light"] .home-event-footer {
+  border-top: 1px solid #e2e8f0;
+}
+
+[data-theme="light"] .fee-label {
+  color: #64748b;
+}
+
+[data-theme="light"] .fee-amount {
+  color: #2563eb;
+}
+
+[data-theme="light"] .home-event-btn {
+  background: #eff6ff;
+  border: 1.5px solid #2563eb;
+  color: #2563eb;
+}
+
+[data-theme="light"] .home-event-btn:hover {
+  background: #2563eb;
+  color: #ffffff;
+  box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3);
+}
