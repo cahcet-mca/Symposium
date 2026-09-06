@@ -108,10 +108,10 @@ const updateRegistrationStatus = async (req, res) => {
 
     console.log(`🔄 Updating registration ${registrationId} to status: ${status}`);
 
-    if (!['verified', 'rejected'].includes(status)) {
+    if (!['verified', 'rejected', 'pending'].includes(status)) {
       return res.status(400).json({
         success: false,
-        message: 'Invalid status. Must be "verified" or "rejected"'
+        message: 'Invalid status. Must be "verified", "rejected", or "pending"'
       });
     }
 
@@ -126,85 +126,125 @@ const updateRegistrationStatus = async (req, res) => {
       });
     }
 
-    if (registration.paymentStatus !== 'pending') {
-      return res.status(400).json({
-        success: false,
-        message: `Registration already ${registration.paymentStatus}`
-      });
-    }
+    if (status === 'pending') {
+      // Revert to pending — undo previously accepted/rejected
+      const prevStatus = registration.paymentStatus;
+      registration.paymentStatus = 'pending';
+      registration.registrationStatus = 'pending';
+      await registration.save();
 
-    const event = registration.event;
-    const currentConfirmedCount = await Registration.countDocuments({
-      event: event._id,
-      paymentStatus: 'verified'
-    });
-    
-    if (status === 'verified') {
-      // Check capacity
-      if (currentConfirmedCount >= event.maxParticipants) {
-        if (registration.registrationStatus === 'waitlist') {
-          return res.status(400).json({
-            success: false,
-            message: 'Event is full. This registration is in waitlist. Cannot accept now.'
-          });
-        } else {
+      if (prevStatus === 'verified') {
+        await Event.findByIdAndUpdate(registration.event._id, {
+          $inc: { confirmedCount: -1, pendingCount: 1 }
+        });
+        await User.findByIdAndUpdate(registration.user._id, {
+          $pull: { registeredEvents: registration.event._id }
+        });
+      } else if (prevStatus === 'rejected') {
+        await Event.findByIdAndUpdate(registration.event._id, {
+          $inc: { rejectedCount: -1, pendingCount: 1 }
+        });
+      }
+
+      await Transaction.findOneAndUpdate(
+        { transactionId: registration.transactionId },
+        { status: 'pending' }
+      );
+
+      console.log(`🔄 Registration reverted to pending from ${prevStatus}`);
+    } else if (status === 'verified') {
+      // Check capacity only when going from pending → verified
+      if (registration.paymentStatus !== 'pending') {
+        // Allow re-accepting rejected registrations if there's capacity
+        const confirmedCount = await Registration.countDocuments({
+          event: registration.event._id, paymentStatus: 'verified'
+        });
+        if (confirmedCount >= registration.event.maxParticipants) {
           return res.status(400).json({
             success: false,
             message: 'Event has reached maximum capacity'
           });
         }
+        if (registration.paymentStatus === 'rejected') {
+          await Event.findByIdAndUpdate(registration.event._id, {
+            $inc: { rejectedCount: -1 }
+          });
+        }
       }
-      
+
+      const currentConfirmedCount = await Registration.countDocuments({
+        event: registration.event._id,
+        paymentStatus: 'verified'
+      });
+
+      if (currentConfirmedCount >= registration.event.maxParticipants) {
+        return res.status(400).json({
+          success: false,
+          message: 'Event has reached maximum capacity'
+        });
+      }
+
+      const prevStatus = registration.paymentStatus;
       registration.paymentStatus = 'verified';
       registration.registrationStatus = 'confirmed';
       await registration.save();
-      
-      await Event.findByIdAndUpdate(event._id, {
-        $inc: { confirmedCount: 1, pendingCount: -1 }
-      });
-      
+
+      if (prevStatus === 'pending') {
+        await Event.findByIdAndUpdate(registration.event._id, {
+          $inc: { confirmedCount: 1, pendingCount: -1 }
+        });
+      } else {
+        await Event.findByIdAndUpdate(registration.event._id, {
+          $inc: { confirmedCount: 1 }
+        });
+      }
+
       await User.findByIdAndUpdate(registration.user._id, {
-        $addToSet: { registeredEvents: event._id }
+        $addToSet: { registeredEvents: registration.event._id }
       });
-      
+
       await Transaction.findOneAndUpdate(
         { transactionId: registration.transactionId },
         { status: 'verified' }
       );
-      
-      console.log(`✅ Registration accepted and moved from ${registration.registrationStatus} to confirmed`);
-      
-      // Check for waitlist registrations to promote
-      const nextWaitlist = await Registration.findOne({
-        event: event._id,
-        paymentStatus: 'pending',
-        registrationStatus: 'waitlist'
-      }).sort({ createdAt: 1 });
-      
-      if (nextWaitlist) {
-        console.log(`📋 Waitlist registration found for ${event.name}. Admin can promote.`);
-      }
-      
+
+      console.log(`✅ Registration accepted`);
     } else {
+      // rejected
+      const prevStatus = registration.paymentStatus;
       registration.paymentStatus = 'rejected';
       registration.registrationStatus = 'cancelled';
       await registration.save();
-      
-      await Event.findByIdAndUpdate(event._id, {
-        $inc: { pendingCount: -1, rejectedCount: 1 }
-      });
-      
+
+      if (prevStatus === 'pending') {
+        await Event.findByIdAndUpdate(registration.event._id, {
+          $inc: { pendingCount: -1, rejectedCount: 1 }
+        });
+      } else if (prevStatus === 'verified') {
+        await Event.findByIdAndUpdate(registration.event._id, {
+          $inc: { confirmedCount: -1, rejectedCount: 1 }
+        });
+        await User.findByIdAndUpdate(registration.user._id, {
+          $pull: { registeredEvents: registration.event._id }
+        });
+      } else {
+        await Event.findByIdAndUpdate(registration.event._id, {
+          $inc: { rejectedCount: 1 }
+        });
+      }
+
       await Transaction.findOneAndUpdate(
         { transactionId: registration.transactionId },
         { status: 'rejected' }
       );
-      
+
       console.log(`❌ Registration rejected`);
     }
 
+    const statusLabel = status === 'verified' ? 'accepted' : status;
     res.json({
       success: true,
-      message: `Registration ${status === 'verified' ? 'accepted' : 'rejected'} successfully`,
+      message: `Registration ${statusLabel} successfully`,
       data: registration
     });
 

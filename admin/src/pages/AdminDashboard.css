@@ -689,6 +689,75 @@
   transform: scale(1.1);
 }
 
+.btn-pending {
+  background: rgba(255, 165, 0, 0.1);
+  border: 2px solid #ffa500;
+  color: #ffa500;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  font-size: 0.85rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s;
+  font-weight: 700;
+}
+
+.btn-pending:hover:not(:disabled) {
+  background: #ffa500;
+  color: #000;
+  transform: scale(1.1);
+}
+
+.btn-screenshot {
+  background: rgba(100, 180, 255, 0.1);
+  border: 2px solid #64b4ff;
+  color: #64b4ff;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  font-size: 0.85rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.btn-screenshot:hover {
+  background: #64b4ff;
+  color: #000;
+  transform: scale(1.1);
+}
+
+/* Active status — button is already the current status, show as filled */
+.btn-accept.btn-status-active {
+  background: #2ecc71;
+  color: #fff;
+  cursor: default;
+}
+
+.btn-reject.btn-status-active {
+  background: #ff4757;
+  color: #fff;
+  cursor: default;
+}
+
+.btn-pending.btn-status-active {
+  background: #ffa500;
+  color: #000;
+  cursor: default;
+}
+
+.btn-accept:disabled,
+.btn-reject:disabled,
+.btn-pending:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
 /* Participant Name Cell */
 .participant-name-cell {
   font-weight: 600;
@@ -980,8 +1049,42 @@
   color: #000;
 }
 
+.mobile-action-btn.pending-btn {
+  background: rgba(255, 165, 0, 0.1);
+  border: 1px solid #ffa500;
+  color: #ffa500;
+}
+
+.mobile-action-btn.pending-btn:hover:not(:disabled) {
+  background: #ffa500;
+  color: #000;
+}
+
+/* Active state — current status button filled */
+.mobile-action-btn.active-status {
+  opacity: 1 !important;
+  filter: brightness(1.2);
+  font-weight: 800;
+  box-shadow: 0 0 8px rgba(255,255,255,0.15);
+}
+
+.mobile-action-btn.accept.active-status {
+  background: #2ecc71;
+  color: #000;
+}
+
+.mobile-action-btn.reject.active-status {
+  background: #ff4757;
+  color: #fff;
+}
+
+.mobile-action-btn.pending-btn.active-status {
+  background: #ffa500;
+  color: #000;
+}
+
 .mobile-action-btn:disabled {
-  opacity: 0.5;
+  opacity: 0.45;
   cursor: not-allowed;
 }
 

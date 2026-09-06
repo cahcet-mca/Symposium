@@ -12,6 +12,7 @@ const Login = () => {
   const [rememberMe, setRememberMe] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [showForgotPopup, setShowForgotPopup] = useState(false);
   
   const navigate = useNavigate();
   const location = useLocation();
@@ -126,9 +127,13 @@ const Login = () => {
                 <span className="remember-text">Remember me</span>
               </label>
               
-              <Link to="/forgot-password" className="forgot-link">
+              <button
+                type="button"
+                className="forgot-link"
+                onClick={() => setShowForgotPopup(true)}
+              >
                 Forgot Password?
-              </Link>
+              </button>
             </div>
 
             <button 
@@ -158,6 +163,23 @@ const Login = () => {
             </Link>
           </div>
         </div>
+
+        {/* Forgot Password Popup */}
+        {showForgotPopup && (
+          <div className="forgot-popup-overlay" onClick={() => setShowForgotPopup(false)}>
+            <div className="forgot-popup" onClick={e => e.stopPropagation()}>
+              <div className="forgot-popup-icon">🔐</div>
+              <h3>Not Available</h3>
+              <p>The Forgot Password feature will be available soon. Please contact support if you need immediate help.</p>
+              <button
+                className="forgot-popup-close"
+                onClick={() => setShowForgotPopup(false)}
+              >
+                Got it
+              </button>
+            </div>
+          </div>
+        )}
 
         <div 
           ref={infoRef}

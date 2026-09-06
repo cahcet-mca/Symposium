@@ -10,7 +10,7 @@ import './AdminDashboard.css';
 const API_URL = import.meta.env.VITE_API_URL;
 
 const AdminDashboard = () => {
-  const [activeTab, setActiveTab] = useState('pending');
+  const [activeTab, setActiveTab] = useState('all');
   const [registrations, setRegistrations] = useState([]);
   const [participants, setParticipants] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -782,7 +782,7 @@ const AdminDashboard = () => {
         return;
       }
 
-      const backendStatus = status === 'accepted' ? 'verified' : 'rejected';
+      const backendStatus = status === 'accepted' ? 'verified' : status === 'rejected' ? 'rejected' : 'pending';
       
       console.log(`🔄 Updating registration ${registrationId} to ${backendStatus}`);
       
@@ -973,8 +973,8 @@ const AdminDashboard = () => {
     if (activeTab === 'participants') {
       return ['S.No', 'Participant Name', 'Mobile', 'Event', 'College', 'Year'];
     }
-    const baseHeaders = ['Date', 'Transaction ID', 'User', 'Event', 'Team Size', 'Amount', 'Status'];
-    return activeTab === 'pending' ? [...baseHeaders, 'Actions'] : baseHeaders;
+    const base = ['Date', 'Transaction ID', 'User', 'Event', 'Team Size', 'Amount', 'Status'];
+    return (activeTab === 'all' || activeTab === 'pending') ? [...base, 'Actions'] : base;
   };
 
   // ============================================
@@ -1081,34 +1081,37 @@ const AdminDashboard = () => {
             </div>
           )}
           
-          {isPending && (
+          {/* Actions — on All Registrations and Pending tabs */}
+          {(activeTab === 'all' || activeTab === 'pending') && (
             <div className="mobile-card-actions">
-              <button 
+              <button
                 onClick={() => handleStatusUpdate(safeReg._id, 'accepted')}
-                className="mobile-action-btn accept"
-                disabled={processingId === safeReg._id}
+                className={`mobile-action-btn accept${safeReg.paymentStatus === 'verified' ? ' active-status' : ''}`}
+                disabled={processingId === safeReg._id || safeReg.paymentStatus === 'verified'}
               >
                 {processingId === safeReg._id ? '⏳' : '✓'} Accept
               </button>
-              <button 
+              <button
                 onClick={() => handleStatusUpdate(safeReg._id, 'rejected')}
-                className="mobile-action-btn reject"
-                disabled={processingId === safeReg._id}
+                className={`mobile-action-btn reject${safeReg.paymentStatus === 'rejected' ? ' active-status' : ''}`}
+                disabled={processingId === safeReg._id || safeReg.paymentStatus === 'rejected'}
               >
                 {processingId === safeReg._id ? '⏳' : '✗'} Reject
               </button>
-              <button 
-                onClick={() => viewParticipants(reg)} 
+              {activeTab === 'all' && (
+                <button
+                  onClick={() => handleStatusUpdate(safeReg._id, 'pending')}
+                  className={`mobile-action-btn pending-btn${safeReg.paymentStatus === 'pending' ? ' active-status' : ''}`}
+                  disabled={processingId === safeReg._id || safeReg.paymentStatus === 'pending'}
+                >
+                  {processingId === safeReg._id ? '⏳' : '⟳'} Pending
+                </button>
+              )}
+              <button
+                onClick={() => viewScreenshot(reg)}
                 className="mobile-action-btn view"
               >
-                👥 View Team
-              </button>
-              <button 
-                onClick={() => viewScreenshot(reg)} 
-                className="mobile-action-btn view"
-                style={{ marginTop: '5px' }}
-              >
-                👁️ View Screenshot
+                📷 Screenshot
               </button>
             </div>
           )}
@@ -1199,6 +1202,13 @@ const AdminDashboard = () => {
 
         <nav className="sidebar-nav">
           <button 
+            className={`nav-item ${activeTab === 'all' ? 'active' : ''}`} 
+            onClick={() => setActiveTab('all')}
+          >
+            <span className="nav-icon">📋</span> 
+            All Registrations
+          </button>
+          <button 
             className={`nav-item ${activeTab === 'pending' ? 'active' : ''}`} 
             onClick={() => setActiveTab('pending')}
           >
@@ -1229,13 +1239,6 @@ const AdminDashboard = () => {
             <span className="nav-icon">👥</span> 
             Participants 
             {stats.participants > 0 && <span className="badge info">{stats.participants}</span>}
-          </button>
-          <button 
-            className={`nav-item ${activeTab === 'all' ? 'active' : ''}`} 
-            onClick={() => setActiveTab('all')}
-          >
-            <span className="nav-icon">📋</span> 
-            All Registrations
           </button>
           <button 
             className={`nav-item ${activeTab === 'events' ? 'active' : ''}`} 
@@ -1735,49 +1738,52 @@ const AdminDashboard = () => {
                                       </span>
                                     </td>
                                     
-                                    {activeTab === 'pending' && (
-                                      <td>
-                                        <div className="action-buttons">
-                                          <button 
-                                            onClick={() => handleStatusUpdate(safeReg._id, 'accepted')} 
-                                            className="btn-accept" 
-                                            disabled={processingId === safeReg._id}
-                                            title="Accept"
-                                          >
-                                            {processingId === safeReg._id ? '⏳' : '✓'}
-                                          </button>
-                                          <button 
-                                            onClick={() => handleStatusUpdate(safeReg._id, 'rejected')} 
-                                            className="btn-reject" 
-                                            disabled={processingId === safeReg._id}
-                                            title="Reject"
-                                          >
-                                            {processingId === safeReg._id ? '⏳' : '✗'}
-                                          </button>
-                                          <button 
-                                            onClick={() => viewParticipants(reg)} 
-                                            className="btn-view" 
-                                            title="View Team"
-                                          >
-                                            👥
-                                          </button>
-                                          <button 
-                                            onClick={() => viewScreenshot(reg)} 
-                                            className="btn-view" 
-                                            title="View Screenshot"
-                                            style={{ marginLeft: '5px' }}
-                                          >
-                                            👁️
-                                          </button>
-                                        </div>
-                                      </td>
-                                    )}
+                                     {/* Actions — on All Registrations and Pending tabs */}
+                                     {(activeTab === 'all' || activeTab === 'pending') && (
+                                       <td>
+                                         <div className="action-buttons">
+                                           <button
+                                             onClick={() => handleStatusUpdate(safeReg._id, 'accepted')}
+                                             className={`btn-accept${safeReg.paymentStatus === 'verified' ? ' btn-status-active' : ''}`}
+                                             disabled={processingId === safeReg._id || safeReg.paymentStatus === 'verified'}
+                                             title="Accept"
+                                           >
+                                             {processingId === safeReg._id ? '⏳' : '✓'}
+                                           </button>
+                                           <button
+                                             onClick={() => handleStatusUpdate(safeReg._id, 'rejected')}
+                                             className={`btn-reject${safeReg.paymentStatus === 'rejected' ? ' btn-status-active' : ''}`}
+                                             disabled={processingId === safeReg._id || safeReg.paymentStatus === 'rejected'}
+                                             title="Reject"
+                                           >
+                                             {processingId === safeReg._id ? '⏳' : '✗'}
+                                           </button>
+                                           {activeTab === 'all' && (
+                                             <button
+                                               onClick={() => handleStatusUpdate(safeReg._id, 'pending')}
+                                               className={`btn-pending${safeReg.paymentStatus === 'pending' ? ' btn-status-active' : ''}`}
+                                               disabled={processingId === safeReg._id || safeReg.paymentStatus === 'pending'}
+                                               title="Revert to Pending"
+                                             >
+                                               {processingId === safeReg._id ? '⏳' : '⟳'}
+                                             </button>
+                                           )}
+                                           <button
+                                             onClick={() => viewScreenshot(reg)}
+                                             className="btn-screenshot"
+                                             title="View Screenshot"
+                                           >
+                                             📷
+                                           </button>
+                                         </div>
+                                       </td>
+                                     )}
                                   </tr>
                                 );
                               })
                             ) : (
                               <tr>
-                                <td colSpan={activeTab === 'pending' ? 8 : 7} className="no-data">
+                                <td colSpan={(activeTab === 'all' || activeTab === 'pending') ? 8 : 7} className="no-data">
                                   No {activeTab} registrations found
                                 </td>
                               </tr>

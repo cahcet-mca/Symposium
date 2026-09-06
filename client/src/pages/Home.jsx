@@ -17,6 +17,7 @@ const Home = () => {
   const [nonTechnicalEvents, setNonTechnicalEvents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isHeroVisible, setIsHeroVisible] = useState(true);
+  const [participantsCount, setParticipantsCount] = useState(0);
   
   // Slider refs
   const technicalSliderRef = useRef(null);
@@ -62,6 +63,16 @@ const Home = () => {
           
           setTechnicalEvents(technical);
           setNonTechnicalEvents(nonTechnical);
+        }
+
+        // Fetch real confirmed participants count
+        try {
+          const statsResponse = await axios.get(`${API_URL}/events/stats/participants`);
+          if (statsResponse.data.success) {
+            setParticipantsCount(statsResponse.data.count);
+          }
+        } catch {
+          // Silently ignore if stats endpoint fails
         }
       } catch (error) {
         console.error('Error fetching data:', error);
@@ -383,7 +394,7 @@ const Home = () => {
       >
         <div className="container">
           <h2 className="cta-animate">Ready to Showcase Your Talent?</h2>
-          <p className="cta-animate cta-delay-1">Join {technicalEvents.length + nonTechnicalEvents.length}+ participants in this premier symposium</p>
+          <p className="cta-animate cta-delay-1">Join {participantsCount}+ participants in this premier symposium</p>
           <button onClick={handleExploreEventsClick} className="btn btn-primary btn-large cta-animate cta-delay-2">
             Browse All Events
           </button>
