@@ -1162,3 +1162,284 @@
     gap: 8px;
   }
 }
+
+/* ==========================================================================
+   LIGHT THEME OVERRIDES — Event Details Popup (White & Blue ONLY, No Gold/Black)
+   ========================================================================== */
+[data-theme="light"] .popup-overlay {
+  background: rgba(15, 23, 42, 0.6);
+  backdrop-filter: blur(8px);
+}
+
+[data-theme="light"] .popup-container {
+  background: #ffffff;
+  border: 1.5px solid #dbeafe;
+  box-shadow: 0 25px 60px rgba(37, 99, 235, 0.15), 0 0 0 1px rgba(37, 99, 235, 0.08);
+}
+
+[data-theme="light"] .popup-container::-webkit-scrollbar-track {
+  background: #f1f5f9;
+}
+
+[data-theme="light"] .popup-container::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+}
+
+[data-theme="light"] .popup-close {
+  background: #eff6ff;
+  border: 2px solid #2563eb;
+  color: #2563eb;
+}
+
+[data-theme="light"] .popup-close:hover {
+  background: #2563eb;
+  color: #ffffff;
+  transform: rotate(90deg);
+}
+
+[data-theme="light"] .popup-header {
+  border-bottom: 2px solid #eff6ff;
+}
+
+[data-theme="light"] .popup-header h2 {
+  color: #0f172a;
+}
+
+[data-theme="light"] .category-badge.technical {
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  color: #ffffff;
+}
+
+[data-theme="light"] .category-badge.non-technical {
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
+  color: #ffffff;
+}
+
+[data-theme="light"] .type-badge {
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  color: #2563eb;
+}
+
+[data-theme="light"] .popup-section h3 {
+  color: #2563eb;
+}
+
+[data-theme="light"] .registration-status-section {
+  background: #f8fbff;
+  border: 1px solid #dbeafe;
+}
+
+[data-theme="light"] .status-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+}
+
+[data-theme="light"] .status-text {
+  color: #0f172a;
+}
+
+[data-theme="light"] .status-update-time {
+  color: #2563eb;
+  background: #eff6ff;
+  border: 1px solid #dbeafe;
+}
+
+[data-theme="light"] .stat-box {
+  background: #f8fbff;
+  border: 1px solid #e2e8f0;
+}
+
+[data-theme="light"] .stat-label {
+  color: #64748b;
+}
+
+[data-theme="light"] .stat-value.total {
+  color: #0f172a;
+}
+
+[data-theme="light"] .stat-value.registered {
+  color: #2563eb;
+}
+
+[data-theme="light"] .progress-info {
+  color: #64748b;
+}
+
+[data-theme="light"] .progress-bar-bg {
+  background: #e2e8f0;
+}
+
+[data-theme="light"] .event-description,
+[data-theme="light"] .event-full-description {
+  color: #334155;
+  background: #f8fbff;
+  border: 1px solid #e2e8f0;
+}
+
+[data-theme="light"] .info-grid {
+  background: #f8fbff;
+  border: 1px solid #e2e8f0;
+}
+
+[data-theme="light"] .info-label {
+  color: #64748b;
+}
+
+[data-theme="light"] .info-value {
+  color: #0f172a;
+}
+
+[data-theme="light"] .info-value.fee {
+  color: #2563eb;
+  font-weight: 700;
+}
+
+[data-theme="light"] .requirements-list li,
+[data-theme="light"] .rules-list li {
+  background: #f8fbff;
+  border: 1px solid #dbeafe;
+  color: #334155;
+}
+
+[data-theme="light"] .prizes-grid .prize-item {
+  background: #f8fbff;
+  border: 1px solid #e2e8f0;
+}
+
+[data-theme="light"] .prize-item.first {
+  background: linear-gradient(90deg, #eff6ff, #f8fbff);
+  border-left: 4px solid #2563eb;
+}
+
+[data-theme="light"] .prize-item.first .prize-place {
+  color: #2563eb;
+}
+
+[data-theme="light"] .prize-item.second {
+  background: linear-gradient(90deg, #f1f5f9, #f8fbff);
+  border-left: 4px solid #94a3b8;
+}
+
+[data-theme="light"] .prize-item.second .prize-place {
+  color: #64748b;
+}
+
+[data-theme="light"] .prize-item.third {
+  background: linear-gradient(90deg, #fef3c7, #f8fbff);
+  border-left: 4px solid #f59e0b;
+}
+
+[data-theme="light"] .prize-item.third .prize-place {
+  color: #d97706;
+}
+
+[data-theme="light"] .prize-desc {
+  color: #0f172a;
+}
+
+[data-theme="light"] .meta-info {
+  background: #f8fbff;
+  border: 1px solid #e2e8f0;
+  color: #64748b;
+}
+
+[data-theme="light"] .btn-close {
+  background: #ffffff;
+  border: 2px solid #2563eb;
+  color: #2563eb;
+}
+
+[data-theme="light"] .btn-close:hover {
+  background: #eff6ff;
+  color: #1d4ed8;
+  border-color: #1d4ed8;
+  box-shadow: 0 6px 20px rgba(37, 99, 235, 0.2);
+}
+
+[data-theme="light"] .btn-register-popup {
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  color: #ffffff;
+  box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3);
+}
+
+[data-theme="light"] .btn-register-popup:hover {
+  background: linear-gradient(135deg, #1d4ed8, #1e40af);
+  box-shadow: 0 8px 25px rgba(37, 99, 235, 0.45);
+  color: #ffffff;
+}
+
+[data-theme="light"] .user-registration-status {
+  background: #f8fbff;
+  border: 1px solid #dbeafe;
+}
+
+[data-theme="light"] .user-registration-card {
+  background: #f8fbff;
+  border: 1px solid #dbeafe;
+}
+
+[data-theme="light"] .user-registration-card .info-row {
+  border-bottom: 1px solid #e2e8f0;
+}
+
+[data-theme="light"] .user-registration-card .info-label {
+  color: #64748b;
+}
+
+[data-theme="light"] .user-registration-card .info-value {
+  color: #0f172a;
+}
+
+[data-theme="light"] .sub-event-name {
+  background: #eff6ff;
+  border-left: 3px solid #2563eb;
+}
+
+[data-theme="light"] .sub-event-label {
+  color: #64748b;
+}
+
+[data-theme="light"] .sub-event-value {
+  color: #2563eb;
+}
+
+[data-theme="light"] .coordinator-grid {
+  background: #f8fbff;
+  border: 1px solid #dbeafe;
+}
+
+[data-theme="light"] .coordinator-name {
+  color: #0f172a;
+}
+
+[data-theme="light"] .popup-image-container {
+  border-bottom: 2px solid #dbeafe;
+}
+
+[data-theme="light"] .popup-image-container::before {
+  display: none;
+}
+
+[data-theme="light"] .registration-details-mini {
+  background: #f8fbff;
+  border: 1px solid #e2e8f0;
+}
+
+[data-theme="light"] .registration-details-mini small {
+  color: #475569;
+}
+
+[data-theme="light"] .detail-icon {
+  color: #2563eb;
+}
+
+[data-theme="light"] .rejected-message-small {
+  background: #fef2f2;
+  border-left: 4px solid #ef4444;
+  border-radius: 8px;
+}
+
+[data-theme="light"] .rejected-message-small p {
+  color: #b91c1c;
+}

@@ -47,7 +47,7 @@ export const USER_ROLES = {
 
 // Symposium Details
 export const SYMPOSIUM = {
-  NAME: 'TECNO RENDEZVOUS',
+  NAME: 'TECHNO RENDEZVOUS',
   TAGLINE: 'Innovate • Inspire • Integrate',
   DATE: '26th July 2026',
   VENUE: 'C. Abdul Hakeem College of Engineering and Technology (Auditorium)',

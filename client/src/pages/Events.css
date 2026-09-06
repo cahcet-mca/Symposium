@@ -926,3 +926,213 @@
     gap: 10px !important;
   }
 }
+
+/* ==========================================================================
+   LIGHT THEME OVERRIDES — Events Page (White & Blue ONLY, No Gold/Black)
+   ========================================================================== */
+
+[data-theme="light"] .events-page {
+  background: #f8fbff;
+}
+
+/* Header */
+[data-theme="light"] .events-header {
+  background: linear-gradient(135deg, #eff6ff, #dbeafe);
+  border-bottom: 1px solid #dbeafe;
+  color: #0f172a;
+}
+
+[data-theme="light"] .events-header::after {
+  background: linear-gradient(90deg, transparent, rgba(37, 99, 235, 0.3), transparent);
+}
+
+[data-theme="light"] .header-glow-orb-1 {
+  background: radial-gradient(circle, rgba(37, 99, 235, 0.15) 0%, rgba(37, 99, 235, 0) 70%);
+}
+
+[data-theme="light"] .header-glow-orb-2 {
+  background: radial-gradient(circle, rgba(59, 130, 246, 0.12) 0%, rgba(59, 130, 246, 0) 70%);
+}
+
+[data-theme="light"] .events-header h1 {
+  background: linear-gradient(135deg, #1d4ed8, #2563eb, #3b82f6);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+[data-theme="light"] .header-subtitle {
+  color: #64748b;
+}
+
+/* Search */
+[data-theme="light"] .search-wrapper {
+  background: #ffffff;
+  border: 1.5px solid #dbeafe;
+  box-shadow: 0 5px 25px rgba(37, 99, 235, 0.06);
+}
+
+[data-theme="light"] .search-wrapper:focus-within {
+  border-color: #2563eb;
+  box-shadow: 0 8px 30px rgba(37, 99, 235, 0.12), 0 0 0 3px rgba(37, 99, 235, 0.08);
+}
+
+[data-theme="light"] .search-icon-anim {
+  color: #2563eb;
+}
+
+[data-theme="light"] .search-input {
+  color: #0f172a;
+}
+
+[data-theme="light"] .search-input::placeholder {
+  color: #94a3b8;
+}
+
+[data-theme="light"] .search-clear-btn {
+  background: rgba(37, 99, 235, 0.1);
+  color: #2563eb;
+}
+
+/* Filter Tabs (All Events / Technical / Non-Technical) */
+[data-theme="light"] .filter-btn {
+  border-color: #dbeafe;
+  color: #64748b;
+  background: #ffffff;
+}
+
+[data-theme="light"] .filter-btn::before {
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+}
+
+[data-theme="light"] .filter-btn:hover {
+  border-color: #2563eb;
+  color: #2563eb;
+}
+
+[data-theme="light"] .filter-btn.active {
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  border-color: transparent;
+  color: #ffffff;
+  box-shadow: 0 4px 18px rgba(37, 99, 235, 0.3);
+}
+
+/* Type Filter Buttons (Individual / Team / etc.) */
+[data-theme="light"] .type-filter-label {
+  color: #334155;
+}
+
+[data-theme="light"] .type-filter-btn {
+  border-color: #dbeafe;
+  background: #ffffff;
+  color: #64748b;
+}
+
+[data-theme="light"] .type-filter-btn::before {
+  background: linear-gradient(135deg, rgba(37, 99, 235, 0.08), transparent);
+}
+
+[data-theme="light"] .type-filter-btn:hover {
+  border-color: #93c5fd;
+  color: #2563eb;
+}
+
+[data-theme="light"] .type-filter-btn.active {
+  background: #eff6ff;
+  color: #2563eb;
+  border-color: #2563eb;
+  box-shadow: 0 4px 15px rgba(37, 99, 235, 0.12);
+}
+
+[data-theme="light"] .type-filter-btn.active::after {
+  background: linear-gradient(90deg, transparent, #2563eb, transparent);
+}
+
+/* Category Sections */
+[data-theme="light"] .category-header {
+  border-bottom: 2px solid #dbeafe;
+}
+
+[data-theme="light"] .category-header::after {
+  background: linear-gradient(90deg, #2563eb, transparent);
+}
+
+[data-theme="light"] .category-header h2 {
+  color: #0f172a;
+}
+
+[data-theme="light"] .category-header:hover h2 {
+  color: #2563eb;
+}
+
+[data-theme="light"] .category-fee {
+  color: #2563eb;
+}
+
+/* No Results */
+[data-theme="light"] .no-results {
+  background: #ffffff;
+  border: 1.5px solid #dbeafe;
+  box-shadow: 0 8px 30px rgba(37, 99, 235, 0.05);
+}
+
+[data-theme="light"] .no-results h3 {
+  color: #0f172a;
+}
+
+[data-theme="light"] .no-results p {
+  color: #64748b;
+}
+
+[data-theme="light"] .clear-filters {
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  color: #ffffff;
+}
+
+[data-theme="light"] .clear-filters:hover {
+  box-shadow: 0 8px 25px rgba(37, 99, 235, 0.4);
+}
+
+/* Error / Empty containers */
+[data-theme="light"] .error-container,
+[data-theme="light"] .no-events-container {
+  background: #ffffff;
+  border: 1.5px solid #dbeafe;
+}
+
+[data-theme="light"] .error-container p,
+[data-theme="light"] .no-events-container p {
+  color: #64748b;
+}
+
+[data-theme="light"] .error-container .btn-primary,
+[data-theme="light"] .no-events-container .btn-primary {
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  color: #ffffff;
+}
+
+[data-theme="light"] .error-container .btn-primary:hover,
+[data-theme="light"] .no-events-container .btn-primary:hover {
+  box-shadow: 0 8px 25px rgba(37, 99, 235, 0.4);
+}
+
+/* Scroll progress bar */
+[data-theme="light"] .scroll-progress-bar {
+  background: linear-gradient(90deg, #1d4ed8, #2563eb, #3b82f6, #60a5fa);
+  box-shadow: 0 0 12px rgba(37, 99, 235, 0.6);
+}
+
+/* Scroll to top button */
+[data-theme="light"] .scroll-to-top-btn {
+  background: #ffffff;
+  border: 2px solid #bfdbfe;
+  color: #2563eb;
+  box-shadow: 0 6px 20px rgba(37, 99, 235, 0.1);
+}
+
+[data-theme="light"] .scroll-to-top-btn:hover {
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  color: #ffffff;
+  border-color: #2563eb;
+  box-shadow: 0 10px 30px rgba(37, 99, 235, 0.4);
+}

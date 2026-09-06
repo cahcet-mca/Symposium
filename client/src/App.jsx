@@ -3,6 +3,7 @@ import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 
 // Import Contexts
+import { ThemeProvider } from './context/ThemeContext';
 import { AuthProvider } from './context/AuthContext';
 import { DateProvider } from './context/DateContext';
 import { EventProvider } from './context/EventContext';
@@ -23,42 +24,44 @@ import ProtectedRoute from './components/common/ProtectedRoute';
 
 function App() {
   return (
-    <AuthProvider>
-      <DateProvider>
-        <EventProvider>
-          <div className="app-container">
-            <Navbar />
-            <Routes>
-              <Route path="/" element={<Home />} />
-              <Route path="/events" element={<Events />} />
-              <Route path="/event/:id" element={<EventDetailsPage />} />
-              <Route path="/login" element={<Login />} />
-              <Route path="/register" element={<UserRegister />} />
-              <Route path="/verify-ticket/:id" element={<VerifyTicket />} />
-              
-              <Route 
-                path="/dashboard" 
-                element={
-                  <ProtectedRoute>
-                    <Dashboard />
-                  </ProtectedRoute>
-                } 
-              />
-              <Route 
-                path="/payment/:id" 
-                element={
-                  <ProtectedRoute>
-                    <UPIPayment />
-                  </ProtectedRoute>
-                } 
-              />
-              
-              <Route path="*" element={<Navigate to="/" replace />} />
-            </Routes>
-          </div>
-        </EventProvider>
-      </DateProvider>
-    </AuthProvider>
+    <ThemeProvider>
+      <AuthProvider>
+        <DateProvider>
+          <EventProvider>
+            <div className="app-container">
+              <Navbar />
+              <Routes>
+                <Route path="/" element={<Home />} />
+                <Route path="/events" element={<Events />} />
+                <Route path="/event/:id" element={<EventDetailsPage />} />
+                <Route path="/login" element={<Login />} />
+                <Route path="/register" element={<UserRegister />} />
+                <Route path="/verify-ticket/:id" element={<VerifyTicket />} />
+                
+                <Route 
+                  path="/dashboard" 
+                  element={
+                    <ProtectedRoute>
+                      <Dashboard />
+                    </ProtectedRoute>
+                  } 
+                />
+                <Route 
+                  path="/payment/:id" 
+                  element={
+                    <ProtectedRoute>
+                      <UPIPayment />
+                    </ProtectedRoute>
+                  } 
+                />
+                
+                <Route path="*" element={<Navigate to="/" replace />} />
+              </Routes>
+            </div>
+          </EventProvider>
+        </DateProvider>
+      </AuthProvider>
+    </ThemeProvider>
   );
 }
 

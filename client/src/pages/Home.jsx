@@ -4,6 +4,7 @@ import { useSymposiumDate } from '../context/DateContext';
 import { useAuth } from '../context/AuthContext';
 import axios from 'axios';
 import HomeEventCard from '../components/events/HomeEventCard';
+import { BoltIcon, PaletteIcon, TargetIcon } from '../components/common/Icons';
 import './Home.css';
 
 // Import location icon image
@@ -17,6 +18,7 @@ const Home = () => {
   const [nonTechnicalEvents, setNonTechnicalEvents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isHeroVisible, setIsHeroVisible] = useState(true);
+  const [participantsCount, setParticipantsCount] = useState(0);
   
   // Slider refs
   const technicalSliderRef = useRef(null);
@@ -62,6 +64,16 @@ const Home = () => {
           
           setTechnicalEvents(technical);
           setNonTechnicalEvents(nonTechnical);
+        }
+
+        // Fetch real confirmed participants count
+        try {
+          const statsResponse = await axios.get(`${API_URL}/events/stats/participants`);
+          if (statsResponse.data.success) {
+            setParticipantsCount(statsResponse.data.count);
+          }
+        } catch {
+          // Silently ignore if stats endpoint fails
         }
       } catch (error) {
         console.error('Error fetching data:', error);
@@ -243,7 +255,9 @@ const Home = () => {
         <div className="container">
           <div className="slider-header">
             <div className="header-left">
-              <h2 className="section-title section-title-animate">⚡ Technical Events</h2>
+              <h2 className="section-title section-title-animate" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <BoltIcon size={26} className="text-blue-500" /> Technical Events
+              </h2>
               <span className="event-count">{technicalEvents.length} Events</span>
             </div>
             <div className="slider-controls">
@@ -295,7 +309,9 @@ const Home = () => {
         <div className="container">
           <div className="slider-header">
             <div className="header-left">
-              <h2 className="section-title section-title-animate">🎨 Non-Technical Events</h2>
+              <h2 className="section-title section-title-animate" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <PaletteIcon size={26} className="text-purple-500" /> Non-Technical Events
+              </h2>
               <span className="event-count">{nonTechnicalEvents.length} Events</span>
             </div>
             <div className="slider-controls">
@@ -367,9 +383,9 @@ const Home = () => {
             </a>
             
             <div className="venue-features venue-content-animate venue-delay-4">
-              <span>🎯 State-of-the-art facilities</span>
-              <span>🎯 AC Auditorium</span>
-              <span>🎯 Easy accessibility</span>
+              <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}><TargetIcon size={16} /> State-of-the-art facilities</span>
+              <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}><TargetIcon size={16} /> AC Auditorium</span>
+              <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}><TargetIcon size={16} /> Easy accessibility</span>
             </div>
           </div>
         </div>
@@ -383,7 +399,7 @@ const Home = () => {
       >
         <div className="container">
           <h2 className="cta-animate">Ready to Showcase Your Talent?</h2>
-          <p className="cta-animate cta-delay-1">Join {technicalEvents.length + nonTechnicalEvents.length}+ participants in this premier symposium</p>
+          <p className="cta-animate cta-delay-1">Join {participantsCount}+ participants in this premier symposium</p>
           <button onClick={handleExploreEventsClick} className="btn btn-primary btn-large cta-animate cta-delay-2">
             Browse All Events
           </button>

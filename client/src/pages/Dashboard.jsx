@@ -8,6 +8,22 @@ import { useSymposiumDate } from '../context/DateContext';
 import axios from 'axios';
 import Loader from '../components/common/Loader';
 import EventDetailsPopup from '../components/events/EventDetailsPopup';
+import { 
+  FileTextIcon, 
+  CalendarIcon, 
+  UserIcon, 
+  ClockIcon, 
+  MapPinIcon, 
+  UsersIcon, 
+  DollarIcon, 
+  TagIcon, 
+  CheckIcon, 
+  XIcon, 
+  HourglassIcon, 
+  LockIcon, 
+  DownloadIcon,
+  BarChartIcon
+} from '../components/common/Icons';
 import './Dashboard.css';
 
 const API_URL = import.meta.env.VITE_API_URL;
@@ -114,7 +130,7 @@ const Dashboard = () => {
     if (regStatus === 'waitlist') {
       return {
         className: 'status-waitlist',
-        icon: '📋',
+        icon: <FileTextIcon size={14} />,
         text: 'Waitlisted',
         color: '#ffa502'
       };
@@ -124,28 +140,28 @@ const Dashboard = () => {
       case 'pending':
         return {
           className: 'status-pending',
-          icon: '⏳',
+          icon: <HourglassIcon size={14} />,
           text: 'Pending Approval',
           color: '#ffa502'
         };
       case 'verified':
         return {
           className: 'status-confirmed',
-          icon: '✅',
+          icon: <CheckIcon size={14} />,
           text: 'Confirmed',
-          color: '#2ecc71'
+          color: '#16a34a'
         };
       case 'rejected':
         return {
           className: 'status-rejected',
-          icon: '❌',
+          icon: <XIcon size={14} />,
           text: 'Rejected',
-          color: '#ff4757'
+          color: '#dc2626'
         };
       default:
         return {
           className: 'status-pending',
-          icon: '⏳',
+          icon: <HourglassIcon size={14} />,
           text: 'Pending',
           color: '#ffa502'
         };
@@ -565,7 +581,7 @@ const Dashboard = () => {
             gap: '12px',
             fontWeight: '600'
           }}>
-            <span style={{ fontSize: '1.5rem' }}>🔒</span>
+            <span style={{ display: 'flex', alignItems: 'center' }}><LockIcon size={20} /></span>
             <span>Online registration is currently closed. You can still view your existing registrations and profile.</span>
           </div>
         )}
@@ -598,9 +614,9 @@ const Dashboard = () => {
                 <span className="stat-value">{registeredEvents.filter(e => e.paymentStatus === 'pending' && e.registrationStatus !== 'waitlist').length}</span>
                 <span className="stat-label">Pending</span>
               </div>
-              <div className="stat-item">
-                <span className="stat-value">{registeredEvents.filter(e => e.paymentStatus === 'verified').length}</span>
-                <span className="stat-label">Confirmed</span>
+              <div className="stat-item stat-item-confirmed">
+                <span className="stat-value stat-value-confirmed">{registeredEvents.filter(e => e.paymentStatus === 'verified').length}</span>
+                <span className="stat-label stat-label-confirmed">Confirmed</span>
               </div>
             </div>
           </div>
@@ -612,13 +628,13 @@ const Dashboard = () => {
           className="dashboard-tabs section-animate"
         >
           <button className={`tab-btn ${activeTab === 'myregistrations' ? 'active' : ''}`} onClick={() => setActiveTab('myregistrations')}>
-            <span className="tab-icon">📋</span> My Registrations
+            <span className="tab-icon"><FileTextIcon size={16} /></span> My Registrations
           </button>
           <button className={`tab-btn ${activeTab === 'allevents' ? 'active' : ''}`} onClick={() => setActiveTab('allevents')}>
-            <span className="tab-icon">📅</span> All Events
+            <span className="tab-icon"><CalendarIcon size={16} /></span> All Events
           </button>
           <button className={`tab-btn ${activeTab === 'profile' ? 'active' : ''}`} onClick={() => setActiveTab('profile')}>
-            <span className="tab-icon">👤</span> Profile Settings
+            <span className="tab-icon"><UserIcon size={16} /></span> Profile Settings
           </button>
         </div>
 
@@ -628,73 +644,86 @@ const Dashboard = () => {
           className="tab-content section-animate"
         >
           {activeTab === 'myregistrations' && (
-            <div className="registrations-tab">
-              <h2 className="section-title">My Event Registrations</h2>
+            <div className="my-registrations-tab">
               {registeredEvents.length > 0 ? (
-                <div className="registrations-grid stagger-children">
-                  {registeredEvents.map((registration) => {
+                <div className="registered-events-grid stagger-children">
+                  {registeredEvents.map((registration, index) => {
+                    const status = getStatusDisplay(registration);
+                    const isWaitlisted = registration.registrationStatus === 'waitlist';
                     const safeRegistration = {
-                      _id: registration?._id || `temp-${Math.random()}`,
-                      paymentStatus: registration?.paymentStatus || 'pending',
-                      registrationStatus: registration?.registrationStatus || 'pending',
-                      eventName: registration?.eventName || 'Unknown Event',
-                      teamSize: registration?.teamSize || 1,
-                      totalAmount: registration?.totalAmount || 0,
-                      transactionId: registration?.transactionId || 'N/A',
-                      event: registration?.event || {
-                        category: 'Event',
-                        startTime: 'TBA',
-                        venue: 'TBA',
-                        name: registration?.eventName || 'Unknown Event'
-                      },
-                      participants: registration?.participants || []
+                      ...registration,
+                      eventName: registration.event?.name || registration.eventName || 'Event',
+                      totalAmount: registration.totalAmount || registration.event?.fee || 0,
+                      teamSize: registration.teamSize || 1,
+                      transactionId: registration.transactionId || 'N/A'
                     };
 
-                    const status = getStatusDisplay(safeRegistration);
-                    const isWaitlisted = safeRegistration.registrationStatus === 'waitlist';
-
                     return (
-                      <div key={safeRegistration._id} className={`registration-card ${isWaitlisted ? 'waitlist' : ''}`}>
-                        <div className="registration-header">
-                          <span className={`event-status ${status.className}`}>
-                            <span className="status-icon">{status.icon}</span>{status.text}
+                      <div key={registration._id || index} className="registration-card">
+                        <div className="card-header flex items-center justify-between w-full mb-3.5">
+                          <span className={`status-tag status-pill ${status.className} inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold tracking-wider uppercase shadow-sm transition-all duration-300 hover:scale-105 backdrop-blur-md`}>
+                            <span className="status-icon-wrapper flex items-center justify-center">
+                              {status.className === 'status-confirmed' ? (
+                                <span className="svg-mask-check-wrap" aria-hidden="true">
+                                  <svg className="svg-mask-check" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                                    <polyline points="20 6 9 17 4 12"/>
+                                  </svg>
+                                </span>
+                              ) : (
+                                <span className="status-icon">{status.icon}</span>
+                              )}
+                            </span>
+                            <span className="status-text-gradient">{status.text}</span>
                           </span>
-                          <span className="event-category-tag">{safeRegistration.event?.category || 'Event'}</span>
+                          <span className="event-category-tag inline-block px-3 py-1 rounded-full text-xs font-semibold">{safeRegistration.event?.category || 'Event'}</span>
                         </div>
                         <h3 className="event-name">{safeRegistration.eventName}</h3>
                         <div className="registration-details">
                           <div className="detail-row">
-                            <span className="detail-label">📅 Date:</span>
+                            <span className="detail-label"><CalendarIcon size={13} /> Date:</span>
                             <span className="detail-value">{symposiumDate}</span>
                           </div>
                           <div className="detail-row">
-                            <span className="detail-label">⏰ Time:</span>
+                            <span className="detail-label"><ClockIcon size={13} /> Time:</span>
                             <span className="detail-value">{safeRegistration.event?.startTime || 'TBA'}</span>
                           </div>
                           <div className="detail-row">
-                            <span className="detail-label">📍 Venue:</span>
+                            <span className="detail-label"><MapPinIcon size={13} /> Venue:</span>
                             <span className="detail-value">{safeRegistration.event?.venue || 'TBA'}</span>
                           </div>
                           <div className="detail-row">
-                            <span className="detail-label">📊 Team Size:</span>
+                            <span className="detail-label"><UsersIcon size={13} /> Team Size:</span>
                             <span className="detail-value">{safeRegistration.teamSize} members</span>
                           </div>
                           <div className="detail-row">
-                            <span className="detail-label">💰 Amount:</span>
+                            <span className="detail-label"><DollarIcon size={13} /> Amount:</span>
                             <span className="detail-value amount">₹{safeRegistration.totalAmount}</span>
                           </div>
                           <div className="detail-row">
-                            <span className="detail-label">🆔 Transaction:</span>
+                            <span className="detail-label"><TagIcon size={13} /> Transaction:</span>
                             <span className="detail-value">{safeRegistration.transactionId?.substring(0, 12)}...</span>
                           </div>
-                          <div className="detail-row">
-                            <span className="detail-label">📊 Status:</span>
-                            <span className="detail-value" style={{ color: status.color, fontWeight: 'bold' }}>{status.icon} {status.text}</span>
+                          <div className="detail-row flex justify-between items-center py-2">
+                            <span className="detail-label">Status:</span>
+                            <span className={`status-tag status-pill status-pill-sm ${status.className} inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold`}>
+                              <span className="status-icon-wrapper flex items-center justify-center">
+                                {status.className === 'status-confirmed' ? (
+                                  <span className="svg-mask-check-wrap" aria-hidden="true" style={{ width: '15px', height: '15px' }}>
+                                    <svg className="svg-mask-check" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                                      <polyline points="20 6 9 17 4 12"/>
+                                    </svg>
+                                  </span>
+                                ) : (
+                                  <span className="status-icon">{status.icon}</span>
+                                )}
+                              </span>
+                              <span className="status-text-gradient">{status.text}</span>
+                            </span>
                           </div>
                         </div>
                         {isWaitlisted && (
                           <div className="waitlist-message">
-                            <span className="waitlist-icon">📋</span>
+                            <span className="waitlist-icon"><FileTextIcon size={14} /></span>
                             You are on the waitlist. You will be notified if a spot opens up.
                           </div>
                         )}
@@ -702,17 +731,17 @@ const Dashboard = () => {
                           <button onClick={() => handleViewDetails(safeRegistration.event || { ...safeRegistration, _id: safeRegistration.event?._id || registration.eventId })} className="btn-view-details">View Details</button>
                           {safeRegistration.paymentStatus === 'verified' && (
                             <button className="btn-download" onClick={() => handleDownloadTicket(safeRegistration)}>
-                              <span className="btn-icon">📎</span> Download Ticket
+                              <span className="btn-icon"><DownloadIcon size={14} /></span> Download Ticket
                             </button>
                           )}
                           {safeRegistration.paymentStatus === 'pending' && safeRegistration.registrationStatus !== 'waitlist' && (
-                            <div className="pending-message"><span className="pending-icon">⏳</span><span>Awaiting Admin Approval</span></div>
+                            <div className="pending-message"><span className="pending-icon"><HourglassIcon size={14} /></span><span>Awaiting Admin Approval</span></div>
                           )}
                           {safeRegistration.paymentStatus === 'pending' && safeRegistration.registrationStatus === 'waitlist' && (
-                            <div className="pending-message waitlist"><span className="pending-icon">📋</span><span>On Waitlist - Waiting for spot</span></div>
+                            <div className="pending-message waitlist"><span className="pending-icon"><FileTextIcon size={14} /></span><span>On Waitlist - Waiting for spot</span></div>
                           )}
                           {safeRegistration.paymentStatus === 'rejected' && (
-                            <div className="rejected-message"><span className="rejected-icon">❌</span><span>Registration Rejected</span></div>
+                            <div className="rejected-message"><span className="rejected-icon"><XIcon size={14} /></span><span>Registration Rejected</span></div>
                           )}
                         </div>
                       </div>
@@ -721,7 +750,7 @@ const Dashboard = () => {
                 </div>
               ) : (
                 <div className="empty-state">
-                  <div className="empty-icon">📭</div>
+                  <div className="empty-icon"><FileTextIcon size={36} /></div>
                   <h3>No Registrations Yet</h3>
                   <p>You have not registered for any events yet.</p>
                   <button onClick={() => setActiveTab('allevents')} className="btn-browse">Browse Events</button>
@@ -735,7 +764,7 @@ const Dashboard = () => {
               <h2 className="section-title">All Events</h2>
               {!registrationsOpen && (
                 <div className="registration-closed-warning">
-                  <span className="warning-icon">🔒</span>
+                  <span className="warning-icon"><LockIcon size={16} /></span>
                   <span className="warning-text">Online registration is currently closed.</span>
                 </div>
               )}
@@ -785,26 +814,26 @@ const Dashboard = () => {
                         <h3 className="event-title-dashboard">{event.name}</h3>
                         {event.subEventName && (
                           <div className="event-subname-dashboard">
-                            <span className="subname-icon-dashboard">🏷️</span>
+                            <span className="subname-icon-dashboard"><TagIcon size={13} /></span>
                             <span className="subname-text-dashboard">{event.subEventName}</span>
                           </div>
                         )}
                         <p className="event-description-dashboard">{event.description?.substring(0, 100)}...</p>
                         <div className="event-details-dashboard">
                           <div className="detail-item-dashboard">
-                            <span className="icon-dashboard">🕐</span>
+                            <span className="icon-dashboard"><ClockIcon size={14} /></span>
                             <span>{event.startTime} - {event.endTime}</span>
                           </div>
                           <div className="detail-item-dashboard">
-                            <span className="icon-dashboard">📅</span>
+                            <span className="icon-dashboard"><CalendarIcon size={14} /></span>
                             <span>{symposiumDate}</span>
                           </div>
                           <div className="detail-item-dashboard">
-                            <span className="icon-dashboard">📍</span>
+                            <span className="icon-dashboard"><MapPinIcon size={14} /></span>
                             <span>{event.venue}</span>
                           </div>
                           <div className="detail-item-dashboard">
-                            <span className="icon-dashboard">👥</span>
+                            <span className="icon-dashboard"><UsersIcon size={14} /></span>
                             <span>
                               {event.type === 'Individual' 
                                 ? 'Individual' 
@@ -813,12 +842,12 @@ const Dashboard = () => {
                             </span>
                           </div>
                           <div className="detail-item-dashboard fee-dashboard">
-                            <span className="icon-dashboard">💰</span>
+                            <span className="icon-dashboard"><DollarIcon size={14} /></span>
                             <span>₹{event.fee} per head</span>
                           </div>
                           
                           <div className="detail-item-dashboard registration-progress-dashboard">
-                            <span className="icon-dashboard">📊</span>
+                            <span className="icon-dashboard"><BarChartIcon size={14} /></span>
                             <div className="progress-info-dashboard">
                               <div className="registration-summary-dashboard">
                                 <span className="registered-count-dashboard">
@@ -829,7 +858,7 @@ const Dashboard = () => {
                                     · <strong>{stats.pendingCount}</strong> on waitlist
                                   </span>
                                 )}
-                                <span className="fill-percentage-dashboard" style={{ marginLeft: 'auto', fontSize: '0.8rem', color: '#ffd700' }}>
+                                <span className="fill-percentage-dashboard" style={{ marginLeft: 'auto', fontSize: '0.8rem' }}>
                                   {fillPercentage}% Full
                                 </span>
                               </div>
@@ -855,7 +884,14 @@ const Dashboard = () => {
                         <div className="event-actions-dashboard">
                           <button onClick={() => handleViewDetails(event)} className="btn-view-details-dashboard">View Details</button>
                           {isRegistered ? (
-                            <button className="btn-registered-dashboard" disabled>Already Registered</button>
+                            <button className="btn-registered-dashboard inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl font-bold transition-all duration-300" disabled>
+                              <span className="svg-mask-check-wrap" aria-hidden="true" style={{ width: '15px', height: '15px' }}>
+                                <svg className="svg-mask-check" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                                  <polyline points="20 6 9 17 4 12"/>
+                                </svg>
+                              </span>
+                              <span className="status-text-gradient">Already Registered</span>
+                            </button>
                           ) : (
                             <button onClick={() => { if (!registrationsOpen) { alert('Online registration is currently closed.'); return; } navigate(`/payment/${event._id}`); }} className={`btn-register-now-dashboard ${isFull ? 'waitlist-btn-dashboard' : ''}`}>
                               {isFull ? 'Join Waitlist' : 'Register Now'}
@@ -868,7 +904,7 @@ const Dashboard = () => {
                 </div>
               ) : (
                 <div className="empty-state">
-                  <div className="empty-icon">📅</div>
+                  <div className="empty-icon"><CalendarIcon size={40} /></div>
                   <h3>No Events Available</h3>
                   <p>Check back later for new events.</p>
                 </div>
@@ -881,7 +917,7 @@ const Dashboard = () => {
               <h2 className="section-title">Profile Settings</h2>
               {profileUpdateStatus.show && (
                 <div className={`profile-update-message ${profileUpdateStatus.type}`}>
-                  <span className="message-icon">{profileUpdateStatus.type === 'success' ? '✅' : '❌'}</span>
+                  <span className="message-icon">{profileUpdateStatus.type === 'success' ? <CheckIcon size={16} /> : <XIcon size={16} />}</span>
                   <span>{profileUpdateStatus.message}</span>
                 </div>
               )}

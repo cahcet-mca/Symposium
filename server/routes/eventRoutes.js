@@ -12,7 +12,8 @@ const {
   getFeaturedEvents,
   debugEventCounts,
   syncEventCounts,
-  getEventWaitlistStatus
+  getEventWaitlistStatus,
+  getTotalParticipantsCount
 } = require('../controllers/eventController');
 const { protect, authorize } = require('../middleware/authMiddleware');
 const { adminAuth } = require('../middleware/adminMiddleware');
@@ -49,6 +50,13 @@ router.get('/category/:category', getEventsByCategory);
  * @access  Public
  */
 router.get('/debug/counts', debugEventCounts);
+
+/**
+ * @route   GET /api/events/stats/participants
+ * @desc    Get total confirmed participants count (for homepage)
+ * @access  Public
+ */
+router.get('/stats/participants', getTotalParticipantsCount);
 
 /**
  * @route   GET /api/events/:id

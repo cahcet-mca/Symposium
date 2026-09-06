@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import Loader from '../components/common/Loader';
+import { CheckIcon, XIcon, HourglassIcon } from '../components/common/Icons';
 import './VerifyTicket.css';
 
 const API_URL = import.meta.env.VITE_API_URL;
@@ -44,7 +45,7 @@ const VerifyTicket = () => {
     return (
       <div className="verify-page">
         <div className="verify-card error-card">
-          <div className="icon">❌</div>
+          <div className="icon" style={{ display: 'flex', justifyContent: 'center' }}><XIcon size={36} /></div>
           <h2>Verification Failed</h2>
           <p>{error}</p>
           <button className="btn-home" onClick={() => navigate('/')}>Return Home</button>
@@ -58,7 +59,7 @@ const VerifyTicket = () => {
       return (
         <div className="status-badge success">
           <div className="status-icon-wrap success">
-            <span className="status-check">✓</span>
+            <span className="status-check" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}><CheckIcon size={20} /></span>
           </div>
           <h3>VERIFIED TICKET</h3>
           <p>This ticket is valid and confirmed.</p>
@@ -68,7 +69,7 @@ const VerifyTicket = () => {
       return (
         <div className="status-badge pending">
           <div className="status-icon-wrap pending">
-            <span className="status-check">⏳</span>
+            <span className="status-check" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}><HourglassIcon size={20} /></span>
           </div>
           <h3>PENDING APPROVAL</h3>
           <p>This ticket has not been approved yet.</p>
@@ -78,7 +79,7 @@ const VerifyTicket = () => {
       return (
         <div className="status-badge rejected">
           <div className="status-icon-wrap rejected">
-            <span className="status-check">✕</span>
+            <span className="status-check" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}><XIcon size={20} /></span>
           </div>
           <h3>REJECTED</h3>
           <p>This ticket is invalid or cancelled.</p>

@@ -440,3 +440,54 @@
     transform: scale(1.1);
   }
 }
+
+/* ==========================================================================
+   LIGHT THEME OVERRIDES — Loader (White & Blue ONLY, No Gold/Black)
+   ========================================================================== */
+[data-theme="light"] .loader-container {
+  background: #f8fbff;
+}
+
+[data-theme="light"] .loader-circle {
+  border-top-color: #2563eb;
+  border-right-color: #3b82f6;
+  box-shadow: 0 0 20px rgba(37, 99, 235, 0.3);
+}
+
+[data-theme="light"] .loader-circle.mirror {
+  border-top-color: #3b82f6;
+  border-right-color: #2563eb;
+  box-shadow: 0 0 30px rgba(37, 99, 235, 0.2);
+}
+
+[data-theme="light"] .loader-circle::before {
+  background: radial-gradient(circle at 30% 30%, rgba(37, 99, 235, 0.15), transparent 70%);
+}
+
+[data-theme="light"] .loader-text {
+  color: #2563eb;
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-shadow: none;
+}
+
+[data-theme="light"] .spinner {
+  border-color: rgba(37, 99, 235, 0.2);
+  border-top-color: #2563eb;
+}
+
+[data-theme="light"] .spinner-small {
+  border-color: rgba(37, 99, 235, 0.2);
+  border-top-color: #2563eb;
+}
+
+[data-theme="light"] .spinner-large {
+  border-color: rgba(37, 99, 235, 0.2);
+  border-top-color: #2563eb;
+}
+
+[data-theme="light"] .gold-loader::before {
+  background: radial-gradient(circle at center, rgba(37, 99, 235, 0.1) 0%, transparent 70%);
+}

@@ -680,3 +680,155 @@
   transform: translateY(-2px);
   box-shadow: 0 8px 20px rgba(255, 165, 2, 0.5);
 }
+
+/* ==========================================================================
+   LIGHT THEME OVERRIDES — EventCard (White & Blue ONLY, No Gold/Black)
+   ========================================================================== */
+[data-theme="light"] .event-card {
+  background: #ffffff;
+  border: 1.5px solid #dbeafe;
+  box-shadow: 0 5px 20px rgba(37, 99, 235, 0.06);
+}
+
+[data-theme="light"] .event-card:hover {
+  box-shadow: 0 12px 30px rgba(37, 99, 235, 0.14);
+  border-color: #93c5fd;
+}
+
+[data-theme="light"] .event-card.technical {
+  border-top: 5px solid #2563eb;
+}
+
+[data-theme="light"] .event-card.non-technical {
+  border-top: 5px solid #3b82f6;
+}
+
+[data-theme="light"] .event-image-container {
+  border-bottom: 2px solid #dbeafe;
+}
+
+[data-theme="light"] .event-image-container.no-image {
+  background: linear-gradient(135deg, #eff6ff, #dbeafe);
+}
+
+[data-theme="light"] .event-badge {
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  color: #ffffff;
+}
+
+[data-theme="light"] .type-tag {
+  background: #eff6ff;
+  color: #2563eb;
+  border-color: #bfdbfe;
+}
+
+[data-theme="light"] .type-tag.individual {
+  background: #eff6ff;
+  color: #2563eb;
+  border-color: #2563eb;
+}
+
+[data-theme="light"] .type-tag.team {
+  background: #e0e7ff;
+  color: #1d4ed8;
+  border-color: #1d4ed8;
+}
+
+[data-theme="light"] .event-content h3 {
+  color: #0f172a;
+}
+
+[data-theme="light"] .event-card:hover .event-content h3 {
+  color: #2563eb;
+}
+
+[data-theme="light"] .event-subname {
+  background: #eff6ff;
+  border-color: #bfdbfe;
+}
+
+[data-theme="light"] .subname-icon {
+  color: #2563eb;
+}
+
+[data-theme="light"] .subname-text {
+  color: #64748b;
+}
+
+[data-theme="light"] .event-description {
+  color: #475569;
+}
+
+[data-theme="light"] .event-details {
+  background: #f8fbff;
+  border: 1px solid #f1f5f9;
+}
+
+[data-theme="light"] .detail-item {
+  color: #64748b;
+}
+
+[data-theme="light"] .detail-item.fee {
+  color: #2563eb;
+  font-weight: 700;
+}
+
+[data-theme="light"] .detail-item.coordinator {
+  border-top-color: rgba(37, 99, 235, 0.15);
+}
+
+[data-theme="light"] .coordinator-name {
+  color: #2563eb;
+}
+
+[data-theme="light"] .coordinator-name:hover::after {
+  background: #ffffff;
+  color: #2563eb;
+  border-color: #bfdbfe;
+}
+
+[data-theme="light"] .registered-count {
+  color: #0f172a;
+}
+
+[data-theme="light"] .registered-count strong {
+  color: #2563eb;
+}
+
+[data-theme="light"] .stats-bar {
+  background: rgba(37, 99, 235, 0.1);
+}
+
+[data-theme="light"] .loading-skeleton {
+  background: linear-gradient(90deg, #f0f7ff 25%, #dbeafe 50%, #f0f7ff 75%);
+}
+
+[data-theme="light"] .btn-details {
+  background: transparent;
+  border: 2px solid #2563eb;
+  color: #2563eb;
+}
+
+[data-theme="light"] .btn-details:hover {
+  background: #2563eb;
+  color: #ffffff;
+  box-shadow: 0 8px 20px rgba(37, 99, 235, 0.3);
+}
+
+[data-theme="light"] .btn-details::before {
+  background: #2563eb;
+}
+
+[data-theme="light"] .btn-register {
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  color: #ffffff;
+}
+
+[data-theme="light"] .btn-register:hover {
+  box-shadow: 0 8px 20px rgba(37, 99, 235, 0.4);
+}
+
+[data-theme="light"] .btn-register-closed {
+  background: #e2e8f0;
+  color: #94a3b8;
+}

@@ -1,4 +1,4 @@
-# robots.txt for TECNO RENDEZVOUS
+# robots.txt for TECHNO RENDEZVOUS
 # This file tells search engines which pages to crawl
 
 User-agent: *

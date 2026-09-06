@@ -2,6 +2,18 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSymposiumDate } from '../../context/DateContext';
 import { getEventImageUrl } from '../../services/api';
+import { 
+  ClockIcon, 
+  CalendarIcon, 
+  MapPinIcon, 
+  UsersIcon, 
+  DollarIcon, 
+  PhoneIcon, 
+  BarChartIcon, 
+  TagIcon, 
+  LockIcon, 
+  HourglassIcon 
+} from '../common/Icons';
 import axios from 'axios';
 import './EventCard.css';
 
@@ -165,7 +177,7 @@ const EventCard = ({ event, onViewDetails, registrationsOpen = true, style = {},
         
         {eventDetails.subEventName && (
           <div className="event-subname">
-            <span className="subname-icon">🏷️</span>
+            <span className="subname-icon"><TagIcon size={14} /></span>
             <span className="subname-text">{eventDetails.subEventName}</span>
           </div>
         )}
@@ -176,19 +188,19 @@ const EventCard = ({ event, onViewDetails, registrationsOpen = true, style = {},
         
         <div className="event-details">
           <div className="detail-item">
-            <span className="icon">🕐</span>
+            <span className="icon"><ClockIcon size={15} /></span>
             <span>{event.startTime} - {event.endTime}</span>
           </div>
           <div className="detail-item">
-            <span className="icon">📅</span>
+            <span className="icon"><CalendarIcon size={15} /></span>
             <span>{symposiumDate}</span>
           </div>
           <div className="detail-item">
-            <span className="icon">📍</span>
+            <span className="icon"><MapPinIcon size={15} /></span>
             <span>{event.venue}</span>
           </div>
           <div className="detail-item">
-            <span className="icon">👥</span>
+            <span className="icon"><UsersIcon size={15} /></span>
             <span>
               {event.type === 'Individual' 
                 ? 'Individual' 
@@ -197,13 +209,13 @@ const EventCard = ({ event, onViewDetails, registrationsOpen = true, style = {},
             </span>
           </div>
           <div className="detail-item fee">
-            <span className="icon">💰</span>
+            <span className="icon"><DollarIcon size={15} /></span>
             <span>₹{event.fee} per head</span>
           </div>
           
           {(eventDetails.coordinatorName || eventDetails.coordinatorPhone) && (
             <div className="detail-item coordinator">
-              <span className="icon">📞</span>
+              <span className="icon"><PhoneIcon size={15} /></span>
               <div className="coordinator-info">
                 {eventDetails.coordinatorName && (
                   <span className="coordinator-name">{eventDetails.coordinatorName}</span>
@@ -214,7 +226,7 @@ const EventCard = ({ event, onViewDetails, registrationsOpen = true, style = {},
                     className="coordinator-call-btn"
                     title={`Call ${eventDetails.coordinatorPhone}`}
                   >
-                    📞 {eventDetails.coordinatorPhone}
+                    <PhoneIcon size={13} /> {eventDetails.coordinatorPhone}
                   </button>
                 )}
               </div>
@@ -223,7 +235,7 @@ const EventCard = ({ event, onViewDetails, registrationsOpen = true, style = {},
           
           {/* REGISTRATION COUNT SECTION with FILL PERCENTAGE */}
           <div className="detail-item registration-count">
-            <span className="icon">📊</span>
+            <span className="icon"><BarChartIcon size={15} /></span>
             <div className="registration-stats">
               {loading ? (
                 <span>Loading...</span>
@@ -240,7 +252,7 @@ const EventCard = ({ event, onViewDetails, registrationsOpen = true, style = {},
                       </span>
                     )}
                     {/* Total occupancy percentage */}
-                    <span className="fill-percentage" style={{ marginLeft: 'auto', fontSize: '0.8rem', color: '#ffd700' }}>
+                    <span className="fill-percentage" style={{ marginLeft: 'auto', fontSize: '0.8rem', color: '#2563eb', fontWeight: 'bold' }}>
                       {fillPercentage}% Full
                     </span>
                   </div>
@@ -259,8 +271,8 @@ const EventCard = ({ event, onViewDetails, registrationsOpen = true, style = {},
                   {/* Second line: Spots available message (Capacity - Registered - Waitlist) */}
                   <div className="spots-message">
                     {availableSpots <= 0 ? (
-                      <span style={{ color: '#ffa502' }}>
-                        ⏳ Event Full - Join Waitlist
+                      <span style={{ color: '#ffa502', display: 'flex', alignItems: 'center', gap: '5px' }}>
+                        <HourglassIcon size={13} /> Event Full - Join Waitlist
                       </span>
                     ) : (
                       <span style={{ color: '#2ecc71' }}>
@@ -283,11 +295,11 @@ const EventCard = ({ event, onViewDetails, registrationsOpen = true, style = {},
           </button>
           {!registrationStatus ? (
             <button onClick={handleRegisterClick} className="btn-register-closed">
-              <span>🔒</span> Registration Closed
+              <LockIcon size={14} /> Registration Closed
             </button>
           ) : isFull ? (
             <button onClick={handleRegisterClick} className="btn-register waitlist-btn">
-              <span>⏳</span> Join Waitlist
+              <HourglassIcon size={14} /> Join Waitlist
             </button>
           ) : (
             <button onClick={handleRegisterClick} className="btn-register">

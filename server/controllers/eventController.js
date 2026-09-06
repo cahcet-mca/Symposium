@@ -656,6 +656,20 @@ const syncEventCounts = async (req, res) => {
   }
 };
 
+// @desc    Get total confirmed participants count (for homepage)
+// @route   GET /api/events/stats/participants
+// @access  Public
+const getTotalParticipantsCount = async (req, res) => {
+  try {
+    const totalParticipants = await Registration.countDocuments({
+      paymentStatus: 'verified'
+    });
+    res.json({ success: true, count: totalParticipants });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
 module.exports = {
   getEvents,
   getEventById,
@@ -668,5 +682,6 @@ module.exports = {
   getFeaturedEvents,
   debugEventCounts,
   syncEventCounts,
-  getEventWaitlistStatus
+  getEventWaitlistStatus,
+  getTotalParticipantsCount
 };

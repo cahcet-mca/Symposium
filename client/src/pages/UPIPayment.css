@@ -529,3 +529,178 @@
   transform: none;
   box-shadow: none;
 }
+
+/* ==========================================================================
+   LIGHT THEME OVERRIDES — UPIPayment (White & Blue ONLY, No Gold/Black)
+   ========================================================================== */
+[data-theme="light"] .payment-page {
+  background: #f8fbff;
+}
+
+[data-theme="light"] .payment-header h1 {
+  color: #0f172a;
+}
+
+[data-theme="light"] .event-summary {
+  background: #ffffff;
+  border: 1.5px solid #dbeafe;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
+}
+
+[data-theme="light"] .event-summary h2 {
+  color: #0f172a;
+}
+
+[data-theme="light"] .event-time-info {
+  color: #2563eb;
+}
+
+[data-theme="light"] .conflict-checking {
+  background: #f8fbff;
+  border: 1px solid #dbeafe;
+  color: #0f172a;
+}
+
+[data-theme="light"] .spinner-small {
+  border-color: #2563eb;
+  border-top-color: transparent;
+}
+
+[data-theme="light"] .btn-browse {
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  color: #ffffff;
+}
+
+[data-theme="light"] .form-section {
+  background: #ffffff;
+  border: 1.5px solid #dbeafe;
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.05);
+}
+
+[data-theme="light"] .form-section h3 {
+  color: #2563eb;
+  border-bottom: 2px solid #eff6ff;
+}
+
+[data-theme="light"] .form-section h4 {
+  color: #0f172a;
+}
+
+[data-theme="light"] .form-group label {
+  color: #334155;
+}
+
+[data-theme="light"] .form-input,
+[data-theme="light"] .form-select {
+  background: #f8fafc;
+  border: 1.5px solid #e2e8f0;
+  color: #0f172a;
+}
+
+[data-theme="light"] .form-input:focus,
+[data-theme="light"] .form-select:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+[data-theme="light"] .participant-card {
+  background: #f8fbff;
+  border: 1.5px solid #dbeafe;
+}
+
+[data-theme="light"] .participant-card h5 {
+  color: #2563eb;
+}
+
+[data-theme="light"] .amount-box {
+  background: #eff6ff;
+  border: 1.5px solid #bfdbfe;
+}
+
+[data-theme="light"] .amount-row {
+  color: #475569;
+}
+
+[data-theme="light"] .amount-row.total {
+  border-top: 2px solid #bfdbfe;
+  color: #0f172a;
+}
+
+[data-theme="light"] .total-amount {
+  color: #2563eb;
+}
+
+[data-theme="light"] .merchant-details p {
+  color: #64748b;
+}
+
+[data-theme="light"] .upi-id-box {
+  background: #eff6ff;
+  border: 1.5px solid #bfdbfe;
+}
+
+[data-theme="light"] .upi-id {
+  color: #2563eb;
+}
+
+[data-theme="light"] .copy-btn {
+  background: #ffffff;
+  border: 1px solid #2563eb;
+  color: #2563eb;
+}
+
+[data-theme="light"] .copy-btn:hover {
+  background: #2563eb;
+  color: #ffffff;
+}
+
+[data-theme="light"] .qr-container {
+  background: #ffffff;
+  border: 1.5px solid #dbeafe;
+}
+
+[data-theme="light"] .qr-container img {
+  border: 2px solid #2563eb;
+}
+
+[data-theme="light"] .payment-steps {
+  background: #f8fbff;
+  border: 1.5px solid #dbeafe;
+}
+
+[data-theme="light"] .payment-steps h4 {
+  color: #2563eb;
+}
+
+[data-theme="light"] .payment-steps ol {
+  color: #475569;
+}
+
+[data-theme="light"] .file-input {
+  background: #f8fafc;
+  border: 2px dashed #bfdbfe;
+  color: #475569;
+}
+
+[data-theme="light"] .screenshot-preview img {
+  border: 2px solid #2563eb;
+}
+
+[data-theme="light"] .btn-submit {
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  color: #ffffff;
+}
+
+[data-theme="light"] .btn-submit:hover:not(:disabled) {
+  box-shadow: 0 10px 30px rgba(37, 99, 235, 0.35);
+}
+
+[data-theme="light"] .btn-back {
+  border: 2px solid #dbeafe;
+  color: #64748b;
+}
+
+[data-theme="light"] .btn-back:hover {
+  border-color: #2563eb;
+  color: #2563eb;
+}

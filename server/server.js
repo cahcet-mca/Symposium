@@ -279,7 +279,7 @@ app.use('/api/registrations/check-conflict', checkRegistrationsOpen);
 // Root endpoint
 app.get('/', (req, res) => {
   res.json({
-    message: '🎯 TECNO RENDEZVOUS API is running',
+    message: '🎯 TECHNO RENDEZVOUS API is running',
     status: 'online',
     version: '2.0.0',
     timestamp: new Date().toISOString(),
@@ -410,7 +410,7 @@ const PORT = process.env.PORT || 5000;
 // Listen on all network interfaces
 const server = app.listen(PORT, '0.0.0.0', () => {
   console.log(`\n${'='.repeat(60)}`.green);
-  console.log(`🚀 TECNO RENDEZVOUS BACKEND SERVER`.green.bold);
+  console.log(`🚀 TECHNO RENDEZVOUS BACKEND SERVER`.green.bold);
   console.log(`${'='.repeat(60)}`.green);
   console.log(`📡 Port: ${PORT}`.cyan);
   console.log(`🌍 Environment: ${process.env.NODE_ENV || 'development'}`.cyan);
