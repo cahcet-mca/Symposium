@@ -1,0 +1,9 @@
+# robots.txt for TECHNO RENDEZVOUS - Admin Panel
+# https://symposium-admin.onrender.com
+
+User-agent: *
+Allow: /
+Allow: /admin/login
+
+# Sitemap URL
+Sitemap: https://symposium-admin.onrender.com/sitemap.xml
