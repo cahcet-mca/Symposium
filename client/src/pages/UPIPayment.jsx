@@ -240,8 +240,9 @@ const UPIPayment = () => {
   const handleScreenshotChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      if (file.size > 5 * 1024 * 1024) {
-        setError('File size too large. Please upload image less than 5MB.');
+      if (file.size > 500 * 1024) {
+        setError('File size too large. Please upload image less than 500KB.');
+        e.target.value = '';
         return;
       }
 
@@ -754,7 +755,8 @@ const UPIPayment = () => {
                   <li>Scan QR code or copy UPI ID</li>
                   <li>Pay ₹{totalAmount} from your UPI app</li>
                   <li>Copy the 12-digit transaction ID from your app</li>
-                  <li>Enter the 12-digit transaction ID below and upload screenshot</li>
+                  <li>Enter the 12-digit transaction ID below</li>
+                  <li>Upload Payment screenshot which shows amount and transaction ID</li>
                 </ol>
               </div>
 
@@ -793,7 +795,7 @@ const UPIPayment = () => {
                     <img src={formData.screenshotPreview} alt="Payment screenshot" />
                   </div>
                 )}
-                <small className="field-note">Upload screenshot showing successful payment (max 5MB)</small>
+                <small className="field-note">Upload screenshot showing amount & transaction ID (max 500KB, image only)</small>
               </div>
 
               {error && (
