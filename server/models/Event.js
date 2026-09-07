@@ -40,6 +40,11 @@ const eventSchema = new mongoose.Schema({
     required: [true, 'Please add registration fee'],
     min: [0, 'Fee cannot be negative']
   },
+  feeType: {
+    type: String,
+    enum: ['per_head', 'per_team'],
+    default: 'per_head'
+  },
   minTeamSize: {
     type: Number,
     default: 1,

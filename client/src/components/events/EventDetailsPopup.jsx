@@ -389,7 +389,9 @@ const EventDetailsPopup = ({ event, onClose, registrationsOpen = true }) => {
               </div>
               <div className="info-item">
                 <span className="info-label">Registration Fee:</span>
-                <span className="info-value fee">₹{eventDetails.fee} per person</span>
+                <span className="info-value fee">
+                  ₹{eventDetails.fee} {eventDetails.feeType === 'per_team' ? 'per team' : 'per person'}
+                </span>
               </div>
             </div>
           </div>

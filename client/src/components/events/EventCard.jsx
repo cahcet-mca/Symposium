@@ -210,7 +210,7 @@ const EventCard = ({ event, onViewDetails, registrationsOpen = true, style = {},
           </div>
           <div className="detail-item fee">
             <span className="icon"><DollarIcon size={15} /></span>
-            <span>₹{event.fee} per head</span>
+            <span>₹{event.fee} {event.feeType === 'per_team' ? 'per team' : 'per head'}</span>
           </div>
           
           {(eventDetails.coordinatorName || eventDetails.coordinatorPhone) && (
