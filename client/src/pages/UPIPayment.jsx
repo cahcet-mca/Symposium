@@ -345,7 +345,9 @@ const UPIPayment = () => {
         return;
       }
 
-      const totalAmount = event.fee * formData.teamSize;
+      const totalAmount = event?.feeType === 'per_team' 
+        ? (event.fee || 0) 
+        : (event.fee || 0) * (formData.teamSize || 1);
 
       console.log('📡 Submitting payment verification for event:', event._id);
 
@@ -427,7 +429,9 @@ const UPIPayment = () => {
     }
   };
 
-  const totalAmount = event && event.fee ? event.fee * formData.teamSize : 0;
+  const totalAmount = event && event.fee 
+    ? (event.feeType === 'per_team' ? event.fee : event.fee * (formData.teamSize || 1))
+    : 0;
 
   // ✅ Event Full Message State
   if (eventFullMessage) {
@@ -697,7 +701,12 @@ const UPIPayment = () => {
               <div className="amount-box">
                 <div className="amount-row">
                   <span>Registration Fee:</span>
-                  <span>₹{event.fee} × {formData.teamSize}</span>
+                  <span>
+                    {event.feeType === 'per_team'
+                      ? `₹${event.fee} (Flat Team Fee)`
+                      : `₹${event.fee} × ${formData.teamSize || 1}`
+                    }
+                  </span>
                 </div>
                 <div className="amount-row total">
                   <span>Total Amount:</span>

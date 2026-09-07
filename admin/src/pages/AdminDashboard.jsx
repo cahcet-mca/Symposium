@@ -83,6 +83,7 @@ const AdminDashboard = () => {
     type: 'Individual',
     description: '',
     fee: 50,
+    feeType: 'per_head',
     minTeamSize: 1,
     maxTeamSize: 1,
     startTime: '10:00 AM',
@@ -102,6 +103,11 @@ const AdminDashboard = () => {
   const [creatingEvent, setCreatingEvent] = useState(false);
   const [tempRequirement, setTempRequirement] = useState('');
   const [tempRule, setTempRule] = useState('');
+  // For inline editing of list items
+  const [editingReqIdx, setEditingReqIdx] = useState(null);
+  const [editingReqVal, setEditingReqVal] = useState('');
+  const [editingRuleIdx, setEditingRuleIdx] = useState(null);
+  const [editingRuleVal, setEditingRuleVal] = useState('');
 
   const addRequirement = () => {
     if (tempRequirement.trim()) {
@@ -118,6 +124,29 @@ const AdminDashboard = () => {
       ...prev,
       requirements: (prev.requirements || []).filter((_, i) => i !== index)
     }));
+    if (editingReqIdx === index) { setEditingReqIdx(null); setEditingReqVal(''); }
+  };
+
+  const moveRequirement = (index, dir) => {
+    setNewEvent(prev => {
+      const reqs = [...(prev.requirements || [])];
+      const target = index + dir;
+      if (target < 0 || target >= reqs.length) return prev;
+      [reqs[index], reqs[target]] = [reqs[target], reqs[index]];
+      return { ...prev, requirements: reqs };
+    });
+  };
+
+  const saveEditRequirement = (index) => {
+    if (editingReqVal.trim()) {
+      setNewEvent(prev => {
+        const reqs = [...(prev.requirements || [])];
+        reqs[index] = editingReqVal.trim();
+        return { ...prev, requirements: reqs };
+      });
+    }
+    setEditingReqIdx(null);
+    setEditingReqVal('');
   };
 
   const addRule = () => {
@@ -135,6 +164,29 @@ const AdminDashboard = () => {
       ...prev,
       rules: (prev.rules || []).filter((_, i) => i !== index)
     }));
+    if (editingRuleIdx === index) { setEditingRuleIdx(null); setEditingRuleVal(''); }
+  };
+
+  const moveRule = (index, dir) => {
+    setNewEvent(prev => {
+      const rules = [...(prev.rules || [])];
+      const target = index + dir;
+      if (target < 0 || target >= rules.length) return prev;
+      [rules[index], rules[target]] = [rules[target], rules[index]];
+      return { ...prev, rules };
+    });
+  };
+
+  const saveEditRule = (index) => {
+    if (editingRuleVal.trim()) {
+      setNewEvent(prev => {
+        const rules = [...(prev.rules || [])];
+        rules[index] = editingRuleVal.trim();
+        return { ...prev, rules };
+      });
+    }
+    setEditingRuleIdx(null);
+    setEditingRuleVal('');
   };
   
   // Event Management states
@@ -506,6 +558,7 @@ const AdminDashboard = () => {
       type: 'Individual',
       description: '',
       fee: 50,
+      feeType: 'per_head',
       minTeamSize: 1,
       maxTeamSize: 1,
       startTime: '10:00 AM',
@@ -524,6 +577,8 @@ const AdminDashboard = () => {
     });
     setTempRequirement('');
     setTempRule('');
+    setEditingReqIdx(null);
+    setEditingRuleIdx(null);
     setShowEventModal(true);
   };
 
@@ -538,6 +593,7 @@ const AdminDashboard = () => {
       type: event.type || 'Individual',
       description: event.description || '',
       fee: event.fee || 0,
+      feeType: event.feeType || 'per_head',
       minTeamSize: event.minTeamSize || 1,
       maxTeamSize: event.maxTeamSize || 1,
       startTime: event.startTime || '10:00 AM',
@@ -556,6 +612,8 @@ const AdminDashboard = () => {
     });
     setTempRequirement('');
     setTempRule('');
+    setEditingReqIdx(null);
+    setEditingRuleIdx(null);
     setShowEventModal(true);
   };
 
@@ -1505,7 +1563,7 @@ const AdminDashboard = () => {
                                   </span>
                                 </td>
                                 <td>{event.type}</td>
-                                <td>₹{event.fee}</td>
+                                <td>₹{event.fee} {event.feeType === 'per_team' ? '(Team)' : '(Per Head)'}</td>
                                 <td>
                                   <div style={{ display: 'flex', flexDirection: 'column' }}>
                                     <span>{event.coordinatorName}</span>
@@ -1541,6 +1599,76 @@ const AdminDashboard = () => {
                           )}
                         </tbody>
                       </table>
+                    </div>
+
+                    {/* Mobile Cards for Manage Events */}
+                    <div className="mobile-cards-view">
+                      {loadingEvents ? (
+                        <div className="no-data">Loading events...</div>
+                      ) : events.length > 0 ? (
+                        events.map(event => (
+                          <div key={event._id} className="registration-mobile-card event-mobile-card">
+                            <div className="mobile-card-header">
+                              <span className="mobile-event-name">{event.name}</span>
+                              <span className={`mobile-status-badge ${event.category === 'Technical' ? 'accepted' : 'pending'}`}>
+                                {event.category}
+                              </span>
+                            </div>
+                            <div className="mobile-card-body">
+                              {event.subEventName && (
+                                <div className="mobile-info-row">
+                                  <span className="mobile-info-label">Sub Event:</span>
+                                  <span className="mobile-info-value">{event.subEventName}</span>
+                                </div>
+                              )}
+                              <div className="mobile-info-row">
+                                <span className="mobile-info-label">Type:</span>
+                                <span className="mobile-info-value">{event.type}</span>
+                              </div>
+                              <div className="mobile-info-row">
+                                <span className="mobile-info-label">Fee:</span>
+                                <span className="mobile-info-value" style={{ color: '#2563eb', fontWeight: 'bold' }}>
+                                  ₹{event.fee} {event.feeType === 'per_team' ? '(Team Fee)' : '(Per Head)'}
+                                </span>
+                              </div>
+                              <div className="mobile-info-row">
+                                <span className="mobile-info-label">Coordinator:</span>
+                                <div className="mobile-info-value">
+                                  <div><strong>{event.coordinatorName || 'TBA'}</strong></div>
+                                  {event.coordinatorPhone && (
+                                    <div style={{ color: '#2563eb', fontSize: '0.85rem' }}>{event.coordinatorPhone}</div>
+                                  )}
+                                </div>
+                              </div>
+                              <div className="mobile-info-row">
+                                <span className="mobile-info-label">Capacity:</span>
+                                <span className="mobile-info-value">
+                                  {(event.confirmedCount || 0) + (event.pendingCount || 0)} / {event.maxParticipants}
+                                </span>
+                              </div>
+                              <div className="mobile-card-actions" style={{ display: 'flex', gap: '10px', marginTop: '10px' }}>
+                                <button
+                                  onClick={() => openEditEventModal(event)}
+                                  className="btn-save-settings"
+                                  style={{ flex: 1, padding: '8px 12px', fontSize: '0.88rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}
+                                >
+                                  <EditIcon size={14} /> Edit Event
+                                </button>
+                                <button
+                                  onClick={() => handleDeleteEvent(event._id)}
+                                  className="btn-reject"
+                                  style={{ padding: '8px 14px', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                                  title="Delete Event"
+                                >
+                                  <TrashIcon size={14} />
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                        ))
+                      ) : (
+                        <div className="no-data">No events found</div>
+                      )}
                     </div>
                   </div>
                 ) : activeTab === 'settings' ? (
@@ -2111,17 +2239,47 @@ const AdminDashboard = () => {
                     />
                   </div>
 
-                  <div className="form-group">
-                    <label htmlFor="eventFee">Registration Fee (₹) *</label>
-                    <input
-                      type="number"
-                      id="eventFee"
-                      value={newEvent.fee}
-                      onChange={(e) => setNewEvent({ ...newEvent, fee: Number(e.target.value) })}
-                      min="0"
-                      className="settings-input"
-                      required
-                    />
+                  <div className="form-group full-width">
+                    <label>Registration Fee *</label>
+                    <div className="fee-type-row">
+                      <div className="fee-type-options">
+                        <label className={`fee-type-option ${newEvent.feeType === 'per_head' ? 'selected' : ''}`}>
+                          <input
+                            type="radio"
+                            name="feeType"
+                            value="per_head"
+                            checked={newEvent.feeType === 'per_head'}
+                            onChange={(e) => setNewEvent({ ...newEvent, feeType: e.target.value })}
+                          />
+                          <span className="fee-type-label">Per Head</span>
+                        </label>
+                        <label className={`fee-type-option ${newEvent.feeType === 'per_team' ? 'selected' : ''}`}>
+                          <input
+                            type="radio"
+                            name="feeType"
+                            value="per_team"
+                            checked={newEvent.feeType === 'per_team'}
+                            onChange={(e) => setNewEvent({ ...newEvent, feeType: e.target.value })}
+                          />
+                          <span className="fee-type-label">Per Team</span>
+                        </label>
+                      </div>
+                      <div className="fee-amount-input">
+                        <label htmlFor="eventFee">
+                          {newEvent.feeType === 'per_team' ? 'Team Amount (₹) *' : 'Per Head Amount (₹) *'}
+                        </label>
+                        <input
+                          type="number"
+                          id="eventFee"
+                          value={newEvent.fee}
+                          onChange={(e) => setNewEvent({ ...newEvent, fee: Number(e.target.value) })}
+                          min="0"
+                          className="settings-input"
+                          required
+                          placeholder="e.g. 100"
+                        />
+                      </div>
+                    </div>
                   </div>
 
                   <div className="form-group">
@@ -2248,36 +2406,45 @@ const AdminDashboard = () => {
 
                   <div className="form-group full-width">
                     <label>Requirements</label>
-                    <div style={{ display: 'flex', gap: '10px', marginBottom: '10px' }}>
+                    <div className="list-add-row">
                       <input
                         type="text"
                         value={tempRequirement}
                         onChange={(e) => setTempRequirement(e.target.value)}
+                        onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), addRequirement())}
                         placeholder="Add requirement (e.g. Research Paper (4-6 pages))"
                         className="settings-input"
-                        style={{ flex: 1 }}
                       />
-                      <button 
-                        type="button" 
-                        onClick={addRequirement}
-                        className="btn-close"
-                        style={{ padding: '0 20px', whiteSpace: 'nowrap' }}
-                      >
-                        Add
-                      </button>
+                      <button type="button" onClick={addRequirement} className="btn-list-add">+ Add</button>
                     </div>
                     {newEvent.requirements && newEvent.requirements.length > 0 && (
-                      <div className="mobile-participants" style={{ background: 'rgba(255, 215, 0, 0.05)', padding: '10px', borderRadius: '8px' }}>
+                      <div className="list-items-container">
                         {newEvent.requirements.map((req, idx) => (
-                          <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '5px 0', borderBottom: '1px solid rgba(255,215,0,0.1)' }}>
-                            <span style={{ color: '#ffffff', fontSize: '0.85rem' }}>• {req}</span>
-                            <button 
-                              type="button" 
-                              onClick={() => removeRequirement(idx)}
-                              style={{ background: 'transparent', border: 'none', color: '#ff4757', cursor: 'pointer', fontSize: '1rem', marginLeft: 'auto' }}
-                            >
-                              ✕
-                            </button>
+                          <div key={idx} className="list-item">
+                            {editingReqIdx === idx ? (
+                              <>
+                                <input
+                                  type="text"
+                                  value={editingReqVal}
+                                  onChange={(e) => setEditingReqVal(e.target.value)}
+                                  onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), saveEditRequirement(idx))}
+                                  className="settings-input list-item-edit-input"
+                                  autoFocus
+                                />
+                                <button type="button" onClick={() => saveEditRequirement(idx)} className="list-btn list-btn-save" title="Save">✓</button>
+                                <button type="button" onClick={() => { setEditingReqIdx(null); setEditingReqVal(''); }} className="list-btn list-btn-cancel" title="Cancel">✕</button>
+                              </>
+                            ) : (
+                              <>
+                                <span className="list-item-text">• {req}</span>
+                                <div className="list-item-actions">
+                                  <button type="button" onClick={() => moveRequirement(idx, -1)} className="list-btn list-btn-move" title="Move Up" disabled={idx === 0}>↑</button>
+                                  <button type="button" onClick={() => moveRequirement(idx, 1)} className="list-btn list-btn-move" title="Move Down" disabled={idx === newEvent.requirements.length - 1}>↓</button>
+                                  <button type="button" onClick={() => { setEditingReqIdx(idx); setEditingReqVal(req); }} className="list-btn list-btn-edit" title="Edit">✎</button>
+                                  <button type="button" onClick={() => removeRequirement(idx)} className="list-btn list-btn-delete" title="Delete">✕</button>
+                                </div>
+                              </>
+                            )}
                           </div>
                         ))}
                       </div>
@@ -2286,36 +2453,45 @@ const AdminDashboard = () => {
 
                   <div className="form-group full-width">
                     <label>Rules & Guidelines</label>
-                    <div style={{ display: 'flex', gap: '10px', marginBottom: '10px' }}>
+                    <div className="list-add-row">
                       <input
                         type="text"
                         value={tempRule}
                         onChange={(e) => setTempRule(e.target.value)}
+                        onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), addRule())}
                         placeholder="Add rule (e.g. Maximum 10 minutes presentation time)"
                         className="settings-input"
-                        style={{ flex: 1 }}
                       />
-                      <button 
-                        type="button" 
-                        onClick={addRule}
-                        className="btn-close"
-                        style={{ padding: '0 20px', whiteSpace: 'nowrap' }}
-                      >
-                        Add
-                      </button>
+                      <button type="button" onClick={addRule} className="btn-list-add">+ Add</button>
                     </div>
                     {newEvent.rules && newEvent.rules.length > 0 && (
-                      <div className="mobile-participants" style={{ background: 'rgba(255, 215, 0, 0.05)', padding: '10px', borderRadius: '8px' }}>
+                      <div className="list-items-container">
                         {newEvent.rules.map((rule, idx) => (
-                          <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '5px 0', borderBottom: '1px solid rgba(255,215,0,0.1)' }}>
-                            <span style={{ color: '#ffffff', fontSize: '0.85rem' }}>• {rule}</span>
-                            <button 
-                              type="button" 
-                              onClick={() => removeRule(idx)}
-                              style={{ background: 'transparent', border: 'none', color: '#ff4757', cursor: 'pointer', fontSize: '1rem', marginLeft: 'auto' }}
-                            >
-                              ✕
-                            </button>
+                          <div key={idx} className="list-item">
+                            {editingRuleIdx === idx ? (
+                              <>
+                                <input
+                                  type="text"
+                                  value={editingRuleVal}
+                                  onChange={(e) => setEditingRuleVal(e.target.value)}
+                                  onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), saveEditRule(idx))}
+                                  className="settings-input list-item-edit-input"
+                                  autoFocus
+                                />
+                                <button type="button" onClick={() => saveEditRule(idx)} className="list-btn list-btn-save" title="Save">✓</button>
+                                <button type="button" onClick={() => { setEditingRuleIdx(null); setEditingRuleVal(''); }} className="list-btn list-btn-cancel" title="Cancel">✕</button>
+                              </>
+                            ) : (
+                              <>
+                                <span className="list-item-text">• {rule}</span>
+                                <div className="list-item-actions">
+                                  <button type="button" onClick={() => moveRule(idx, -1)} className="list-btn list-btn-move" title="Move Up" disabled={idx === 0}>↑</button>
+                                  <button type="button" onClick={() => moveRule(idx, 1)} className="list-btn list-btn-move" title="Move Down" disabled={idx === newEvent.rules.length - 1}>↓</button>
+                                  <button type="button" onClick={() => { setEditingRuleIdx(idx); setEditingRuleVal(rule); }} className="list-btn list-btn-edit" title="Edit">✎</button>
+                                  <button type="button" onClick={() => removeRule(idx)} className="list-btn list-btn-delete" title="Delete">✕</button>
+                                </div>
+                              </>
+                            )}
                           </div>
                         ))}
                       </div>

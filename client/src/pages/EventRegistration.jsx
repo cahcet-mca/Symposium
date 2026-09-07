@@ -169,7 +169,7 @@ const EventRegistration = () => {
     );
   }
 
-  const totalAmount = event.fee * teamSize;
+  const totalAmount = event?.feeType === 'per_team' ? event.fee : (event.fee * teamSize);
 
   return (
     <div className="register-page">
@@ -183,7 +183,9 @@ const EventRegistration = () => {
             </span>
             <div className="fee-summary">
               <span className="fee-label">Registration Fee:</span>
-              <span className="fee-amount">₹{event.fee} per person</span>
+              <span className="fee-amount">
+                {event.feeType === 'per_team' ? `₹${event.fee} per team` : `₹${event.fee} per person`}
+              </span>
             </div>
           </div>
         </div>
@@ -274,7 +276,12 @@ const EventRegistration = () => {
             <h4>Payment Summary</h4>
             <div className="summary-row">
               <span>Registration Fee:</span>
-              <span>£{event.fee} × {teamSize} {teamSize === 1 ? 'person' : 'persons'}</span>
+              <span>
+                {event.feeType === 'per_team'
+                  ? `₹${event.fee} (Flat Team Fee)`
+                  : `₹${event.fee} × ${teamSize} ${teamSize === 1 ? 'person' : 'persons'}`
+                }
+              </span>
             </div>
             <div className="summary-row total">
               <span>Total Amount:</span>
