@@ -51,6 +51,33 @@ const verifyPayment = async (req, res) => {
       });
     }
 
+    // Validate participants
+    if (participants && Array.isArray(participants)) {
+      for (let i = 0; i < participants.length; i++) {
+        const p = participants[i];
+        if (!p || !p.name || !p.name.trim()) {
+          return res.status(400).json({
+            success: false,
+            message: `Name is required for participant ${i + 1}`
+          });
+        }
+        if (i === 0) {
+          if (!p.email || !p.email.trim() || !p.email.includes('@')) {
+            return res.status(400).json({
+              success: false,
+              message: 'Valid email is required for participant 1 (Team Lead)'
+            });
+          }
+        }
+        if (!p.phone || !p.phone.trim() || p.phone.trim().length !== 10) {
+          return res.status(400).json({
+            success: false,
+            message: `Valid 10-digit mobile number is required for participant ${i + 1}`
+          });
+        }
+      }
+    }
+
     // STEP 2: Find the event in database
     let event;
     try {

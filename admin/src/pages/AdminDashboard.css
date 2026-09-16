@@ -567,7 +567,7 @@
 }
 
 .registrations-table tr:hover td {
-  background: rgba(255, 215, 0, 0.05);
+  background: rgba(255, 215, 0, 0.1);
 }
 
 /* Transaction ID */
@@ -830,11 +830,12 @@
 
 /* Participant Name Cell */
 .participant-name-cell {
-  font-weight: 600;
-  color: #ffffff;
+  font-weight: 700;
+  color: #ffffff !important;
   min-width: 180px;
   position: relative;
   font-size: 0.9rem;
+  letter-spacing: 0.02em;
 }
 
 .lead-indicator {
@@ -855,20 +856,21 @@
 
 /* Participant Mobile Cell */
 .participant-mobile-cell {
-  color: #2ecc71;
+  color: #2ecc71 !important;
   font-family: monospace;
-  font-size: 0.9rem;
-  font-weight: 600;
-  min-width: 120px;
+  font-size: 0.88rem;
+  font-weight: 700;
+  min-width: 130px;
+  letter-spacing: 0.02em;
 }
 
 /* Participant Event Cell */
 .participant-event-cell {
-  min-width: 220px;
+  min-width: 200px;
 }
 
 .participant-event-cell .event-main {
-  color: #ffffff;
+  color: #ffd700 !important;
   font-weight: 700;
   font-size: 0.9rem;
   display: block;
@@ -876,7 +878,7 @@
 }
 
 .participant-event-cell .event-sub {
-  color: #ffd700;
+  color: #ffd700 !important;
   font-size: 0.8rem;
   display: block;
   margin-top: 2px;
@@ -884,7 +886,7 @@
 }
 
 .participant-event-cell .event-team {
-  color: #b0b0b0;
+  color: #b0b0b0 !important;
   font-size: 0.75rem;
   display: block;
   margin-top: 2px;
@@ -892,18 +894,18 @@
 
 /* Participant College Cell */
 .participant-college-cell {
-  color: #ffffff;
+  color: #a78bfa !important;
   font-size: 0.9rem;
   min-width: 180px;
   white-space: normal;
   word-wrap: break-word;
   line-height: 1.3;
-  font-weight: 500;
+  font-weight: 600;
 }
 
 /* Participant Year Cell */
 .participant-year-cell {
-  color: #ffd700;
+  color: #2ecc71 !important;
   font-size: 0.9rem;
   font-weight: 700;
   min-width: 90px;
@@ -2782,4 +2784,442 @@
   .fee-type-options {
     grid-template-columns: 1fr;
   }
-}
+}
+
+/* ============================================
+   LIGHT THEME OVERRIDES
+   ============================================ */
+
+/* Root background */
+[data-theme="light"] .admin-dashboard {
+  background: linear-gradient(160deg, #f0f4ff 0%, #e8eeff 50%, #f5f7ff 100%);
+  color: #1e293b;
+}
+
+/* Navbar */
+[data-theme="light"] .navbar {
+  background: rgba(255, 255, 255, 0.92);
+  border-bottom: 1px solid rgba(37, 99, 235, 0.15);
+  box-shadow: 0 4px 20px rgba(37, 99, 235, 0.08);
+}
+
+/* Sidebar */
+[data-theme="light"] .admin-sidebar {
+  background: rgba(255, 255, 255, 0.95);
+  border-right: 1px solid rgba(37, 99, 235, 0.12);
+  box-shadow: 4px 0 20px rgba(37, 99, 235, 0.06);
+}
+
+[data-theme="light"] .sidebar-brand h2 {
+  color: #1e40af;
+}
+
+[data-theme="light"] .sidebar-brand p {
+  color: #3b82f6;
+}
+
+[data-theme="light"] .sidebar-nav-item {
+  color: #374151;
+}
+
+[data-theme="light"] .sidebar-nav-item:hover {
+  background: rgba(37, 99, 235, 0.08);
+  color: #1d4ed8;
+}
+
+[data-theme="light"] .sidebar-nav-item.active {
+  background: linear-gradient(135deg, rgba(37, 99, 235, 0.15), rgba(139, 92, 246, 0.1));
+  color: #1d4ed8;
+  border-right: 3px solid #2563eb;
+}
+
+[data-theme="light"] .sidebar-nav-item .nav-icon {
+  color: #2563eb;
+}
+
+[data-theme="light"] .sidebar-badge {
+  background: #2563eb;
+  color: #fff;
+}
+
+[data-theme="light"] .admin-sidebar::-webkit-scrollbar-track {
+  background: #f1f5f9;
+}
+
+[data-theme="light"] .admin-sidebar::-webkit-scrollbar-thumb {
+  background: #93c5fd;
+}
+
+/* Main area */
+[data-theme="light"] .admin-main::-webkit-scrollbar-track {
+  background: #f1f5f9;
+}
+
+[data-theme="light"] .admin-main::-webkit-scrollbar-thumb {
+  background: #93c5fd;
+}
+
+/* Stats grid */
+[data-theme="light"] .stats-grid {
+  background: transparent;
+}
+
+[data-theme="light"] .stat-card {
+  background: linear-gradient(145deg, #ffffff, #f0f6ff);
+  border: 1px solid rgba(37, 99, 235, 0.15);
+  box-shadow: 0 4px 15px rgba(37, 99, 235, 0.08);
+}
+
+[data-theme="light"] .stat-card:hover {
+  border-color: rgba(37, 99, 235, 0.35);
+  box-shadow: 0 8px 24px rgba(37, 99, 235, 0.14);
+}
+
+[data-theme="light"] .stat-icon {
+  background: rgba(37, 99, 235, 0.1);
+  color: #2563eb;
+}
+
+[data-theme="light"] .stat-info h3 {
+  color: #1e293b;
+}
+
+[data-theme="light"] .stat-info p {
+  color: #475569;
+}
+
+[data-theme="light"] .revenue-card {
+  background: linear-gradient(145deg, #f0fdf4, #dcfce7);
+  border-color: rgba(22, 163, 74, 0.2);
+}
+
+[data-theme="light"] .revenue-card .stat-info h3 {
+  color: #16a34a;
+}
+
+/* Registrations section */
+[data-theme="light"] .registrations-section {
+  background: linear-gradient(145deg, #ffffff, #f8faff);
+  border: 1px solid rgba(37, 99, 235, 0.15);
+  box-shadow: 0 5px 20px rgba(37, 99, 235, 0.08);
+}
+
+[data-theme="light"] .section-header {
+  border-bottom: 2px solid rgba(37, 99, 235, 0.15);
+}
+
+[data-theme="light"] .section-header h2 {
+  color: #1d4ed8;
+}
+
+[data-theme="light"] .live-status-indicator {
+  background: rgba(37, 99, 235, 0.08);
+  border-color: rgba(37, 99, 235, 0.25);
+  color: #1d4ed8;
+}
+
+/* Table */
+[data-theme="light"] .table-container {
+  border: 1px solid rgba(37, 99, 235, 0.12);
+}
+
+[data-theme="light"] .table-container::-webkit-scrollbar-thumb {
+  background: #93c5fd;
+}
+
+[data-theme="light"] .registrations-table th {
+  color: #1d4ed8;
+  background: rgba(219, 234, 254, 0.5);
+  border-bottom: 2px solid rgba(37, 99, 235, 0.2);
+}
+
+[data-theme="light"] .registrations-table td {
+  color: #1e293b !important;
+  border-bottom: 1px solid rgba(37, 99, 235, 0.08);
+}
+
+[data-theme="light"] .registrations-table tr:hover td {
+  background: rgba(99, 102, 241, 0.1);
+}
+
+/* Participant cells — light theme (override !important base) */
+[data-theme="light"] .participant-name-cell {
+  color: #0f172a !important;
+}
+
+[data-theme="light"] .participant-mobile-cell {
+  color: #059669 !important;
+}
+
+[data-theme="light"] .participant-event-cell .event-main {
+  color: #1d4ed8 !important;
+}
+
+[data-theme="light"] .participant-event-cell .event-sub {
+  color: #7c3aed !important;
+}
+
+[data-theme="light"] .participant-college-cell {
+  color: #1d4ed8 !important;
+}
+
+[data-theme="light"] .participant-year-cell {
+  color: #059669 !important;
+}
+
+/* Transaction ID */
+[data-theme="light"] .transaction-id-full {
+  background: rgba(37, 99, 235, 0.08);
+  color: #1d4ed8;
+  border-color: rgba(37, 99, 235, 0.2);
+}
+
+/* User info */
+[data-theme="light"] .user-info strong {
+  color: #1e293b;
+}
+
+[data-theme="light"] .user-info .user-email {
+  color: #2563eb;
+}
+
+[data-theme="light"] .user-info .user-phone {
+  color: #059669;
+}
+
+[data-theme="light"] .user-info .user-college {
+  color: #374151;
+}
+
+/* Event info */
+[data-theme="light"] .event-info strong {
+  color: #1e293b;
+}
+
+[data-theme="light"] .event-info .event-subname {
+  color: #7c3aed;
+}
+
+/* Participant cells */
+[data-theme="light"] .participant-name-cell {
+  color: #0f172a;
+}
+
+[data-theme="light"] .participant-mobile-cell {
+  color: #059669;
+}
+
+[data-theme="light"] .participant-event-cell .event-main {
+  color: #1d4ed8;
+}
+
+[data-theme="light"] .participant-event-cell .event-sub {
+  color: #7c3aed;
+}
+
+[data-theme="light"] .participant-college-cell {
+  color: #1d4ed8;
+}
+
+[data-theme="light"] .participant-year-cell {
+  color: #059669;
+}
+
+/* Amount */
+[data-theme="light"] .amount {
+  color: #1d4ed8;
+}
+
+/* No data */
+[data-theme="light"] .no-data {
+  color: #64748b;
+  background: rgba(241, 245, 249, 0.5);
+}
+
+/* Manage Events heading */
+[data-theme="light"] .events-management h2 {
+  color: #1d4ed8;
+}
+
+/* Mobile cards */
+[data-theme="light"] .registration-mobile-card {
+  background: linear-gradient(145deg, #ffffff, #f0f6ff);
+  border: 1px solid rgba(37, 99, 235, 0.15);
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.08);
+}
+
+[data-theme="light"] .mobile-card-header {
+  border-bottom: 1px solid rgba(37, 99, 235, 0.12);
+}
+
+[data-theme="light"] .mobile-event-name {
+  color: #1d4ed8;
+}
+
+[data-theme="light"] .mobile-info-label {
+  color: #64748b;
+}
+
+[data-theme="light"] .mobile-info-value {
+  color: #1e293b;
+}
+
+[data-theme="light"] .mobile-event-details {
+  color: #7c3aed;
+}
+
+/* Modal overlays */
+[data-theme="light"] .modal-overlay {
+  background: rgba(15, 23, 42, 0.5);
+}
+
+[data-theme="light"] .modal-content {
+  background: linear-gradient(145deg, #ffffff, #f8faff);
+  border: 1px solid rgba(37, 99, 235, 0.2);
+  color: #1e293b;
+}
+
+[data-theme="light"] .modal-header {
+  background: linear-gradient(135deg, #1d4ed8, #7c3aed);
+}
+
+[data-theme="light"] .modal-body label {
+  color: #374151;
+}
+
+[data-theme="light"] .modal-body input,
+[data-theme="light"] .modal-body select,
+[data-theme="light"] .modal-body textarea {
+  background: #f1f5f9;
+  border-color: rgba(37, 99, 235, 0.25);
+  color: #1e293b;
+}
+
+[data-theme="light"] .modal-body input:focus,
+[data-theme="light"] .modal-body select:focus,
+[data-theme="light"] .modal-body textarea:focus {
+  border-color: #2563eb;
+  background: #fff;
+}
+
+[data-theme="light"] .modal-body input::placeholder,
+[data-theme="light"] .modal-body textarea::placeholder {
+  color: #94a3b8;
+}
+
+/* Screenshot modal */
+[data-theme="light"] .screenshot-modal {
+  background: linear-gradient(145deg, #ffffff, #f0f6ff);
+  border: 1px solid rgba(37, 99, 235, 0.2);
+}
+
+/* Symposium settings section */
+[data-theme="light"] .settings-grid {
+  background: transparent;
+}
+
+[data-theme="light"] .setting-card {
+  background: linear-gradient(145deg, #ffffff, #f0f6ff);
+  border: 1px solid rgba(37, 99, 235, 0.15);
+  box-shadow: 0 4px 15px rgba(37, 99, 235, 0.06);
+}
+
+[data-theme="light"] .setting-card h3,
+[data-theme="light"] .setting-card label {
+  color: #1d4ed8;
+}
+
+[data-theme="light"] .setting-card p {
+  color: #475569;
+}
+
+[data-theme="light"] .setting-input {
+  background: #f1f5f9;
+  border-color: rgba(37, 99, 235, 0.25);
+  color: #1e293b;
+}
+
+[data-theme="light"] .setting-input:focus {
+  border-color: #2563eb;
+  background: #fff;
+}
+
+/* Loading spinner */
+[data-theme="light"] .loading-spinner {
+  color: #2563eb;
+}
+
+/* Scroll progress */
+[data-theme="light"] .scroll-progress-bar {
+  background: linear-gradient(90deg, #2563eb, #7c3aed, #06b6d4, #7c3aed);
+}
+
+/* Sidebar logout button */
+[data-theme="light"] .sidebar-logout-btn {
+  background: rgba(239, 68, 68, 0.08);
+  border-color: rgba(239, 68, 68, 0.3);
+  color: #dc2626;
+}
+
+[data-theme="light"] .sidebar-logout-btn:hover {
+  background: #dc2626;
+  color: #fff;
+}
+
+/* Registrations toggle */
+[data-theme="light"] .registrations-toggle-btn {
+  border-color: rgba(37, 99, 235, 0.3);
+  color: #2563eb;
+}
+
+/* Action message */
+[data-theme="light"] .action-message.success {
+  background: rgba(22, 163, 74, 0.1);
+  border-color: rgba(22, 163, 74, 0.3);
+  color: #15803d;
+}
+
+[data-theme="light"] .action-message.error {
+  background: rgba(220, 38, 38, 0.1);
+  border-color: rgba(220, 38, 38, 0.3);
+  color: #b91c1c;
+}
+
+/* Fee type options */
+[data-theme="light"] .fee-type-option {
+  background: #f1f5f9;
+  border-color: rgba(37, 99, 235, 0.2);
+  color: #1e293b;
+}
+
+[data-theme="light"] .fee-type-option.selected {
+  background: rgba(37, 99, 235, 0.1);
+  border-color: #2563eb;
+  color: #1d4ed8;
+}
+
+/* List items (requirements/rules) */
+[data-theme="light"] .list-item {
+  background: rgba(219, 234, 254, 0.3);
+  border-color: rgba(37, 99, 235, 0.15);
+  color: #1e293b;
+}
+
+[data-theme="light"] .list-item-edit-input {
+  background: #fff;
+  border-color: rgba(37, 99, 235, 0.3);
+  color: #1e293b;
+}
+
+/* Mobile sidebar overlay */
+[data-theme="light"] .sidebar-overlay {
+  background: rgba(15, 23, 42, 0.4);
+}
+
+/* Mobile sidebar toggle button */
+[data-theme="light"] .mobile-sidebar-toggle {
+  background: rgba(37, 99, 235, 0.1);
+  border-color: rgba(37, 99, 235, 0.3);
+  color: #2563eb;
+}
+

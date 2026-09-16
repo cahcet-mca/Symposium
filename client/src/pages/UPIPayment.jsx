@@ -275,9 +275,11 @@ const UPIPayment = () => {
         setError(`Please enter name for participant ${i + 1}`);
         return false;
       }
-      if (!p.email?.trim() || !p.email.includes('@')) {
-        setError(`Please enter valid email for participant ${i + 1}`);
-        return false;
+      if (i === 0) {
+        if (!p.email?.trim() || !p.email.includes('@')) {
+          setError('Please enter valid email for participant 1 (Team Lead)');
+          return false;
+        }
       }
       if (!p.phone?.trim() || p.phone.length !== 10 || !/^\d+$/.test(p.phone)) {
         setError(`Please enter valid 10-digit phone number for participant ${i + 1}`);
@@ -667,7 +669,7 @@ const UPIPayment = () => {
               {formData.participants.map((participant, index) => (
                 <div key={index} className="participant-card">
                   <h5>Participant {index + 1} {index === 0 && '(Team Lead)'}</h5>
-                  <div className="form-row">
+                  <div className={`form-row ${index > 0 ? 'form-row-two-col' : ''}`}>
                     <input
                       type="text"
                       placeholder="Full Name"
@@ -676,17 +678,19 @@ const UPIPayment = () => {
                       className="form-input"
                       required
                     />
-                    <input
-                      type="email"
-                      placeholder="Email"
-                      value={participant.email}
-                      onChange={(e) => handleParticipantChange(index, 'email', e.target.value)}
-                      className="form-input"
-                      required
-                    />
+                    {index === 0 && (
+                      <input
+                        type="email"
+                        placeholder="Email"
+                        value={participant.email}
+                        onChange={(e) => handleParticipantChange(index, 'email', e.target.value)}
+                        className="form-input"
+                        required
+                      />
+                    )}
                     <input
                       type="tel"
-                      placeholder="Phone"
+                      placeholder="Mobile Number"
                       value={participant.phone}
                       onChange={(e) => handleParticipantChange(index, 'phone', e.target.value)}
                       className="form-input"

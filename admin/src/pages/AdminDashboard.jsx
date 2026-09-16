@@ -753,26 +753,25 @@ const AdminDashboard = () => {
           
           verifiedRegs.forEach(reg => {
             if (reg.participants && reg.participants.length > 0) {
-              reg.participants.forEach((p, index) => {
-                allParticipants.push({
-                  name: p.name || 'N/A',
-                  mobile: p.phone || 'N/A',
-                  eventName: reg.event?.name || reg.eventName || 'N/A',
-                  eventSubName: reg.event?.subEventName || '',
-                  college: reg.user?.college || 'N/A',
-                  year: reg.user?.year,
-                  isTeamLead: index === 0
-                });
-              });
-            } else {
+              // One row per registration — join all participant names and phones
+              const names = reg.participants.map(p => p.name || 'N/A').join(', ');
+              const mobiles = reg.participants.map(p => p.phone || 'N/A').join(', ');
               allParticipants.push({
-                name: reg.user?.name || 'N/A',
-                mobile: reg.user?.phone || 'N/A',
+                names,
+                mobiles,
                 eventName: reg.event?.name || reg.eventName || 'N/A',
                 eventSubName: reg.event?.subEventName || '',
                 college: reg.user?.college || 'N/A',
-                year: reg.user?.year,
-                isTeamLead: true
+                year: reg.user?.year
+              });
+            } else {
+              allParticipants.push({
+                names: reg.user?.name || 'N/A',
+                mobiles: reg.user?.phone || 'N/A',
+                eventName: reg.event?.name || reg.eventName || 'N/A',
+                eventSubName: reg.event?.subEventName || '',
+                college: reg.user?.college || 'N/A',
+                year: reg.user?.year
               });
             }
           });
@@ -955,24 +954,22 @@ const AdminDashboard = () => {
     try {
       const excelData = participants.map((p, index) => ({
         'S.No': index + 1,
-        'Participant Name': p.name || 'N/A',
-        'Event Name': `${p.eventName} ${p.eventSubName ? `- ${p.eventSubName}` : ''}`,
-        'Mobile Number': p.mobile || 'N/A',
+        'Participant Name': p.names || 'N/A',
+        'Event Name': p.eventSubName || p.eventName || 'N/A',
+        'Mobile Number': p.mobiles || 'N/A',
         'College Name': p.college || 'N/A',
-        'Year': formatYear(p.year),
-        'Role': p.isTeamLead ? 'Team Lead' : 'Member'
+        'Year': formatYear(p.year)
       }));
 
       const ws = XLSX.utils.json_to_sheet(excelData);
       
       const colWidths = [
         { wch: 5 },   // S.No
-        { wch: 25 },  // Participant Name
+        { wch: 40 },  // Participant Name (comma-separated)
         { wch: 35 },  // Event Name
-        { wch: 15 },  // Mobile Number
+        { wch: 50 },  // Mobile Number (comma-separated)
         { wch: 30 },  // College Name
-        { wch: 12 },  // Year
-        { wch: 12 }   // Role
+        { wch: 12 }   // Year
       ];
       ws['!cols'] = colWidths;
 
@@ -1208,25 +1205,19 @@ const AdminDashboard = () => {
     return (
       <div key={index} className="registration-mobile-card">
         <div className="mobile-card-header">
-          <span className="mobile-event-name">{participant.name}</span>
-          <span className={`mobile-status-badge ${participant.isTeamLead ? 'verified' : 'pending'}`}>
-            {participant.isTeamLead ? 'Team Lead' : 'Member'}
-          </span>
+          <span className="mobile-event-name">{participant.names}</span>
         </div>
         
         <div className="mobile-card-body">
           <div className="mobile-info-row">
             <span className="mobile-info-label">Mobile:</span>
-            <span className="mobile-info-value">{participant.mobile}</span>
+            <span className="mobile-info-value">{participant.mobiles}</span>
           </div>
           
           <div className="mobile-info-row">
             <span className="mobile-info-label">Event:</span>
             <div className="mobile-info-value">
-              <strong>{participant.eventName}</strong>
-              {participant.eventSubName && (
-                <div className="mobile-event-details">📌 {participant.eventSubName}</div>
-              )}
+              <strong>{participant.eventSubName || participant.eventName}</strong>
             </div>
           </div>
           
@@ -1885,19 +1876,11 @@ const AdminDashboard = () => {
                                 <tr key={i}>
                                   <td>{i + 1}</td>
                                   <td className="participant-name-cell">
-                                    {p.name}
-                                    {p.isTeamLead ? (
-                                      <span className="lead-indicator">(Lead)</span>
-                                    ) : (
-                                      <span className="member-indicator">(Member)</span>
-                                    )}
+                                    {p.names}
                                   </td>
-                                  <td className="participant-mobile-cell">{p.mobile}</td>
+                                  <td className="participant-mobile-cell">{p.mobiles}</td>
                                   <td className="participant-event-cell">
-                                    <span className="event-main">{p.eventName}</span>
-                                    {p.eventSubName && (
-                                      <span className="event-sub"><TagIcon size={12} /> {p.eventSubName}</span>
-                                    )}
+                                    <span className="event-main">{p.eventSubName || p.eventName}</span>
                                   </td>
                                   <td className="participant-college-cell">{p.college}</td>
                                   <td className="participant-year-cell">{formatYear(p.year)}</td>
