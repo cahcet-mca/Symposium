@@ -100,9 +100,11 @@ const EventRegistration = () => {
         alert(`Please enter name for participant ${i + 1}`);
         return false;
       }
-      if (!p.email?.trim() || !p.email.includes('@')) {
-        alert(`Please enter valid email for participant ${i + 1}`);
-        return false;
+      if (i === 0) {
+        if (!p.email?.trim() || !p.email.includes('@')) {
+          alert('Please enter valid email for participant 1 (Team Lead)');
+          return false;
+        }
       }
       if (!p.phone?.trim() || p.phone.length < 10) {
         alert(`Please enter valid 10-digit phone number for participant ${i + 1}`);
@@ -229,7 +231,7 @@ const EventRegistration = () => {
                   {index === 0 && <span className="team-lead-badge">Team Lead</span>}
                 </div>
                 
-                <div className="participant-form-grid">
+                <div className={`participant-form-grid ${index > 0 ? 'two-column-grid' : ''}`}>
                   <div className="form-group">
                     <label>Full Name</label>
                     <input
@@ -242,20 +244,22 @@ const EventRegistration = () => {
                     />
                   </div>
                   
-                  <div className="form-group">
-                    <label>Email</label>
-                    <input
-                      type="email"
-                      value={participant.email}
-                      onChange={(e) => handleParticipantChange(index, 'email', e.target.value)}
-                      placeholder="Enter email"
-                      className="mirror-input"
-                      required
-                    />
-                  </div>
+                  {index === 0 && (
+                    <div className="form-group">
+                      <label>Email</label>
+                      <input
+                        type="email"
+                        value={participant.email}
+                        onChange={(e) => handleParticipantChange(index, 'email', e.target.value)}
+                        placeholder="Enter email"
+                        className="mirror-input"
+                        required
+                      />
+                    </div>
+                  )}
                   
                   <div className="form-group">
-                    <label>Phone Number</label>
+                    <label>Mobile Number</label>
                     <input
                       type="tel"
                       value={participant.phone}

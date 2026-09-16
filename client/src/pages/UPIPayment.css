@@ -206,6 +206,10 @@
   gap: 15px;
 }
 
+.form-row.form-row-two-col {
+  grid-template-columns: repeat(2, 1fr);
+}
+
 .amount-box {
   background: rgba(255, 215, 0, 0.1);
   border: 1px solid rgba(255, 215, 0, 0.3);
